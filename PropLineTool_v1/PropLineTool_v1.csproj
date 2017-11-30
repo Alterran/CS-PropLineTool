@@ -34,10 +34,6 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>C:\Program Files (x86)\Steam\SteamApps\common\Cities_Skylines\Cities_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="CimTools, Version=0.1.5821.35742, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\CimTools by PropaneDragon\New 161102\CimTools.dll</HintPath>
-    </Reference>
     <Reference Include="ColossalManaged">
       <HintPath>C:\Program Files (x86)\Steam\SteamApps\common\Cities_Skylines\Cities_Data\Managed\ColossalManaged.dll</HintPath>
     </Reference>
@@ -61,25 +57,107 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UserSettings.cs" />
-    <Compile Include="ErrorCheckingUtil.cs" />
-    <Compile Include="PLTMath.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="PropLineTool\SegmentUtilities.cs" />
+    <Compile Include="Sprites\ResourceLoader.cs" />
+    <Compile Include="Sprites\SpriteManager.cs" />
+    <Compile Include="UI\UIMoreModeButtons.cs" />
+    <Compile Include="Settings\UserSettings.cs" />
+    <Compile Include="Utilities\ErrorCheckingUtil.cs" />
+    <Compile Include="Utilities\PLTMath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PropLineTool.cs" />
-    <Compile Include="PropLineToolMod.cs" />
-    <Compile Include="ToolMan.cs" />
-    <Compile Include="ToolSwitch.cs" />
-    <Compile Include="UIBasicControlPanel.cs" />
-    <Compile Include="UIMoreBasicElements.cs" />
-    <Compile Include="UIOptionPanel.cs" />
-    <Compile Include="UndoManager.cs" />
-    <Compile Include="UserParameters.cs" />
-    <Compile Include="Util.cs" />
+    <Compile Include="PropLineTool\PropLineTool.cs" />
+    <Compile Include="PropLineTool\PropLineToolMod.cs" />
+    <Compile Include="ToolHelpers\ToolMan.cs" />
+    <Compile Include="ToolHelpers\ToolSwitch.cs" />
+    <Compile Include="UI\UIBasicControlPanel.cs" />
+    <Compile Include="UI\UIMoreBasicElements.cs" />
+    <Compile Include="UI\UIOptionPanel.cs" />
+    <Compile Include="PropLineTool\UndoManager.cs" />
+    <Compile Include="Settings\UserParameters.cs" />
+    <Compile Include="Utilities\Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeOne.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeOneDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeOneFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeOneHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeOnePressed.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeTwo.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeTwoDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeTwoFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeTwoHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeTwoPressed.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeZero.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeZeroDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeZeroFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeZeroHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_FenceModeZeroPressed.png" />
+    <EmbeddedResource Include="Icons\PLT_ItemwiseOne.png" />
+    <EmbeddedResource Include="Icons\PLT_ItemwiseOneDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_ItemwiseOneFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_ItemwiseOneHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_ItemwiseOnePressed.png" />
+    <EmbeddedResource Include="Icons\PLT_ItemwiseZero.png" />
+    <EmbeddedResource Include="Icons\PLT_ItemwiseZeroDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_ItemwiseZeroFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_ItemwiseZeroHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_ItemwiseZeroPressed.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateOne.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateOneDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateOneFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateOneHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateOnePressed.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateTwo.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateTwoDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateTwoFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateTwoHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateTwoPressed.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateZero.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateZeroDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateZeroFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateZeroHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_MultiStateZeroPressed.png" />
+    <EmbeddedResource Include="Icons\PLT_SpacingwiseOne.png" />
+    <EmbeddedResource Include="Icons\PLT_SpacingwiseOneDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_SpacingwiseOneFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_SpacingwiseOneHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_SpacingwiseOnePressed.png" />
+    <EmbeddedResource Include="Icons\PLT_SpacingwiseZero.png" />
+    <EmbeddedResource Include="Icons\PLT_SpacingwiseZeroDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_SpacingwiseZeroFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_SpacingwiseZeroHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_SpacingwiseZeroPressed.png" />
+    <EmbeddedResource Include="Icons\PLT_ToggleCPOne.png" />
+    <EmbeddedResource Include="Icons\PLT_ToggleCPOneDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_ToggleCPOneFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_ToggleCPOneHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_ToggleCPOnePressed.png" />
+    <EmbeddedResource Include="Icons\PLT_ToggleCPZero.png" />
+    <EmbeddedResource Include="Icons\PLT_ToggleCPZeroDisabled.png" />
+    <EmbeddedResource Include="Icons\PLT_ToggleCPZeroFocused.png" />
+    <EmbeddedResource Include="Icons\PLT_ToggleCPZeroHovered.png" />
+    <EmbeddedResource Include="Icons\PLT_ToggleCPZeroPressed.png" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\PLT_BasicDividerTile02x02.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BuildDate.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
