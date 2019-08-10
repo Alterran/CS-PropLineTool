@@ -1,29 +1,23 @@
-﻿using System;
+using System;
 using System.Globalization;
 using ColossalFramework.UI;
 using ColossalFramework.Globalization;
 using PropLineTool.Parameters;
 using UnityEngine;
 
-namespace PropLineTool.UI.Elements
-{
-    public class UINumbox2 : UITextField
-    {
+namespace PropLineTool.UI.Elements {
+    public class UINumbox2 : UITextField {
         protected float m_rawValue = 1f;
         protected int m_numDecimalDigits = 0;
-        public float value
-        {
-            get
-            {
+        public float value {
+            get {
                 return m_rawValue;
             }
-            set
-            {
+            set {
                 float _oldValue = m_rawValue;
                 m_rawValue = value;
 
-                if (value != _oldValue)
-                {
+                if (value != _oldValue) {
                     OnValueChanged(value);
                 }
 
@@ -33,14 +27,11 @@ namespace PropLineTool.UI.Elements
         /// <summary>
         /// Number of digits to display after the decimal point, range: [0, 7].
         /// </summary>
-        public int numDecimalDigits
-        {
-            get
-            {
+        public int numDecimalDigits {
+            get {
                 return m_numDecimalDigits;
             }
-            set
-            {
+            set {
                 value = Mathf.Clamp(value, 0, 7);
                 m_numDecimalDigits = value;
 
@@ -50,10 +41,9 @@ namespace PropLineTool.UI.Elements
 
         public event PropertyChangedEventHandler<float> eventValueChanged;
 
-        public override void Awake()
-        {
+        public override void Awake() {
             base.Awake();
-            
+
             this.numericalOnly = true;
             this.maxLength = 8;
             this.allowFloats = true;
@@ -71,84 +61,65 @@ namespace PropLineTool.UI.Elements
             this.disabledTextColor = new Color32(0, 0, 0, 128);
             this.color = new Color32(255, 255, 255, 255);
             this.disabledColor = new Color32(180, 180, 180, 255);
-            
 
-            this.eventTextSubmitted += delegate (UIComponent c, string text)
-            {
+
+            this.eventTextSubmitted += delegate (UIComponent c, string text) {
                 float _result = 0f;
-                if (TryParseNumbox(out _result))
-                {
+                if (TryParseNumbox(out _result)) {
                     value = _result;
-                }
-                else
-                {
+                } else {
                     SetFieldText(this.value, this.numDecimalDigits);
                 }
             };
         }
 
         //new as of 160815
-        public override void OnDestroy()
-        {
+        public override void OnDestroy() {
             this.eventTextSubmitted -= delegate (UIComponent c, string text) { };
 
             base.OnDestroy();
         }
 
 
-        protected void OnValueChanged(float value)
-        {
-            if (this.eventValueChanged != null)
-            {
+        protected void OnValueChanged(float value) {
+            if (this.eventValueChanged != null) {
                 eventValueChanged(this, this.value);
             }
         }
-        
-        protected void SetFieldText(float value)
-        {
+
+        protected void SetFieldText(float value) {
             text = value.ToString("F", LocaleManager.cultureInfo);
         }
 
-        protected void SetFieldText(float value, int numDecimalPlaces)
-        {
+        protected void SetFieldText(float value, int numDecimalPlaces) {
             numDecimalPlaces = Mathf.Clamp(numDecimalPlaces, 0, 7);
             text = value.ToString("F" + numDecimalPlaces.ToString("F0"), LocaleManager.cultureInfo);
         }
 
-        protected bool TryParseNumbox(out float value)
-        {
+        protected bool TryParseNumbox(out float value) {
             value = 0f;
             //attempts to parse text based on LocaleManager's cultureInfo
-            if (float.TryParse(this.text, NumberStyles.Number, LocaleManager.cultureInfo, out value))
-            {
+            if (float.TryParse(this.text, NumberStyles.Number, LocaleManager.cultureInfo, out value)) {
                 return true;
             }
             //attempts to parse text based on current culture
-            else if (float.TryParse(this.text, NumberStyles.Number, CultureInfo.CurrentCulture, out value))
-            {
+            else if (float.TryParse(this.text, NumberStyles.Number, CultureInfo.CurrentCulture, out value)) {
                 return true;
             }
             //assumes en-US is current culture
-            else if (float.TryParse(this.text, out value))
-            {
+            else if (float.TryParse(this.text, out value)) {
                 return true;
             }
             return false;
         }
 
-        public static bool TryParseText(string text, out float value)
-        {
+        public static bool TryParseText(string text, out float value) {
             value = 0f;
-            if (float.TryParse(text, NumberStyles.Number, LocaleManager.cultureInfo, out value))
-            {
+            if (float.TryParse(text, NumberStyles.Number, LocaleManager.cultureInfo, out value)) {
                 return true;
-            }
-            else if (float.TryParse(text, NumberStyles.Number, CultureInfo.CurrentCulture, out value))
-            {
+            } else if (float.TryParse(text, NumberStyles.Number, CultureInfo.CurrentCulture, out value)) {
                 return true;
-            }
-            else if (float.TryParse(text, out value))
-            {
+            } else if (float.TryParse(text, out value)) {
                 return true;
             }
             return false;
@@ -157,8 +128,7 @@ namespace PropLineTool.UI.Elements
 
     }
 
-    public class UINumboxListing : UIPanel
-    {
+    public class UINumboxListing : UIPanel {
         //constants
         public static readonly Vector2 SIZE_LABEL_TEXT_DEFAULT = new Vector2(180f, 30f);
         public static readonly Vector2 SIZE_NUMBOX_DEFAULT = new Vector2(90f, 30f);
@@ -170,42 +140,32 @@ namespace PropLineTool.UI.Elements
         protected UILabel m_labelText;
         protected UILabel m_labelUnits;
         protected UINumbox2 m_numbox;
-        public UILabel labelText
-        {
-            get
-            {
+        public UILabel labelText {
+            get {
                 return m_labelText;
             }
-            set
-            {
+            set {
                 m_labelText = value;
             }
         }
-        public UILabel labelUnits
-        {
-            get
-            {
+        public UILabel labelUnits {
+            get {
                 return m_labelUnits;
             }
-            set
-            {
+            set {
                 m_labelUnits = value;
             }
         }
-        public UINumbox2 numbox
-        {
-            get
-            {
+        public UINumbox2 numbox {
+            get {
                 return m_numbox;
             }
-            set
-            {
+            set {
                 m_numbox = value;
             }
         }
 
-        public override void Awake()
-        {
+        public override void Awake() {
             base.Awake();
 
             this.size = SIZE_PANEL_DEFAULT;
@@ -225,8 +185,7 @@ namespace PropLineTool.UI.Elements
         }
     }
 
-    public class UIDropDownListing : UIPanel
-    {
+    public class UIDropDownListing : UIPanel {
         //constants
         public static readonly Vector2 SIZE_PANEL_DEFAULT = new Vector2(261f, 30f);
         public static readonly Vector2 SIZE_LABEL_DEFAULT = new Vector2(145f, 30f);
@@ -238,31 +197,24 @@ namespace PropLineTool.UI.Elements
         //ui components
         protected UILabel m_label;
         protected UIDropDown m_dropDown;
-        public UILabel label
-        {
-            get
-            {
+        public UILabel label {
+            get {
                 return m_label;
             }
-            set
-            {
+            set {
                 m_label = value;
             }
         }
-        public UIDropDown dropDown
-        {
-            get
-            {
+        public UIDropDown dropDown {
+            get {
                 return m_dropDown;
             }
-            set
-            {
+            set {
                 m_dropDown = value;
             }
         }
-        
-        public override void Awake()
-        {
+
+        public override void Awake() {
             base.Awake();
 
             this.size = SIZE_PANEL_DEFAULT;
@@ -290,54 +242,42 @@ namespace PropLineTool.UI.Elements
             dropDown.relativePosition = new Vector3(SIZE_LABEL_DEFAULT.x, 0f);
         }
 
-        public void SetDropDownItems(string[] items)
-        {
-            if (items != null && items.Length > 0)
-            {
+        public void SetDropDownItems(string[] items) {
+            if (items != null && items.Length > 0) {
                 dropDown.items = items;
                 dropDown.listHeight = ITEM_SPACING + ((ITEM_HEIGHT + ITEM_SPACING) * items.Length);
             }
         }
     }
 
-    public class UICheckboxListing : UIPanel
-    {
+    public class UICheckboxListing : UIPanel {
         //ui components
         protected UIMultiStateButton m_checkbox;
         protected UILabel m_label;
-        public UIMultiStateButton checkbox
-        {
-            get
-            {
+        public UIMultiStateButton checkbox {
+            get {
                 return m_checkbox;
             }
-            protected set
-            {
+            protected set {
                 m_checkbox = value;
             }
         }
-        public UILabel label
-        {
-            get
-            {
+        public UILabel label {
+            get {
                 return m_label;
             }
-            protected set
-            {
+            protected set {
                 m_label = value;
             }
         }
 
         //layout stuff
         protected Vector2 m_checkboxSize = new Vector2(24f, 24f);
-        public Vector2 checkboxSize
-        {
-            get
-            {
+        public Vector2 checkboxSize {
+            get {
                 return m_checkboxSize;
             }
-            set
-            {
+            set {
                 checkbox.size = value;
                 m_checkboxSize = value;
 
@@ -345,14 +285,11 @@ namespace PropLineTool.UI.Elements
             }
         }
         protected int m_numLabelLines = 1;
-        public int numLabelLines
-        {
-            get
-            {
+        public int numLabelLines {
+            get {
                 return m_numLabelLines;
             }
-            set
-            {
+            set {
                 value = Mathf.Clamp(value, 1, 50);
 
                 m_numLabelLines = value;
@@ -360,45 +297,32 @@ namespace PropLineTool.UI.Elements
             }
         }
         protected UITextureAtlas m_checkboxAtlas;
-        public UITextureAtlas checkboxAtlas
-        {
-            get
-            {
+        public UITextureAtlas checkboxAtlas {
+            get {
                 return m_checkboxAtlas;
             }
-            set
-            {
+            set {
                 checkbox.atlas = value;
                 m_checkboxAtlas = value;
             }
         }
 
         //check stuff
-        public bool isChecked
-        {
-            get
-            {
-                if (checkbox.activeStateIndex == 0)
-                {
+        public bool isChecked {
+            get {
+                if (checkbox.activeStateIndex == 0) {
                     return false;
-                }
-                else if (checkbox.activeStateIndex == 1)
-                {
+                } else if (checkbox.activeStateIndex == 1) {
                     return true;
-                }
-                else
-                {
+                } else {
                     return false;
                 }
             }
-            set
-            {
-                if (value == true)
-                {
+            set {
+                if (value == true) {
                     checkbox.activeStateIndex = 1;
                 }
-                if (value == false)
-                {
+                if (value == false) {
                     checkbox.activeStateIndex = 0;
                 }
             }
@@ -406,17 +330,12 @@ namespace PropLineTool.UI.Elements
 
         //events
         public event PropertyChangedEventHandler<bool> eventCheckChanged;
-        protected void OnCheckChanged(bool value)
-        {
-            if (eventCheckChanged != null)
-            {
-                eventCheckChanged(this, value);
-            }
+        protected void OnCheckChanged(bool value) {
+            eventCheckChanged?.Invoke(this, value);
         }
 
         //awake
-        public override void Awake()
-        {
+        public override void Awake() {
             base.Awake();
 
             this.size = new Vector2(342f, 24f);
@@ -429,38 +348,28 @@ namespace PropLineTool.UI.Elements
             label.wordWrap = true;
             label.relativePosition = new Vector3(24f, 0f);
 
-            checkbox.eventActiveStateIndexChanged += delegate (UIComponent c, int index)
-            {
-                if (index == 0)
-                {
+            checkbox.eventActiveStateIndexChanged += delegate (UIComponent c, int index) {
+                if (index == 0) {
                     OnCheckChanged(false);
-                }
-                else if (index == 1)
-                {
+                } else if (index == 1) {
                     OnCheckChanged(true);
                 }
             };
         }
 
-        public override void OnDestroy()
-        {
+        public override void OnDestroy() {
             base.OnDestroy();
 
-            checkbox.eventActiveStateIndexChanged -= delegate (UIComponent c, int index)
-            {
-                if (index == 0)
-                {
+            checkbox.eventActiveStateIndexChanged -= delegate (UIComponent c, int index) {
+                if (index == 0) {
                     OnCheckChanged(false);
-                }
-                else if (index == 1)
-                {
+                } else if (index == 1) {
                     OnCheckChanged(true);
                 }
             };
         }
 
-        public void SetLabelLines(int numLabelLines)
-        {
+        public void SetLabelLines(int numLabelLines) {
             numLabelLines = Mathf.Clamp(numLabelLines, 1, 50);
 
             float _height = checkbox.height * numLabelLines;
@@ -488,7 +397,7 @@ namespace PropLineTool.UI.Elements
     //            m_label = value;
     //        }
     //    }
-        
+
     //    //Special Thanks to ToolBase.ShowExtraInfo()
     //    public void SetTextInfo(string text, Color textColor, Vector3 position, float elevation)
     //    {
@@ -509,8 +418,7 @@ namespace PropLineTool.UI.Elements
     //    }
     //}
 
-    public static class UISimpleElems
-    {
+    public static class UISimpleElems {
         //public static UISimpleTextOverlay CreateSimpleTextOverlay()
         //{
         //    UISimpleTextOverlay _simpleTextOverlay = UIView.GetAView().AddUIComponent(typeof(UISimpleTextOverlay)) as UISimpleTextOverlay;
@@ -518,16 +426,15 @@ namespace PropLineTool.UI.Elements
         //    return _simpleTextOverlay;
         //}
 
-        public static UIButton CreateCalcButton(UIComponent parent, string text, float textScale, Vector2 size, Vector3 relativePosition)
-        {
+        public static UIButton CreateCalcButton(UIComponent parent, string text, float textScale, Vector2 size, Vector3 relativePosition) {
             UIButton _button = parent.AddUIComponent<UIButton>();
-            
+
             _button.normalBgSprite = "ButtonMenu";
             _button.focusedBgSprite = "ButtonMenuFocused";
             _button.hoveredBgSprite = "ButtonMenuHovered";
             _button.pressedBgSprite = "ButtonMenuPressed";
             _button.disabledBgSprite = "ButtonMenuDisabled";
-            
+
             _button.text = text;
             _button.textScale = textScale;
             _button.textPadding = new RectOffset(1, 1, 3, 0);
@@ -536,7 +443,7 @@ namespace PropLineTool.UI.Elements
             _button.textColor = new Color32(255, 255, 255, 255);
             _button.disabledTextColor = new Color32(255, 255, 255, 128);
             _button.wordWrap = true;
-            
+
             _button.playAudioEvents = true;
 
             _button.size = size;
@@ -545,8 +452,7 @@ namespace PropLineTool.UI.Elements
             return _button;
         }
 
-        public static UIButton CreateBlueButton(UIComponent parent, string text, float textScale, UIHorizontalAlignment textHorizontalAlignment, UIVerticalAlignment textVerticalAlignment, RectOffset textPadding, Vector2 size, Vector3 relativePosition)
-        {
+        public static UIButton CreateBlueButton(UIComponent parent, string text, float textScale, UIHorizontalAlignment textHorizontalAlignment, UIVerticalAlignment textVerticalAlignment, RectOffset textPadding, Vector2 size, Vector3 relativePosition) {
             UIButton _button = parent.AddUIComponent<UIButton>();
 
             _button.normalBgSprite = "ButtonMenu";
@@ -572,16 +478,13 @@ namespace PropLineTool.UI.Elements
             return _button;
         }
 
-        public static void ModifyToBlueButton(ref UIButton button, string text, float textScale, UIHorizontalAlignment textHorizontalAlignment, UIVerticalAlignment textVerticalAlignment, RectOffset textPadding, Vector2 size, Vector3 relativePosition)
-        {
+        public static void ModifyToBlueButton(ref UIButton button, string text, float textScale, UIHorizontalAlignment textHorizontalAlignment, UIVerticalAlignment textVerticalAlignment, RectOffset textPadding, Vector2 size, Vector3 relativePosition) {
             ModifyToCustomButton(ref button, text, textScale, textHorizontalAlignment, textVerticalAlignment, textPadding, size, relativePosition, "ButtonMenu", "", null);
         }
 
         /// <param name="atlas">Leave null to keep default atlas.</param>
-        public static void ModifyToCustomButton(ref UIButton button, Vector2 size, Vector3 relativePosition, string spriteBgPrefix, string spriteFgPrefix, UITextureAtlas atlas)
-        {
-            if (atlas != null)
-            {
+        public static void ModifyToCustomButton(ref UIButton button, Vector2 size, Vector3 relativePosition, string spriteBgPrefix, string spriteFgPrefix, UITextureAtlas atlas) {
+            if (atlas != null) {
                 button.atlas = atlas;
             }
 
@@ -596,7 +499,7 @@ namespace PropLineTool.UI.Elements
             button.hoveredFgSprite = spriteFgPrefix + "Hovered";
             button.pressedFgSprite = spriteFgPrefix + "Pressed";
             button.disabledFgSprite = spriteFgPrefix + "Disabled";
-            
+
             button.playAudioEvents = true;
 
             button.size = size;
@@ -604,10 +507,8 @@ namespace PropLineTool.UI.Elements
         }
 
         /// <param name="atlas">Leave null to keep default atlas.</param>
-        public static void ModifyToCustomButton(ref UIButton button, string text, float textScale, UIHorizontalAlignment textHorizontalAlignment, UIVerticalAlignment textVerticalAlignment, RectOffset textPadding, Vector2 size, Vector3 relativePosition, string spriteBgPrefix, string spriteFgPrefix, UITextureAtlas atlas)
-        {
-            if (atlas != null)
-            {
+        public static void ModifyToCustomButton(ref UIButton button, string text, float textScale, UIHorizontalAlignment textHorizontalAlignment, UIVerticalAlignment textVerticalAlignment, RectOffset textPadding, Vector2 size, Vector3 relativePosition, string spriteBgPrefix, string spriteFgPrefix, UITextureAtlas atlas) {
+            if (atlas != null) {
                 button.atlas = atlas;
             }
 
@@ -638,8 +539,7 @@ namespace PropLineTool.UI.Elements
             button.relativePosition = relativePosition;
         }
 
-        public static UILabel CreateLabelWhite(UIComponent parent, string text, float textScale, UIHorizontalAlignment textAlignment, RectOffset padding, Vector2 size, Vector3 relativePosition)
-        {
+        public static UILabel CreateLabelWhite(UIComponent parent, string text, float textScale, UIHorizontalAlignment textAlignment, RectOffset padding, Vector2 size, Vector3 relativePosition) {
             UILabel _label = parent.AddUIComponent<UILabel>();
 
             _label.autoHeight = false;
@@ -660,8 +560,7 @@ namespace PropLineTool.UI.Elements
         }
 
         //Special Thanks to boformer's NetworkSkins.UI.Util for this!
-        public static UIDropDown CreateDropDown(UIComponent parent, float textScale, RectOffset textPadding, Vector2 size, int itemWidth, int itemHeight, int maxItems, int itemSpacing)
-        {
+        public static UIDropDown CreateDropDown(UIComponent parent, float textScale, RectOffset textPadding, Vector2 size, int itemWidth, int itemHeight, int maxItems, int itemSpacing) {
             //dropdown
             UIDropDown _dropDown = parent.AddUIComponent<UIDropDown>();
             _dropDown.size = size;
@@ -678,7 +577,7 @@ namespace PropLineTool.UI.Elements
             _dropDown.listHeight = itemSpacing + ((itemHeight + itemSpacing) * maxItems);
             _dropDown.listPosition = UIDropDown.PopupListPosition.Below;
             _dropDown.listPadding = new RectOffset(itemSpacing, itemSpacing, itemSpacing, itemSpacing);
-            
+
             _dropDown.itemHeight = itemHeight;
             _dropDown.itemHover = "ListItemHover";
             _dropDown.itemHover = "ListItemHover";
@@ -723,8 +622,7 @@ namespace PropLineTool.UI.Elements
             _button.zOrder = 0;
 
             //events
-            _dropDown.eventSizeChanged += delegate (UIComponent c, Vector2 t)
-            {
+            _dropDown.eventSizeChanged += delegate (UIComponent c, Vector2 t) {
                 _button.size = t;
                 _dropDown.listWidth = (int)t.x;
             };
@@ -734,11 +632,10 @@ namespace PropLineTool.UI.Elements
         }
 
         //creates a checkbox
-        public static UICheckBox CreateCheckBox(UIComponent parent, Vector2 size, Vector3 relativePosition)
-        {
+        public static UICheckBox CreateCheckBox(UIComponent parent, Vector2 size, Vector3 relativePosition) {
             UICheckBox _checkBox = parent.AddUIComponent<UICheckBox>();
             _checkBox.size = size;
-            
+
             _checkBox.clipChildren = true;
             UISprite _UISprite = _checkBox.AddUIComponent<UISprite>();
             _UISprite.spriteName = "ToggleBase";
@@ -756,8 +653,7 @@ namespace PropLineTool.UI.Elements
         }
 
         //creates a checkbox listing (checkbox multibutton + label) - default 24px square checkbox
-        public static UICheckboxListing CreateCheckboxListing(UIComponent parent, int numLabelLines, Vector2 size)
-        {
+        public static UICheckboxListing CreateCheckboxListing(UIComponent parent, int numLabelLines, Vector2 size) {
             UICheckboxListing _checkboxListing = parent.AddUIComponent<UICheckboxListing>();
 
             _checkboxListing.size = size;
@@ -768,8 +664,7 @@ namespace PropLineTool.UI.Elements
         }
 
         //creates a checkbox listing (checkbox multibutton + label)
-        public static UICheckboxListing CreateCheckboxListing(UIComponent parent, int numLabelLines, Vector2 size, Vector2 checkboxSize, UITextureAtlas checkboxAtlas)
-        {
+        public static UICheckboxListing CreateCheckboxListing(UIComponent parent, int numLabelLines, Vector2 size, Vector2 checkboxSize, UITextureAtlas checkboxAtlas) {
             UICheckboxListing _checkboxListing = parent.AddUIComponent<UICheckboxListing>();
 
             _checkboxListing.size = size;
@@ -783,8 +678,7 @@ namespace PropLineTool.UI.Elements
         }
 
         //creates a visual divider line
-        public static UITiledSprite CreateDivider(UIComponent parent, UITextureAtlas atlas, string spriteName, Vector2 size, Vector3 relativePosition)
-        {
+        public static UITiledSprite CreateDivider(UIComponent parent, UITextureAtlas atlas, string spriteName, Vector2 size, Vector3 relativePosition) {
             UITiledSprite _divider = parent.AddUIComponent<UITiledSprite>();
             _divider.atlas = atlas;
             _divider.spriteName = spriteName;
@@ -796,7 +690,7 @@ namespace PropLineTool.UI.Elements
             return _divider;
         }
 
-        
+
         /// <summary>
         /// Creates a toggle button (multi-state button) with two states: State 0 and State 1.
         /// </summary>
@@ -805,8 +699,7 @@ namespace PropLineTool.UI.Elements
         /// <param name="fgPrefix0">State 0: foreground sprite prefix</param>
         /// <param name="fgPrefix1">State 1: foreground sprite prefix</param>
         /// <returns></returns>
-        public static UIMultiStateButton AddAToggleButton(UIComponent parent, string name, UITextureAtlas atlas, string bgPrefix0, string bgPrefix1, string fgPrefix0, string fgPrefix1)
-        {
+        public static UIMultiStateButton AddAToggleButton(UIComponent parent, string name, UITextureAtlas atlas, string bgPrefix0, string bgPrefix1, string fgPrefix0, string fgPrefix1) {
             UIMultiStateButton _toggleButton = parent.AddUIComponent<UIMultiStateButton>();
             _toggleButton.name = name;
             _toggleButton.cachedName = name;
@@ -816,36 +709,31 @@ namespace PropLineTool.UI.Elements
             UIMultiStateButton.SpriteSetState fgSpriteSetState = _toggleButton.foregroundSprites;
             UIMultiStateButton.SpriteSetState bgSpriteSetState = _toggleButton.backgroundSprites;
 
-            if (fgSpriteSetState == null || bgSpriteSetState == null)
-            {
+            if (fgSpriteSetState == null || bgSpriteSetState == null) {
                 Debug.LogError("[PLT]: UIMultiStateButton missing SpriteSetState");
             }
 
             UIMultiStateButton.SpriteSet fgSpriteSet0 = fgSpriteSetState[0];
             UIMultiStateButton.SpriteSet bgSpriteSet0 = bgSpriteSetState[0];
 
-            if (fgSpriteSet0 == null)
-            {
+            if (fgSpriteSet0 == null) {
                 fgSpriteSetState.AddState();
                 fgSpriteSet0 = fgSpriteSetState[0];
             }
-            if (bgSpriteSet0 == null)
-            {
+            if (bgSpriteSet0 == null) {
                 bgSpriteSetState.AddState();
                 bgSpriteSet0 = bgSpriteSetState[0];
             }
 
             //add state '0'
-            if (fgPrefix0 != "")
-            {
+            if (fgPrefix0 != "") {
                 fgSpriteSet0.normal = (fgPrefix0 + "");
                 fgSpriteSet0.focused = (fgPrefix0 + "Focused");
                 fgSpriteSet0.hovered = (fgPrefix0 + "Hovered");
                 fgSpriteSet0.pressed = (fgPrefix0 + "Pressed");
                 fgSpriteSet0.disabled = (fgPrefix0 + "Disabled");
             }
-            if (bgPrefix0 != "")
-            {
+            if (bgPrefix0 != "") {
                 bgSpriteSet0.normal = (bgPrefix0 + "");
                 bgSpriteSet0.focused = (bgPrefix0 + "Focused");
                 bgSpriteSet0.hovered = (bgPrefix0 + "Hovered");
@@ -858,16 +746,14 @@ namespace PropLineTool.UI.Elements
             bgSpriteSetState.AddState();
             UIMultiStateButton.SpriteSet fgSpriteSet1 = fgSpriteSetState[1];
             UIMultiStateButton.SpriteSet bgSpriteSet1 = bgSpriteSetState[1];
-            if (fgPrefix1 != "")
-            {
+            if (fgPrefix1 != "") {
                 fgSpriteSet1.normal = (fgPrefix1 + "");
                 fgSpriteSet1.focused = (fgPrefix1 + "Focused");
                 fgSpriteSet1.hovered = (fgPrefix1 + "Hovered");
                 fgSpriteSet1.pressed = (fgPrefix1 + "Pressed");
                 fgSpriteSet1.disabled = (fgPrefix1 + "Disabled");
             }
-            if (bgPrefix1 != "")
-            {
+            if (bgPrefix1 != "") {
                 bgSpriteSet1.normal = (bgPrefix1 + "");
                 bgSpriteSet1.focused = (bgPrefix1 + "Focused");
                 bgSpriteSet1.hovered = (bgPrefix1 + "Hovered");
@@ -885,7 +771,7 @@ namespace PropLineTool.UI.Elements
             _toggleButton.enabled = true;
             _toggleButton.isInteractive = true;
             _toggleButton.isVisible = true;
-            
+
             return _toggleButton;
         }
 
@@ -897,8 +783,7 @@ namespace PropLineTool.UI.Elements
         /// <param name="fgPrefix0">State 0: foreground sprite prefix</param>
         /// <param name="fgPrefix1">State 1: foreground sprite prefix</param>
         /// <returns></returns>
-        public static UIMultiStateButton AddAToggleButton(UIComponent parent, string name, UITextureAtlas atlas, string bgPrefix0, string bgPrefix1, string fgPrefix0, string fgPrefix1, Vector2 size)
-        {
+        public static UIMultiStateButton AddAToggleButton(UIComponent parent, string name, UITextureAtlas atlas, string bgPrefix0, string bgPrefix1, string fgPrefix0, string fgPrefix1, Vector2 size) {
             UIMultiStateButton _button = AddAToggleButton(parent, name, atlas, bgPrefix0, bgPrefix1, fgPrefix0, fgPrefix1);
             _button.size = size;
             _button.playAudioEvents = true;
@@ -916,8 +801,7 @@ namespace PropLineTool.UI.Elements
         /// <param name="fgPrefix1">State 1: foreground sprite prefix</param>
         /// <param name="fgPrefix2">State 2: foreground sprite prefix</param>
         /// <returns></returns>
-        public static UIMultiStateButton AddAThreeStateButton(UIComponent parent, string name, UITextureAtlas atlas, string bgPrefix0, string bgPrefix1, string bgPrefix2, string fgPrefix0, string fgPrefix1, string fgPrefix2)
-        {
+        public static UIMultiStateButton AddAThreeStateButton(UIComponent parent, string name, UITextureAtlas atlas, string bgPrefix0, string bgPrefix1, string bgPrefix2, string fgPrefix0, string fgPrefix1, string fgPrefix2) {
             UIMultiStateButton _toggleButton = parent.AddUIComponent<UIMultiStateButton>();
             _toggleButton.name = name;
             _toggleButton.cachedName = name;
@@ -927,36 +811,31 @@ namespace PropLineTool.UI.Elements
             UIMultiStateButton.SpriteSetState fgSpriteSetState = _toggleButton.foregroundSprites;
             UIMultiStateButton.SpriteSetState bgSpriteSetState = _toggleButton.backgroundSprites;
 
-            if (fgSpriteSetState == null || bgSpriteSetState == null)
-            {
+            if (fgSpriteSetState == null || bgSpriteSetState == null) {
                 Debug.LogError("[PLT]: UIMultiStateButton missing SpriteSetState");
             }
 
             UIMultiStateButton.SpriteSet fgSpriteSet0 = fgSpriteSetState[0];
             UIMultiStateButton.SpriteSet bgSpriteSet0 = bgSpriteSetState[0];
 
-            if (fgSpriteSet0 == null)
-            {
+            if (fgSpriteSet0 == null) {
                 fgSpriteSetState.AddState();
                 fgSpriteSet0 = fgSpriteSetState[0];
             }
-            if (bgSpriteSet0 == null)
-            {
+            if (bgSpriteSet0 == null) {
                 bgSpriteSetState.AddState();
                 bgSpriteSet0 = bgSpriteSetState[0];
             }
 
             //add state '0'
-            if (fgPrefix0 != "")
-            {
+            if (fgPrefix0 != "") {
                 fgSpriteSet0.normal = (fgPrefix0 + "");
                 fgSpriteSet0.focused = (fgPrefix0 + "Focused");
                 fgSpriteSet0.hovered = (fgPrefix0 + "Hovered");
                 fgSpriteSet0.pressed = (fgPrefix0 + "Pressed");
                 fgSpriteSet0.disabled = (fgPrefix0 + "Disabled");
             }
-            if (bgPrefix0 != "")
-            {
+            if (bgPrefix0 != "") {
                 bgSpriteSet0.normal = (bgPrefix0 + "");
                 bgSpriteSet0.focused = (bgPrefix0 + "Focused");
                 bgSpriteSet0.hovered = (bgPrefix0 + "Hovered");
@@ -969,16 +848,14 @@ namespace PropLineTool.UI.Elements
             bgSpriteSetState.AddState();
             UIMultiStateButton.SpriteSet fgSpriteSet1 = fgSpriteSetState[1];
             UIMultiStateButton.SpriteSet bgSpriteSet1 = bgSpriteSetState[1];
-            if (fgPrefix1 != "")
-            {
+            if (fgPrefix1 != "") {
                 fgSpriteSet1.normal = (fgPrefix1 + "");
                 fgSpriteSet1.focused = (fgPrefix1 + "Focused");
                 fgSpriteSet1.hovered = (fgPrefix1 + "Hovered");
                 fgSpriteSet1.pressed = (fgPrefix1 + "Pressed");
                 fgSpriteSet1.disabled = (fgPrefix1 + "Disabled");
             }
-            if (bgPrefix1 != "")
-            {
+            if (bgPrefix1 != "") {
                 bgSpriteSet1.normal = (bgPrefix1 + "");
                 bgSpriteSet1.focused = (bgPrefix1 + "Focused");
                 bgSpriteSet1.hovered = (bgPrefix1 + "Hovered");
@@ -991,16 +868,14 @@ namespace PropLineTool.UI.Elements
             bgSpriteSetState.AddState();
             UIMultiStateButton.SpriteSet fgSpriteSet2 = fgSpriteSetState[2];
             UIMultiStateButton.SpriteSet bgSpriteSet2 = bgSpriteSetState[2];
-            if (fgPrefix2 != "")
-            {
+            if (fgPrefix2 != "") {
                 fgSpriteSet2.normal = (fgPrefix2 + "");
                 fgSpriteSet2.focused = (fgPrefix2 + "Focused");
                 fgSpriteSet2.hovered = (fgPrefix2 + "Hovered");
                 fgSpriteSet2.pressed = (fgPrefix2 + "Pressed");
                 fgSpriteSet2.disabled = (fgPrefix2 + "Disabled");
             }
-            if (bgPrefix2 != "")
-            {
+            if (bgPrefix2 != "") {
                 bgSpriteSet2.normal = (bgPrefix2 + "");
                 bgSpriteSet2.focused = (bgPrefix2 + "Focused");
                 bgSpriteSet2.hovered = (bgPrefix2 + "Hovered");

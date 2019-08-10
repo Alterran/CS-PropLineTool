@@ -1,4 +1,4 @@
-﻿using ICities;
+using ICities;
 
 using ColossalFramework;
 using ColossalFramework.UI;
@@ -14,16 +14,13 @@ using System.Collections.Generic;
 //This class (ResourceLoader) courtesy of SamsamTS:
 //https://github.com/SamsamTS/CS-FineRoadTool/blob/master/FineRoadTool/ResourceLoader.cs
 
-namespace PropLineTool.Sprites
-{
+namespace PropLineTool.Sprites {
     //Special Thanks to SamsamTS! (:
-    internal static class ResourceLoader
-    {
+    internal static class ResourceLoader {
         /// <summary>
         /// Create a new atlas.
         /// </summary>
-        public static UITextureAtlas CreateTextureAtlas(string atlasName, string[] spriteNames, string assemblyPath)
-        {
+        public static UITextureAtlas CreateTextureAtlas(string atlasName, string[] spriteNames, string assemblyPath) {
             int maxSize = 1024;
             Texture2D texture2D = new Texture2D(maxSize, maxSize, TextureFormat.ARGB32, false);
             Texture2D[] textures = new Texture2D[spriteNames.Length];
@@ -40,10 +37,8 @@ namespace PropLineTool.Sprites
             textureAtlas.material = material;
             textureAtlas.name = atlasName;
 
-            for (int i = 0; i < spriteNames.Length; i++)
-            {
-                UITextureAtlas.SpriteInfo item = new UITextureAtlas.SpriteInfo
-                {
+            for (int i = 0; i < spriteNames.Length; i++) {
+                UITextureAtlas.SpriteInfo item = new UITextureAtlas.SpriteInfo {
                     name = spriteNames[i],
                     texture = textures[i],
                     region = regions[i],
@@ -58,16 +53,13 @@ namespace PropLineTool.Sprites
         /// <summary>
         /// Add existing textures to an atlas.
         /// </summary>
-        public static void AddTexturesInAtlas(UITextureAtlas atlas, Texture2D[] newTextures, bool locked = false)
-        {
+        public static void AddTexturesInAtlas(UITextureAtlas atlas, Texture2D[] newTextures, bool locked = false) {
             Texture2D[] textures = new Texture2D[atlas.count + newTextures.Length];
 
-            for (int i = 0; i < atlas.count; i++)
-            {
+            for (int i = 0; i < atlas.count; i++) {
                 Texture2D texture2D = atlas.sprites[i].texture;
 
-                if (locked)
-                {
+                if (locked) {
                     // Locked textures workaround
                     RenderTexture renderTexture = RenderTexture.GetTemporary(texture2D.width, texture2D.height, 0);
                     Graphics.Blit(texture2D, renderTexture);
@@ -93,11 +85,9 @@ namespace PropLineTool.Sprites
 
             atlas.sprites.Clear();
 
-            for (int i = 0; i < textures.Length; i++)
-            {
+            for (int i = 0; i < textures.Length; i++) {
                 UITextureAtlas.SpriteInfo spriteInfo = atlas[textures[i].name];
-                atlas.sprites.Add(new UITextureAtlas.SpriteInfo
-                {
+                atlas.sprites.Add(new UITextureAtlas.SpriteInfo {
                     texture = textures[i],
                     name = textures[i].name,
                     border = (spriteInfo != null) ? spriteInfo.border : new RectOffset(),
@@ -111,11 +101,9 @@ namespace PropLineTool.Sprites
         /// <summary>
         /// Find an atlas that already exists.
         /// </summary>
-        public static UITextureAtlas GetAtlas(string name)
-        {
+        public static UITextureAtlas GetAtlas(string name) {
             UITextureAtlas[] atlases = Resources.FindObjectsOfTypeAll(typeof(UITextureAtlas)) as UITextureAtlas[];
-            for (int i = 0; i < atlases.Length; i++)
-            {
+            for (int i = 0; i < atlases.Length; i++) {
                 if (atlases[i].name == name)
                     return atlases[i];
             }
@@ -126,8 +114,7 @@ namespace PropLineTool.Sprites
         /// <summary>
         /// Used to load embedded images from assembly.
         /// </summary>
-        private static Texture2D loadTextureFromAssembly(string path)
-        {
+        private static Texture2D loadTextureFromAssembly(string path) {
             Stream manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
 
             byte[] array = new byte[manifestResourceStream.Length];
@@ -142,24 +129,21 @@ namespace PropLineTool.Sprites
         //=====================
         //==== Extra Stuff
         //=====================
-        
+
         /// <summary>
         /// Used in conjuction with AddTexturesInAtlas to copy existing sprites into a different atlas.
         /// </summary>
-        public static Texture2D[] FindSprites(string[] spriteNames, string atlasName)
-        {
+        public static Texture2D[] FindSprites(string[] spriteNames, string atlasName) {
             UITextureAtlas _atlas = GetAtlas(atlasName);
 
             List<Texture2D> _textures = new List<Texture2D>(spriteNames.Length);
 
             Texture2D _textureLocal = new Texture2D(8, 8);
 
-            for (int i = 0; i < spriteNames.Length; i++)
-            {
+            for (int i = 0; i < spriteNames.Length; i++) {
                 _textureLocal = _atlas[spriteNames[i]].texture;
 
-                if (_textureLocal != null)
-                {
+                if (_textureLocal != null) {
                     _textures.Add(_textureLocal);
                 }
             }

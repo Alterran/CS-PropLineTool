@@ -1,12 +1,10 @@
-﻿using ColossalFramework;
+using ColossalFramework;
 using System;
 using UnityEngine;
 
-namespace PropLineTool.Parameters
-{
+namespace PropLineTool.Parameters {
     //user-set parameters, set from the PLT control panel
-    public class UserParameters
-    {
+    public class UserParameters {
         //LIMITS ON FIELD VALUES
         //   spacing
         /// <summary>

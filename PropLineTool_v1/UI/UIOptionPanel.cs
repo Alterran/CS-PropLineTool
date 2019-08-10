@@ -1,6 +1,4 @@
-﻿using System;
 using ColossalFramework.UI;
-using PropLineTool.Parameters;
 using PropLineTool.UI.Elements;
 using PropLineTool.Utility;
 using PropLineTool.Sprites;
@@ -16,10 +14,8 @@ using UnityEngine;
 //Much help from: BloodyPenguin's NaturalResourcesBrush.ToolbarButtonSpawner.SpawnSubEntry
 //Without which I could not figure out how to use the game's built-in sprites
 
-namespace PropLineTool.UI.OptionPanel
-{
-    public class UIOptionPanel : UIPanel
-    {
+namespace PropLineTool.UI.OptionPanel {
+    public class UIOptionPanel : UIPanel {
         //DEBUG Testing for FPS hit
         //private PerformanceMeter _DEBUG_meterToolSwitch = new PerformanceMeter("ToolSwitch.SwitchTools", "UIOptionPanel.Update");
         //private PerformanceMeter _DEBUG_meterPanelUpdate = new PerformanceMeter("UIOptionPanel.Update", "UIOptionPanel itself");
@@ -55,7 +51,7 @@ namespace PropLineTool.UI.OptionPanel
             PropLineTool.DrawMode.Freeform,
             PropLineTool.DrawMode.Circle
         };
-        
+
         private UIPanel _panel;
 
         private UIMultiStateButton _snappingToggle;
@@ -68,8 +64,8 @@ namespace PropLineTool.UI.OptionPanel
         //private UICheckBox _controlPanelToggle;
         internal UIMultiStateButton _controlPanelToggle;
 
-        private UIPanel[] _specificSettingPages;
-        
+        //private readonly UIPanel[] _specificSettingPages;
+
         public static readonly string[] TOOL_MODE_NAMES = new string[]
         {
             "Single/Default",
@@ -80,55 +76,46 @@ namespace PropLineTool.UI.OptionPanel
         };
 
         //external events
-        private void PropLineTool_ActiveStateChanged(PropLineTool.ActiveState activeState)
-        {
-            switch (activeState)
-            {
+        private void PropLineTool_ActiveStateChanged(PropLineTool.ActiveState activeState) {
+            switch (activeState) {
                 case PropLineTool.ActiveState.CreatePointFirst:
                 case PropLineTool.ActiveState.CreatePointSecond:
-                case PropLineTool.ActiveState.CreatePointThird:
-                    {
-                        AllDrawModeButtonsEnabler(true);
-                        break;
-                    }
+                case PropLineTool.ActiveState.CreatePointThird: {
+                    AllDrawModeButtonsEnabler(true);
+                    break;
+                }
                 case PropLineTool.ActiveState.LockIdle:
-                case PropLineTool.ActiveState.ItemwiseLock:
-                    {
-                        switch (PropLineTool.drawMode)
-                        {
-                            case PropLineTool.DrawMode.Straight:
-                            case PropLineTool.DrawMode.Circle:
-                                {
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Straight, true);
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Curved, false);
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Freeform, false);
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Circle, true);
-                                    break;
-                                }
-                            case PropLineTool.DrawMode.Curved:
-                                {
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Straight, false);
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Curved, true);
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Freeform, true);
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Circle, false);
-                                    break;
-                                }
-                            case PropLineTool.DrawMode.Freeform:
-                                {
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Straight, false);
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Curved, true);
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Freeform, true);
-                                    LockModeButtonEnabler(PropLineTool.DrawMode.Circle, false);
-                                    break;
-                                }
-                            default:
-                                {
-                                    //do nothing...
-                                    break;
-                                }
+                case PropLineTool.ActiveState.ItemwiseLock: {
+                    switch (PropLineTool.drawMode) {
+                        case PropLineTool.DrawMode.Straight:
+                        case PropLineTool.DrawMode.Circle: {
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Straight, true);
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Curved, false);
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Freeform, false);
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Circle, true);
+                            break;
                         }
-                        break;
+                        case PropLineTool.DrawMode.Curved: {
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Straight, false);
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Curved, true);
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Freeform, true);
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Circle, false);
+                            break;
+                        }
+                        case PropLineTool.DrawMode.Freeform: {
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Straight, false);
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Curved, true);
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Freeform, true);
+                            LockModeButtonEnabler(PropLineTool.DrawMode.Circle, false);
+                            break;
+                        }
+                        default: {
+                            //do nothing...
+                            break;
+                        }
                     }
+                    break;
+                }
                 //case PropLineTool.ActiveState.MovePointFirst:
                 //case PropLineTool.ActiveState.MovePointSecond:
                 //case PropLineTool.ActiveState.MovePointThird:
@@ -139,16 +126,14 @@ namespace PropLineTool.UI.OptionPanel
 
                 //        break;
                 //    }
-                default:
-                    {
-                        //do nothing
-                        break;
-                    }
+                default: {
+                    //do nothing
+                    break;
+                }
             }
         }
 
-        public override void Awake()
-        {
+        public override void Awake() {
             base.Awake();
 
             Debug.Log("[PLT] begin UIOptionPanel.Awake()");
@@ -167,7 +152,7 @@ namespace PropLineTool.UI.OptionPanel
             this._panel.width = base.width;
             this._panel.height = base.height;
             this._panel.relativePosition = new Vector3(0f, 0f);
-            
+
             //setup snapping toggle
             this._snappingToggle = UISimpleElems.AddAThreeStateButton(this._panel, "PLT_ToggleSnapping", SpriteManager.atlasPLT, "PLT_MultiStateZero", "PLT_MultiStateOne", "PLT_MultiStateTwo", "PLT_SnappingModeZero", "PLT_SnappingModeOne", "PLT_SnappingModeTwo");
             this._snappingToggle.height = 36f;
@@ -175,14 +160,12 @@ namespace PropLineTool.UI.OptionPanel
             this._snappingToggle.relativePosition = new Vector3(0f, 0f, 0f);
             this._snappingToggle.playAudioEvents = true;
             this._snappingToggle.tooltip = "[PLT]: Toggle Snapping";
-            if (this._snappingToggle != null)
-            {
-                this._snappingToggle.eventActiveStateIndexChanged += delegate (UIComponent sender, int index)
-                {
+            if (this._snappingToggle != null) {
+                this._snappingToggle.eventActiveStateIndexChanged += delegate (UIComponent sender, int index) {
                     PropLineTool.m_snapMode = this.m_snapModes[index];
                 };
             }
-            
+
             //setup fenceMode toggle
             this._fenceModeToggle = UISimpleElems.AddAToggleButton(this._panel, "PLTToggleFenceMode", SpriteManager.atlasPLT, "PLT_MultiStateZero", "PLT_MultiStateOne", "PLT_FenceModeZero", "PLT_FenceModeOne");
             this._fenceModeToggle.height = 36f;
@@ -192,17 +175,12 @@ namespace PropLineTool.UI.OptionPanel
             this._fenceModeToggle.relativePosition = new Vector3(0f, 0f, 0f);
             this._fenceModeToggle.playAudioEvents = true;
             this._fenceModeToggle.tooltip = "[PLT]: Toggle Fence Mode";
-            if (this._fenceModeToggle != null)
-            {
-                this._fenceModeToggle.eventActiveStateIndexChanged += delegate (UIComponent sender, int index)
-                {
+            if (this._fenceModeToggle != null) {
+                this._fenceModeToggle.eventActiveStateIndexChanged += delegate (UIComponent sender, int index) {
                     bool _fenceModeActive = false;
-                    if (index >= 1)
-                    {
+                    if (index >= 1) {
                         _fenceModeActive = true;
-                    }
-                    else if (index <= 0)
-                    {
+                    } else if (index <= 0) {
                         _fenceModeActive = false;
                     }
                     PropLineTool.fenceMode = _fenceModeActive;
@@ -220,8 +198,7 @@ namespace PropLineTool.UI.OptionPanel
             this._tabstrip.padding.right = 0;
             UIButton componentInChildren = GameObject.Find("ToolMode").GetComponent<UITabstrip>().GetComponentInChildren<UIButton>();
             UITextureAtlas atlas = UIView.GetAView().defaultAtlas;
-            for (int i = 0; i < TOOL_MODE_NAMES.Length; i++)
-            {
+            for (int i = 0; i < TOOL_MODE_NAMES.Length; i++) {
                 UIButton _button = this._tabstrip.AddTab(TOOL_MODE_NAMES[i], componentInChildren, false);
                 _button.autoSize = false;
 
@@ -230,8 +207,7 @@ namespace PropLineTool.UI.OptionPanel
                 _button.height = 36f;
                 _button.width = 36f;
 
-                if (i == 0 || i == 4)
-                {
+                if (i == 0 || i == 4) {
                     _button.name = i == 4 ? "PLTCircle" : "PLTSingle";
 
                     _button.normalFgSprite = "";
@@ -241,7 +217,7 @@ namespace PropLineTool.UI.OptionPanel
                     _button.disabledFgSprite = "";
 
                     _button.text = i == 4 ? "○" : "•";
-                    _button.textScale = i == 4? 3.0f : 1.5f;
+                    _button.textScale = i == 4 ? 3.0f : 1.5f;
                     _button.textPadding.left = i == 4 ? -2 : 0;
                     _button.textPadding.right = 1;
                     _button.textPadding.top = i == 4 ? -13 : 4;
@@ -255,8 +231,7 @@ namespace PropLineTool.UI.OptionPanel
                 }
 
 
-                if (i > 0 && i < 4)
-                {
+                if (i > 0 && i < 4) {
                     _button.name = "PLT" + TOOL_MODE_NAMES[i];
 
                     string str = "RoadOption" + TOOL_MODE_NAMES[i];
@@ -266,16 +241,14 @@ namespace PropLineTool.UI.OptionPanel
                     _button.pressedFgSprite = str + "Pressed";
                     _button.disabledFgSprite = str + "Disabled";
                 }
-                
+
                 _button.playAudioEvents = componentInChildren.playAudioEvents;
-                
+
             }
             //setup selected index in case of re-Load from in-game
             this._tabstrip.selectedIndex = (int)PropLineTool.drawMode;
-            if (this._tabstrip != null)
-            {
-                this._tabstrip.eventSelectedIndexChanged += delegate (UIComponent sender, int index)
-                {
+            if (this._tabstrip != null) {
+                this._tabstrip.eventSelectedIndexChanged += delegate (UIComponent sender, int index) {
                     PropLineTool.drawMode = this.m_drawModes[index];
                 };
             }
@@ -287,25 +260,15 @@ namespace PropLineTool.UI.OptionPanel
             this._controlPanelToggle.relativePosition = new Vector3(216f, 0f, 0f);
             this._controlPanelToggle.playAudioEvents = true;
             this._controlPanelToggle.tooltip = "[PLT]: Toggle Control Panel";
-            if (this._controlPanelToggle != null)
-            {
-                this._controlPanelToggle.eventActiveStateIndexChanged += delegate (UIComponent sender, int index)
-                {
-                    if (index >= 1)
-                    {
+            if (this._controlPanelToggle != null) {
+                this._controlPanelToggle.eventActiveStateIndexChanged += delegate (UIComponent sender, int index) {
+                    if (index >= 1) {
                         PropLineToolMod.basicControlPanel.Show();
-                    }
-                    else if (index <= 0)
-                    {
+                    } else if (index <= 0) {
                         PropLineToolMod.basicControlPanel.Hide();
                     }
                 };
             }
-
-
-
-
-
 
             base.FitChildren();
 
@@ -316,8 +279,7 @@ namespace PropLineTool.UI.OptionPanel
 
 
             //fix sprites if PLTAtlas could not be created
-            if (SpriteManager.atlasPLT == null)
-            {
+            if (SpriteManager.atlasPLT == null) {
                 RevertToBackupToggleButtons();
             }
 
@@ -327,8 +289,7 @@ namespace PropLineTool.UI.OptionPanel
             Debug.Log("[PLT] end UIOptionPanel.Awake()");
         }
 
-        public override void OnDestroy()
-        {
+        public override void OnDestroy() {
             //event unsubscriptions
             PropLineTool.eventActiveStateChanged -= PropLineTool_ActiveStateChanged;
 
@@ -336,31 +297,25 @@ namespace PropLineTool.UI.OptionPanel
         }
 
 
-        public override void Start()
-        {
+        public override void Start() {
             //initialize ToolSwitch
             ToolSwitch.PLTToolSwitch.Initialize();
-            
+
             // setup intial position
             UIComponent optionsBar = GameObject.Find("OptionsBar").GetComponent<UIComponent>();
-            if (optionsBar == null)
-            {
+            if (optionsBar == null) {
                 Debug.LogError("[PLT]: OptionsBar not found!");
                 base.absolutePosition = new Vector3(261f, 542f);
-            }
-            else
-            {
+            } else {
                 //this.absolutePosition = optionsBar.absolutePosition;
                 base.absolutePosition = optionsBar.absolutePosition;
                 //re-center
                 float widthDifference = base.width - optionsBar.width;
-                if (widthDifference != 0f)
-                {
+                if (widthDifference != 0f) {
                     float absX = base.absolutePosition.x;
                     float absY = base.absolutePosition.y;
                     float newX = (float)Mathf.RoundToInt(absX - (widthDifference / 2));
-                    if (newX < 0)
-                    {
+                    if (newX < 0) {
                         newX = 0;
                     }
                     float newY = absY + optionsBar.height - base.height - 6f;
@@ -368,8 +323,7 @@ namespace PropLineTool.UI.OptionPanel
                     //in map or asset editor
                     ICities.LoadMode _loadMode = PropLineToolMod.GetLoadMode();
                     //if (_loadMode != ICities.LoadMode.LoadGame && _loadMode != ICities.LoadMode.NewGame)
-                    if (!_loadMode.IsMainGameplay())
-                    {
+                    if (!_loadMode.IsMainGameplay()) {
                         base.size = SIZE_DEFAULT_EDITORS;
                         base.backgroundSprite = "GenericPanel";
                         base.color = new Color32(91, 97, 106, 255);
@@ -379,7 +333,7 @@ namespace PropLineTool.UI.OptionPanel
                     base.absolutePosition = new Vector3(newX, newY);
                 }
             }
-            
+
             //until snapping is setup
             _snappingToggle.Disable();
             _snappingToggle.Hide();
@@ -388,92 +342,73 @@ namespace PropLineTool.UI.OptionPanel
             //_tabstrip.HideTab(TOOL_MODE_NAMES[4]);
         }
 
-        public override void Update()
-        {
+        public override void Update() {
             //_DEBUG_meterPanelUpdate.FrameStart();
             UpdateImpl();
             //_DEBUG_meterPanelUpdate.FrameEnd();
         }
-        public void UpdateImpl()
-        {
+        public void UpdateImpl() {
             base.Update();
-            
-            //bool _allThreeToolsNull;
-            bool _allThreeToolsNull = new bool();
 
             //DEBUG
             //_DEBUG_meterToolSwitch.FrameStart();
             //DEBUG
 
             //mmmmm-magic!
-            ToolSwitch.PLTToolSwitch.SwitchTools(out _allThreeToolsNull);
+            ToolSwitch.PLTToolSwitch.SwitchTools(out bool _allThreeToolsNull);
 
             //DEBUG
             //_DEBUG_meterToolSwitch.FrameEnd();
             //DEBUG
-            
-            if (_allThreeToolsNull)
-            {
+
+            if (_allThreeToolsNull) {
                 //hide option panel
-                if (base.isVisible)
-                {
+                if (base.isVisible) {
                     base.isVisible = false;
 
                     _controlPanelToggle.activeStateIndex = 0;
                 }
-            }
-            else
-            {
+            } else {
                 //show option panel
                 base.isVisible = true;
-                if (PropLineTool.drawMode == PropLineTool.DrawMode.Single)
-                {
+                if (PropLineTool.drawMode == PropLineTool.DrawMode.Single) {
                     _snappingToggle.isVisible = false;
                     _fenceModeToggle.isVisible = false;
                     _controlPanelToggle.isVisible = false;
 
                     _controlPanelToggle.activeStateIndex = 0;
-                }
-                else
-                {
+                } else {
                     //_snappingToggle.isVisible = true;
                     _fenceModeToggle.isVisible = true;
                     _controlPanelToggle.isVisible = true;
                 }
             }
-            
+
         }
-        
-        private void LockModeButtonEnabler(PropLineTool.DrawMode drawModeButton, bool isEnabled)
-        {
+
+        private void LockModeButtonEnabler(PropLineTool.DrawMode drawModeButton, bool isEnabled) {
             int _index = 0;
-            switch (drawModeButton)
-            {
-                case PropLineTool.DrawMode.Single:
-                    {
-                        _index = 0;
-                        break;
-                    }
-                case PropLineTool.DrawMode.Straight:
-                    {
-                        _index = 1;
-                        break;
-                    }
-                case PropLineTool.DrawMode.Curved:
-                    {
-                        _index = 2;
-                        break;
-                    }
-                case PropLineTool.DrawMode.Freeform:
-                    {
-                        _index = 3;
-                        break;
-                    }
-                case PropLineTool.DrawMode.Circle:
-                    {
-                        _index = 4;
-                        break;
-                    }
+            switch (drawModeButton) {
+                case PropLineTool.DrawMode.Single: {
+                    _index = 0;
+                    break;
+                }
+                case PropLineTool.DrawMode.Straight: {
+                    _index = 1;
+                    break;
+                }
+                case PropLineTool.DrawMode.Curved: {
+                    _index = 2;
+                    break;
+                }
+                case PropLineTool.DrawMode.Freeform: {
+                    _index = 3;
+                    break;
+                }
+                case PropLineTool.DrawMode.Circle: {
+                    _index = 4;
+                    break;
+                }
             }
 
             //if(_index == 4)
@@ -481,60 +416,49 @@ namespace PropLineTool.UI.OptionPanel
             //    return;
             //}
 
-            if (isEnabled)
-            {
+            if (isEnabled) {
                 _tabstrip.EnableTab(_index);
-            }
-            else
-            {
+            } else {
                 _tabstrip.DisableTab(_index);
             }
         }
 
-        private void AllDrawModeButtonsEnabler(bool isEnabled)
-        {
-            if (isEnabled)
-            {
+        private void AllDrawModeButtonsEnabler(bool isEnabled) {
+            if (isEnabled) {
                 //_tabstrip.EnableTab(0);
                 //_tabstrip.EnableTab(1);
                 //_tabstrip.EnableTab(2);
                 //_tabstrip.EnableTab(3);
 
-                for (int i = 0; i < _tabstrip.tabCount; i++)
-                {
+                for (int i = 0; i < _tabstrip.tabCount; i++) {
                     _tabstrip.EnableTab(i);
                 }
-            }
-            else
-            {
+            } else {
                 //_tabstrip.DisableTab(0);
                 //_tabstrip.DisableTab(1);
                 //_tabstrip.DisableTab(2);
                 //_tabstrip.DisableTab(3);
 
-                for (int i = 0; i < _tabstrip.tabCount; i++)
-                {
+                for (int i = 0; i < _tabstrip.tabCount; i++) {
                     _tabstrip.DisableTab(i);
                 }
             }
         }
 
 
-        private void RevertToBackupToggleButtons()
-        {
+        private void RevertToBackupToggleButtons() {
             UITextureAtlas _vanillaAtlas = GameObject.Find("SnappingToggle").GetComponent<UIMultiStateButton>().atlas;
 
-            if (_vanillaAtlas != null)
-            {
+            if (_vanillaAtlas != null) {
                 //fence mode
                 _fenceModeToggle.atlas = atlas;
 
                 _fenceModeToggle.SetVanillaToggleSprites("ToggleBase", "IconPolicyProHipster");
-                
+
 
                 //control panel
                 _controlPanelToggle.atlas = atlas;
-                
+
                 _controlPanelToggle.SetVanillaToggleSprites("InfoIconMaintenance", "");
 
                 //_controlPanelToggle.text = "CP";

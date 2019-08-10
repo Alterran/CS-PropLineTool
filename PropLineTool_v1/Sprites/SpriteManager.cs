@@ -1,4 +1,4 @@
-﻿using ICities;
+using ICities;
 
 using ColossalFramework;
 using ColossalFramework.UI;
@@ -11,10 +11,8 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace PropLineTool.Sprites
-{
-    internal static class SpriteManager
-    {
+namespace PropLineTool.Sprites {
+    internal static class SpriteManager {
         //sprite path
         public const string SPRITE_PATH = "PropLineTool_v1.Icons.";
 
@@ -23,31 +21,24 @@ namespace PropLineTool.Sprites
 
         //atlas
         private static UITextureAtlas m_atlasPLT;
-        public static UITextureAtlas atlasPLT
-        {
-            get
-            {
-                if (m_atlasPLT == null)
-                {
+        public static UITextureAtlas atlasPLT {
+            get {
+                if (m_atlasPLT == null) {
                     CreateAtlasPLT();
                 }
 
                 return m_atlasPLT;
             }
-            private set
-            {
+            private set {
                 m_atlasPLT = value;
             }
         }
 
         //vanilla atlases
         private static UITextureAtlas m_vanillaAtlasIngame;
-        public static UITextureAtlas vanillaAtlasIngame
-        {
-            get
-            {
-                if (m_vanillaAtlasIngame == null)
-                {
+        public static UITextureAtlas vanillaAtlasIngame {
+            get {
+                if (m_vanillaAtlasIngame == null) {
                     m_vanillaAtlasIngame = ResourceLoader.GetAtlas("Ingame");
                 }
 
@@ -55,12 +46,9 @@ namespace PropLineTool.Sprites
             }
         }
         private static UITextureAtlas m_vanillaAtlasInMapEditor;
-        public static UITextureAtlas vanillaAtlasInMapEditor
-        {
-            get
-            {
-                if (m_vanillaAtlasInMapEditor == null)
-                {
+        public static UITextureAtlas vanillaAtlasInMapEditor {
+            get {
+                if (m_vanillaAtlasInMapEditor == null) {
                     m_vanillaAtlasInMapEditor = ResourceLoader.GetAtlas("InMapEditor");
                 }
 
@@ -68,12 +56,9 @@ namespace PropLineTool.Sprites
             }
         }
         private static UITextureAtlas m_vanillaAtlasInScenarioEditor;
-        public static UITextureAtlas vanillaAtlasInScenarioEditor
-        {
-            get
-            {
-                if (m_vanillaAtlasInScenarioEditor == null)
-                {
+        public static UITextureAtlas vanillaAtlasInScenarioEditor {
+            get {
+                if (m_vanillaAtlasInScenarioEditor == null) {
                     m_vanillaAtlasInScenarioEditor = ResourceLoader.GetAtlas("InScenarioEditor");
                 }
 
@@ -146,22 +131,17 @@ namespace PropLineTool.Sprites
             "PLT_SpacingwiseOneDisabled",
             "PLT_BasicDividerTile02x02"
         };
-        public static string[] spriteNamesPLT
-        {
-            get
-            {
+        public static string[] spriteNamesPLT {
+            get {
                 return m_spriteNamesPLT;
             }
-            private set
-            {
+            private set {
                 m_spriteNamesPLT = value;
             }
         }
-        
-        public static void CreateAtlasPLT()
-        {
-            if (m_atlasPLT == null)
-            {
+
+        public static void CreateAtlasPLT() {
+            if (m_atlasPLT == null) {
                 m_atlasPLT = ResourceLoader.CreateTextureAtlas(ATLAS_NAME_PLT, spriteNamesPLT, SPRITE_PATH);
             }
         }
