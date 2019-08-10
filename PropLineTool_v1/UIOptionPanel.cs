@@ -55,7 +55,7 @@ namespace PropLineTool.UI.OptionPanel
         //private UICheckBox _controlPanelToggle;
         internal UIMultiStateButton _controlPanelToggle;
 
-        private UIPanel[] _specificSettingPages;
+        private readonly UIPanel[] _specificSettingPages;
         
         public static readonly string[] TOOL_MODE_NAMES = new string[]
         {
@@ -363,12 +363,9 @@ namespace PropLineTool.UI.OptionPanel
         public override void Update()
         {
             base.Update();
-            
-            //bool _allThreeToolsNull;
-            bool _allThreeToolsNull = new bool();
-            
+
             //mmmmm-magic!
-            ToolSwitch.PLTToolSwitch.SwitchTools(out _allThreeToolsNull);
+            ToolSwitch.PLTToolSwitch.SwitchTools(out bool _allThreeToolsNull);
 
             if (_allThreeToolsNull)
             {

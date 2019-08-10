@@ -11,35 +11,57 @@ namespace PropLineTool.ToolSwitch
         public static bool m_bulldozeToolActive;
         public static bool m_wasBulldozeToolActive;
         
+        // This really needs caching on level loaded rather than checking per frame!
+        private static void DetermineLoadMode(out bool _inGame, out bool _mapEditor, out bool _inMapOrAssetEditor)
+        {
+            ICities.LoadMode mode = PropLineToolMod.GetLoadMode();
+
+            if (mode == ICities.LoadMode.NewGame || mode == ICities.LoadMode.LoadGame)
+            {
+                _inGame = true;
+                _mapEditor = false;
+                _inMapOrAssetEditor = false;
+                return;
+            }
+
+            if (mode == ICities.LoadMode.LoadMap || mode == ICities.LoadMode.NewMap)
+            {
+                _inGame = false;
+                _mapEditor = true;
+                _inMapOrAssetEditor = true;
+                return;
+            }
+
+            if (mode == ICities.LoadMode.LoadAsset || mode == ICities.LoadMode.NewAsset)
+            {
+                _inGame = false;
+                _mapEditor = false;
+                _inMapOrAssetEditor = true;
+                return;
+            }
+
+            _inGame = false;
+            _mapEditor = false;
+            _inMapOrAssetEditor = false;
+        }
+
+
         //Works BEAUTIFULLY!! :DDD
         public static void SwitchTools(out bool allNull)
         {
-            allNull = true;
             m_wasPLTActive = m_PLTActive;
             m_wasBulldozeToolActive = m_bulldozeToolActive;
 
-            ICities.LoadMode _loadMode = PropLineToolMod.GetLoadMode();
-            
-            bool _inMapOrAssetEditor = (   (_loadMode == ICities.LoadMode.LoadMap) || (_loadMode == ICities.LoadMode.LoadAsset) || (_loadMode == ICities.LoadMode.NewAsset) || (_loadMode == ICities.LoadMode.NewMap)   );
-            UIPanel _brushPanel;
-            if (_inMapOrAssetEditor)
-            {
-                _brushPanel = GameObject.Find("BrushPanel").GetComponent<UIPanel>();
-            }
-            else
-            {
-                _brushPanel = new UIPanel();
-            }
-
+            // should really be using events to detect when tools become active and inactive
+            // checking this stuff every frame = laggy
             PropTool _propTool = ToolsModifierControl.GetCurrentTool<PropTool>();
             TreeTool _treeTool = ToolsModifierControl.GetCurrentTool<TreeTool>();
             PropLineTool _propLineTool = ToolsModifierControl.GetCurrentTool<PropLineTool>();
 
-            BulldozeTool _bulldozeTool = ToolsModifierControl.GetCurrentTool<BulldozeTool>();
-
             if ( (_propTool == null) && (_treeTool == null) && (_propLineTool == null) )
             {
                 allNull = true;
+
                 if (!m_wasBulldozeToolActive)
                 {
                     m_PLTActive = false;
@@ -49,6 +71,8 @@ namespace PropLineTool.ToolSwitch
                 {
                     PropLineTool.m_keepActiveState = true;
                 }
+
+                BulldozeTool _bulldozeTool = ToolsModifierControl.GetCurrentTool<BulldozeTool>();
 
                 if (_bulldozeTool != null)
                 {
@@ -61,16 +85,26 @@ namespace PropLineTool.ToolSwitch
                 
                 return;
             }
+
+            allNull = false;
+            if (_propLineTool != null)
+            {
+                m_PLTActive = true;
+            }
+
+            DetermineLoadMode(out bool _inGame, out bool _mapEditor, out bool _inMapOrAssetEditor);
+
+            UIPanel _brushPanel;
+            if (_inMapOrAssetEditor)
+            {
+                _brushPanel = GameObject.Find("BrushPanel").GetComponent<UIPanel>();
+            }
             else
             {
-                allNull = false;
-                if (_propLineTool != null)
-                {
-                    m_PLTActive = true;
-                }
-                //continue along
+                _brushPanel = new UIPanel();
             }
-            
+
+
             //single mode: signal tool switch
             //not-single mode: signal standby
             bool _PLTActiveExclusive = ((_propLineTool != null) && (_propTool == null) && (_treeTool == null));
@@ -87,11 +121,6 @@ namespace PropLineTool.ToolSwitch
                 return;
             }
 
-            //loadmode is in-game
-            bool _inGame = (  (_loadMode == ICities.LoadMode.NewGame) || (_loadMode == ICities.LoadMode.LoadGame)  );
-            //loadmode is map-editor or asset-editor [EDIT: ACTUALLY JUST MAP EDITOR]
-            //bool flag4 = (  (_loadMode == ICities.LoadMode.LoadMap) || (_loadMode == ICities.LoadMode.LoadAsset) || (_loadMode == ICities.LoadMode.NewAsset) || (_loadMode == ICities.LoadMode.NewMap)  );
-            bool _mapEditor = (  (_loadMode == ICities.LoadMode.LoadMap) || (_loadMode == ICities.LoadMode.NewMap)  );
             
             //test if BrushPanel was found
             bool _brushPanelFound = (_brushPanel != null);
