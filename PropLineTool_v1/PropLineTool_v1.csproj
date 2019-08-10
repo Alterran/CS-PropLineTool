@@ -68,6 +68,7 @@
     <Compile Include="UI\UIMoreModeButtons.cs" />
     <Compile Include="Settings\UserSettings.cs" />
     <Compile Include="Utilities\ErrorCheckingUtil.cs" />
+    <Compile Include="Utilities\LoggingUtils.cs" />
     <Compile Include="Utilities\PLTMath.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropLineTool\PropLineTool.cs" />

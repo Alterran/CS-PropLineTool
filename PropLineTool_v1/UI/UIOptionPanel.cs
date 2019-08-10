@@ -6,6 +6,9 @@ using PropLineTool.Utility;
 using PropLineTool.Sprites;
 using UnityEngine;
 
+//debug only
+//using PropLineTool.DebugUtils;
+
 //Reference: NetworkSkins.UI.UINetworkSkinsPanel
 //Thanks to boformer's Network Skins for providing the template for this class
 
@@ -17,6 +20,10 @@ namespace PropLineTool.UI.OptionPanel
 {
     public class UIOptionPanel : UIPanel
     {
+        //DEBUG Testing for FPS hit
+        //private PerformanceMeter _DEBUG_meterToolSwitch = new PerformanceMeter("ToolSwitch.SwitchTools", "UIOptionPanel.Update");
+        //private PerformanceMeter _DEBUG_meterPanelUpdate = new PerformanceMeter("UIOptionPanel.Update", "UIOptionPanel itself");
+
         public const int PaddingTop = 9;
 
         public const int Padding = 7;
@@ -331,6 +338,9 @@ namespace PropLineTool.UI.OptionPanel
 
         public override void Start()
         {
+            //initialize ToolSwitch
+            ToolSwitch.PLTToolSwitch.Initialize();
+            
             // setup intial position
             UIComponent optionsBar = GameObject.Find("OptionsBar").GetComponent<UIComponent>();
             if (optionsBar == null)
@@ -378,17 +388,30 @@ namespace PropLineTool.UI.OptionPanel
             //_tabstrip.HideTab(TOOL_MODE_NAMES[4]);
         }
 
-        
         public override void Update()
+        {
+            //_DEBUG_meterPanelUpdate.FrameStart();
+            UpdateImpl();
+            //_DEBUG_meterPanelUpdate.FrameEnd();
+        }
+        public void UpdateImpl()
         {
             base.Update();
             
             //bool _allThreeToolsNull;
             bool _allThreeToolsNull = new bool();
-            
+
+            //DEBUG
+            //_DEBUG_meterToolSwitch.FrameStart();
+            //DEBUG
+
             //mmmmm-magic!
             ToolSwitch.PLTToolSwitch.SwitchTools(out _allThreeToolsNull);
 
+            //DEBUG
+            //_DEBUG_meterToolSwitch.FrameEnd();
+            //DEBUG
+            
             if (_allThreeToolsNull)
             {
                 //hide option panel

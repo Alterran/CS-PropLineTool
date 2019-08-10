@@ -33,7 +33,31 @@ namespace PropLineTool.ToolSwitch
         public static bool m_wasPLTActive;
         public static bool m_bulldozeToolActive;
         public static bool m_wasBulldozeToolActive;
-        
+
+        //heavy-duty references
+        private static UIPanel m_brushPanel;
+        private static bool m_brushPanelFound;
+
+        private static void FindBrushPanel()
+        {
+            GameObject _brushPanelGO = GameObject.Find("BrushPanel");
+            m_brushPanel = _brushPanelGO == null ? null : _brushPanelGO.GetComponent<UIPanel>();
+
+            //test if BrushPanel was found
+            m_brushPanelFound = (m_brushPanel != null);
+        }
+
+        //initialize heavy-duty references
+        public static void Initialize()
+        {
+            ICities.LoadMode _loadMode = PropLineToolMod.GetLoadMode();
+
+            //bool _inMapOrAssetEditor = (   (_loadMode == ICities.LoadMode.LoadMap) || (_loadMode == ICities.LoadMode.LoadAsset) || (_loadMode == ICities.LoadMode.NewAsset) || (_loadMode == ICities.LoadMode.NewMap)   );
+            bool _notMainGameplay = (!_loadMode.IsMainGameplay());
+
+            FindBrushPanel();
+        }
+
         //Works BEAUTIFULLY!! :DDD
         public static void SwitchTools(out bool allNull)
         {
@@ -42,12 +66,7 @@ namespace PropLineTool.ToolSwitch
             m_wasBulldozeToolActive = m_bulldozeToolActive;
 
             ICities.LoadMode _loadMode = PropLineToolMod.GetLoadMode();
-
-            //bool _inMapOrAssetEditor = (   (_loadMode == ICities.LoadMode.LoadMap) || (_loadMode == ICities.LoadMode.LoadAsset) || (_loadMode == ICities.LoadMode.NewAsset) || (_loadMode == ICities.LoadMode.NewMap)   );
-            bool _notMainGameplay = (!_loadMode.IsMainGameplay());
-            GameObject _brushPanelGO = GameObject.Find("BrushPanel");
-            UIPanel _brushPanel = _brushPanelGO == null ? null : GameObject.Find("BrushPanel").GetComponent<UIPanel>();
-
+            
             PropTool _propTool = ToolsModifierControl.GetCurrentTool<PropTool>();
             TreeTool _treeTool = ToolsModifierControl.GetCurrentTool<TreeTool>();
             PropLineTool _propLineTool = ToolsModifierControl.GetCurrentTool<PropLineTool>();
@@ -122,9 +141,9 @@ namespace PropLineTool.ToolSwitch
             //loadmode is map-editor or asset-editor [EDIT: ACTUALLY JUST MAP EDITOR]
             //bool flag4 = (  (_loadMode == ICities.LoadMode.LoadMap) || (_loadMode == ICities.LoadMode.LoadAsset) || (_loadMode == ICities.LoadMode.NewAsset) || (_loadMode == ICities.LoadMode.NewMap)  );
             bool _mapEditor = (  (_loadMode == ICities.LoadMode.LoadMap) || (_loadMode == ICities.LoadMode.NewMap)  );
-            
+
             //test if BrushPanel was found
-            bool _brushPanelFound = (_brushPanel != null);
+            m_brushPanelFound = (m_brushPanel != null);
 
             switch (PropLineTool.drawMode)
             {
@@ -153,9 +172,12 @@ namespace PropLineTool.ToolSwitch
                                         }
                                         newPropTool.m_prefab = oldPropInfo;
 
-                                        if (_mapEditor && _brushPanelFound)
+                                        //new as of 190809
+                                        FindBrushPanel();
+
+                                        if (_mapEditor && m_brushPanelFound)
                                         {
-                                            _brushPanel.Show();
+                                            m_brushPanel.Show();
                                         }
                                         break;
                                     }
@@ -170,9 +192,12 @@ namespace PropLineTool.ToolSwitch
                                         }
                                         newTreeTool.m_prefab = _propLineTool.treePrefab;
 
-                                        if ((_mapEditor || (_inGame)) && _brushPanelFound)
+                                        //new as of 190809
+                                        FindBrushPanel();
+
+                                        if ((_mapEditor || (_inGame)) && m_brushPanelFound)
                                         {
-                                            _brushPanel.Show();
+                                            m_brushPanel.Show();
                                         }
                                         break;
                                     }
@@ -230,9 +255,12 @@ namespace PropLineTool.ToolSwitch
                                 //calling after setting prefab
                                 PropLineTool.objectMode = PropLineTool.ObjectMode.Props;
 
-                                if (_brushPanelFound)
+                                //new as of 190809
+                                FindBrushPanel();
+
+                                if (m_brushPanelFound)
                                 {
-                                    _brushPanel.Hide();
+                                    m_brushPanel.Hide();
                                 }
                                 return;
                             }
@@ -250,9 +278,12 @@ namespace PropLineTool.ToolSwitch
                                 //calling after setting prefab
                                 PropLineTool.objectMode = PropLineTool.ObjectMode.Trees;
 
-                                if (_brushPanelFound)
+                                //new as of 190809
+                                FindBrushPanel();
+
+                                if (m_brushPanelFound)
                                 {
-                                    _brushPanel.Hide();
+                                    m_brushPanel.Hide();
                                 }
                                 return;
                             }

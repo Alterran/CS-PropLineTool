@@ -19,7 +19,7 @@ namespace PropLineTool
 
         //TODO: Keep this up to date.
         //Cannot automate using BuildDate.txt Resource as it does not reflect properly.
-        public const string BUILD_VERSION = "171008";
+        public const string BUILD_VERSION = "190809";
 
         public static ICities.LoadMode GetLoadMode()
         {

@@ -15,6 +15,9 @@ using PropLineTool.Utility.ErrorChecking;
 using PropLineTool.Undo;
 using PropLineTool.Settings;
 
+//debug only
+//using PropLineTool.DebugUtils;
+
 //resolves the ambiguity between UnityEngine.Debug and SystemDiagnostics.Debug (:
 using Debug = UnityEngine.Debug;
 
@@ -199,6 +202,10 @@ namespace PropLineTool
     //where the *magic* happens!
     public class PropLineTool : ToolBase
     {
+        //debug
+        //PerformanceMeter _DEBUG_OnToolUpdate = new PerformanceMeter("OnToolUpdate", "PropLineTool");
+        //PerformanceMeter _DEBUG_OnToolLateUpdate = new PerformanceMeter("OnToolLateUpdate", "PropLineTool");
+        
         //class instance
         public static PropLineTool instance;
         
@@ -5799,8 +5806,15 @@ namespace PropLineTool
 
         }
 
-        //OnToolLateUpdate
         protected override void OnToolLateUpdate()
+        {
+            //_DEBUG_OnToolLateUpdate.FrameStart();
+            OnToolLateUpdateImpl();
+            //_DEBUG_OnToolLateUpdate.FrameEnd(true);
+        }
+
+        //OnToolLateUpdate
+        protected void OnToolLateUpdateImpl()
         {
             //All 3 stuff
             Vector3 _mousePosition = Input.mousePosition;
@@ -5884,8 +5898,15 @@ namespace PropLineTool
                 Singleton<TerrainManager>.instance.RenderZones = false;
             }
         }
-        
+
         protected override void OnToolUpdate()
+        {
+            //_DEBUG_OnToolUpdate.FrameStart();
+            OnToolUpdateImpl();
+            //_DEBUG_OnToolUpdate.FrameEnd(true);
+        }
+
+        protected void OnToolUpdateImpl()
         {
 
             UpdateCachedControlPoints();
@@ -6564,7 +6585,7 @@ namespace PropLineTool
                         _scale = m_placementInfo[i].scale;
                         _brightness = m_placementInfo[i].brightness;
 
-                        global::TreeInstance.RenderInstance(null, _treeInfo, _meshPosition, _scale, _brightness);
+                        global::TreeInstance.RenderInstance(null, _treeInfo, _meshPosition, _scale, _brightness, RenderManager.DefaultColorLocation);
                     }
                 }
             }

@@ -9,6 +9,9 @@ using PropLineTool.UI.ModeButtons;
 using PropLineTool.Sprites;
 using UnityEngine;
 
+//debug only
+//using PropLineTool.DebugUtils;
+
 namespace PropLineTool.UI.ControlPanel
 {
     public abstract class UIBasicCalculator : UIPanel
@@ -1317,6 +1320,9 @@ namespace PropLineTool.UI.ControlPanel
     //BASIC CONTROL PANEL
     public class UIBasicControlPanel : UIPanel
     {
+        //debug
+        //PerformanceMeter _DEBUG_meterPanelUpdate = new PerformanceMeter("UIBasicControlPanel.Update");
+        
         //constants
         public static readonly Vector2 CONTROL_PANEL_SIZE = new Vector2(374f, 450f);
         public const float TITLEBAR_HEIGHT = 42f;
@@ -1525,6 +1531,12 @@ namespace PropLineTool.UI.ControlPanel
             }
         }
         
+        public override void Update()
+        {
+            //_DEBUG_meterPanelUpdate.FrameStart();
+            base.Update();
+            //_DEBUG_meterPanelUpdate.FrameEnd();
+        }
     }
     
 }
