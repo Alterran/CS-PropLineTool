@@ -1400,13 +1400,7 @@ namespace PropLineTool {
                     _initialOffset = segmentState.lastFinalOffset;
                     _lastFenceEndPoint = segmentState.lastFenceEndpoint;
                 } else {
-                    switch (drawMode) {
-                        default:
-                        case DrawMode.Straight: {
-                            _lastFenceEndPoint = PropLineTool.m_mainSegment.b;
-                            break;
-                        }
-                    }
+                    _lastFenceEndPoint = PropLineTool.m_mainSegment.b;
                 }
 
                 switch (PropLineTool.controlMode) {
