@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ColossalFramework.UI;
 using PropLineTool.Parameters;
 using PropLineTool.UI.Elements;
@@ -6,20 +6,15 @@ using PropLineTool.Utility;
 using PropLineTool.Sprites;
 using UnityEngine;
 
-namespace PropLineTool.UI.ModeButtons
-{
+namespace PropLineTool.UI.ModeButtons {
     //place at top of control panel for now
-    public class UIControlModeTabstrip : UIPanel
-    {
+    public class UIControlModeTabstrip : UIPanel {
         private UITabstrip m_tabstrip;
-        public UITabstrip tabstrip
-        {
-            get
-            {
+        public UITabstrip tabstrip {
+            get {
                 return m_tabstrip;
             }
-            set
-            {
+            set {
                 m_tabstrip = value;
             }
         }
@@ -29,8 +24,7 @@ namespace PropLineTool.UI.ModeButtons
         public static readonly Vector3 DEFAULT_TAB_SPACING = new Vector3(5f, 0f);
         public static readonly RectOffset DEFAULT_TAB_PADDING = new RectOffset(0, 5, 0, 0);
 
-        public override void Awake()
-        {
+        public override void Awake() {
             base.Awake();
 
             //setup tabstrip
@@ -60,8 +54,7 @@ namespace PropLineTool.UI.ModeButtons
 
             //finally
             //event subscriptions
-            this.tabstrip.eventSelectedIndexChanged += delegate (UIComponent c, int index)
-            {
+            this.tabstrip.eventSelectedIndexChanged += delegate (UIComponent c, int index) {
                 PropLineTool.controlMode = (PropLineTool.ControlMode)index;
             };
         }

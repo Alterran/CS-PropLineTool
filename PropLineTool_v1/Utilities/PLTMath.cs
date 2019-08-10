@@ -1,11 +1,9 @@
-﻿using ColossalFramework;
+using ColossalFramework;
 using ColossalFramework.Math;
 using UnityEngine;
 
-namespace PropLineTool.Math
-{
-    public static class MathPLT
-    {
+namespace PropLineTool.Math {
+    public static class MathPLT {
         //Special Thanks to Tinus on the UnityForums for this!
         /// <summary>
         /// Determines the signed angle (-pi to pi) radians between two vectors.
@@ -14,8 +12,7 @@ namespace PropLineTool.Math
         /// <param name="v2">second vector</param>
         /// <param name="n">rotation axis (usually plane normal of v1, v2)</param>
         /// <returns>signed angle (in Radians) between v1 and v2</returns>
-        public static float AngleSigned(Vector3 v1, Vector3 v2, Vector3 n)
-        {
+        public static float AngleSigned(Vector3 v1, Vector3 v2, Vector3 n) {
             float result = 0f;
             result = Mathf.Atan2(
                 Vector3.Dot(n, Vector3.Cross(v1, v2)),
@@ -29,28 +26,23 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="inputAngle">angle in Degrees</param>
         /// <returns></returns>
-        public static float NormalizeAngle360(float inputAngle)
-        {
+        public static float NormalizeAngle360(float inputAngle) {
             float result = 0f;
             float _angle = Mathf.Abs(inputAngle) % 360f;
-            if (inputAngle < 0f)
-            {
+            if (inputAngle < 0f) {
                 result = -1f * _angle;
-            }
-            else
-            {
+            } else {
                 result = _angle;
             }
             return result;
         }
-        
+
         /// <summary>
         /// Constrains Bezier to XZ plane.
         /// </summary>
         /// <param name="bezier"></param>
         /// <returns>A bezier curve with y-components set to zero</returns>
-        public static Bezier3 BezierXZ(Bezier3 bezier)
-        {
+        public static Bezier3 BezierXZ(Bezier3 bezier) {
             Bezier3 result = new Bezier3();
 
             result = bezier;
@@ -66,8 +58,7 @@ namespace PropLineTool.Math
         /// Constrains input Bezier to XZ plane.
         /// </summary>
         /// <param name="bezier"></param>
-        public static void BezierXZ(ref Bezier3 bezier)
-        {
+        public static void BezierXZ(ref Bezier3 bezier) {
             bezier.a.y = 0f;
             bezier.b.y = 0f;
             bezier.c.y = 0f;
@@ -79,8 +70,7 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="bezier"></param>
         /// <returns>A bezier curve with y-components set to zero</returns>
-        public static Segment3 SegmentXZ(Segment3 lineSegment)
-        {
+        public static Segment3 SegmentXZ(Segment3 lineSegment) {
             Segment3 result = new Segment3();
 
             result = lineSegment;
@@ -95,31 +85,30 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="bezier"></param>
         /// <returns>A bezier curve with y-components set to zero</returns>
-        public static void SegmentXZ(ref Segment3 lineSegment)
-        {
+        public static void SegmentXZ(ref Segment3 lineSegment) {
             lineSegment.a.y = 0f;
             lineSegment.b.y = 0f;
         }
 
         //standard conversion
-        public static Bezier3 QuadraticToCubicBezier(Vector3 startPoint, Vector3 middlePoint, Vector3 endPoint)
-        {
-            Bezier3 bezier = new Bezier3();
-            bezier.a = startPoint;
-            bezier.b = startPoint + (2.0f / 3.0f) * (middlePoint - startPoint);
-            bezier.c = endPoint + (2.0f / 3.0f) * (middlePoint - endPoint);
-            bezier.d = endPoint;
+        public static Bezier3 QuadraticToCubicBezier(Vector3 startPoint, Vector3 middlePoint, Vector3 endPoint) {
+            Bezier3 bezier = new Bezier3 {
+                a = startPoint,
+                b = startPoint + (2.0f / 3.0f) * (middlePoint - startPoint),
+                c = endPoint + (2.0f / 3.0f) * (middlePoint - endPoint),
+                d = endPoint
+            };
             return bezier;
         }
 
         //CO's in-house method
         //uses negative of endDirection
         //rounds out tight re-curves (or tight curves)
-        public static Bezier3 QuadraticToCubicBezierCOMethod(Vector3 startPoint, Vector3 startDirection, Vector3 endPoint, Vector3 endDirection /*switch this sign when using!*/)
-        {
-            Bezier3 bezier = new Bezier3();
-            bezier.a = startPoint;
-            bezier.d = endPoint;
+        public static Bezier3 QuadraticToCubicBezierCOMethod(Vector3 startPoint, Vector3 startDirection, Vector3 endPoint, Vector3 endDirection /*switch this sign when using!*/) {
+            Bezier3 bezier = new Bezier3 {
+                a = startPoint,
+                d = endPoint
+            };
             NetSegment.CalculateMiddlePoints(startPoint, startDirection, endPoint, endDirection, false, false, out bezier.b, out bezier.c);
             return bezier;
         }
@@ -130,15 +119,14 @@ namespace PropLineTool.Math
         /// <param name="segment">Line segment from p0 to p1</param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static Vector3 LinePosition(Segment3 segment, float t)
-        {
+        public static Vector3 LinePosition(Segment3 segment, float t) {
             float num = 1 - t;
             Vector3 _p0 = segment.a;
             Vector3 _p1 = segment.b;
             Vector3 result = new Vector3(_p1.x + num * (_p0.x - _p1.x), _p1.y + num * (_p0.y - _p1.y), _p1.z + num * (_p0.z - _p1.z));
             return result;
         }
-        
+
         //used to calculate t in non-fence Curved and Freeform modes
         //for each individual item
         /// <summary>
@@ -149,8 +137,7 @@ namespace PropLineTool.Math
         /// <param name="distance"></param>
         /// <param name="tolerance"></param>
         /// <param name="tEnd"></param>
-        public static void StepDistanceCurve(Bezier3 bezier, float tStart, float distance, float tolerance, out float tEnd)
-        {
+        public static void StepDistanceCurve(Bezier3 bezier, float tStart, float distance, float tolerance, out float tEnd) {
             float _tCurrent = 0f;
             _tCurrent = bezier.Travel(tStart, distance);
             float _tStepInitial = _tCurrent - tStart;
@@ -159,19 +146,17 @@ namespace PropLineTool.Math
 
             float _distCurrent = CubicBezierArcLengthXZGauss04(bezier, tStart, _tCurrent);
             float _toleranceSqr = tolerance * tolerance;
-            if(Mathf.Pow(distance - _distCurrent, 2f) >= _toleranceSqr)
-            {
+            if (Mathf.Pow(distance - _distCurrent, 2f) >= _toleranceSqr) {
                 float _localSpeed = CubicSpeedXZ(bezier, _tCurrent);
                 float _distDifference = distance - _distCurrent;
 
                 int _counter = 0;
-                while (_counter < 12 && (Mathf.Pow(_distDifference, 2f) > _toleranceSqr))
-                {
+                while (_counter < 12 && (Mathf.Pow(_distDifference, 2f) > _toleranceSqr)) {
                     _distCurrent = CubicBezierArcLengthXZGauss04(bezier, tStart, _tCurrent);
                     _distDifference = distance - _distCurrent;
                     _localSpeed = CubicSpeedXZ(bezier, _tCurrent);
 
-                    _tCurrent = _tCurrent + _distDifference / _localSpeed;
+                    _tCurrent += _distDifference / _localSpeed;
                     _counter++;
                 }
             }
@@ -193,8 +178,7 @@ namespace PropLineTool.Math
         /// <param name="tolerance"></param>
         /// <param name="tEnd"></param>
         /// <param name="allowBackwards">Set to false to only step forward along the curve in the direction t=0 -> t=1.</param>
-        public static bool CircleCurveFenceIntersectXZ(Bezier3 bezier, float tStart, float lengthOfSegment, float tolerance, out float tEnd, bool allowBackwards)
-        {
+        public static bool CircleCurveFenceIntersectXZ(Bezier3 bezier, float tStart, float lengthOfSegment, float tolerance, out float tEnd, bool allowBackwards) {
             tEnd = tStart;
             Bezier3 _bezier = BezierXZ(bezier);
 
@@ -204,18 +188,16 @@ namespace PropLineTool.Math
             //original as of 161111 2221
             //lengthOfSegment = Mathf.Abs(lengthOfSegment);
             //new as of 161111 2221
-            if (!allowBackwards)
-            {
+            if (!allowBackwards) {
                 lengthOfSegment = Mathf.Abs(lengthOfSegment);
             }
 
-            if (lengthOfSegment == 0f)
-            {
+            if (lengthOfSegment == 0f) {
                 //already called in the beginning
                 tEnd = tStart;
                 return false;
             }
-            
+
             //initial guess
             float _t0 = 0.5f;
             //initial guess setup
@@ -231,14 +213,12 @@ namespace PropLineTool.Math
 
             //while loop fix
             float _iteratedDistance = Vector3.Distance(_bezier.Position(_t0), _bezier.Position(tStart));
-            
+
             int _counter = 0;
-            while (_counter < 25 && Mathf.Pow(_iteratedDistance - lengthOfSegment, 2f) > _toleranceSqr)
-            {
-                _t = _t - _adjustmentScalar * (_errorFunc / _errorPrime);
-                
-                if (!allowBackwards && _t < tStart)
-                {
+            while (_counter < 25 && Mathf.Pow(_iteratedDistance - lengthOfSegment, 2f) > _toleranceSqr) {
+                _t -= _adjustmentScalar * (_errorFunc / _errorPrime);
+
+                if (!allowBackwards && _t < tStart) {
                     _t = 1f;
                 }
 
@@ -246,21 +226,18 @@ namespace PropLineTool.Math
                 _errorPrime = PLTErrorFunctionPrimeXZ(_bezier, _t, tStart);
 
                 _iteratedDistance = Vector3.Distance(_bezier.Position(_t), _bezier.Position(tStart));
-                
+
                 _counter++;
             }
 
             //finish
             tEnd = _t;
-            
 
-            if (Mathf.Pow(_iteratedDistance - lengthOfSegment, 2f) > _toleranceSqr)
-            {
+
+            if (Mathf.Pow(_iteratedDistance - lengthOfSegment, 2f) > _toleranceSqr) {
                 //failed to converge
                 return false;
-            }
-            else
-            {
+            } else {
                 //success in convergence!
                 return true;
             }
@@ -280,8 +257,7 @@ namespace PropLineTool.Math
         /// <param name="tolerance"></param>
         /// <param name="tEnd"></param>
         /// <param name="allowBackwards">Set to false to only step forward along the curve in the direction t=0 -> t=1.</param>
-        public static bool LinkCircleCurveFenceIntersectXZ(Bezier3 bezier, Vector3 startPos, float lengthOfSegment, float tolerance, out float tEnd, bool allowBackwards)
-        {
+        public static bool LinkCircleCurveFenceIntersectXZ(Bezier3 bezier, Vector3 startPos, float lengthOfSegment, float tolerance, out float tEnd, bool allowBackwards) {
             tEnd = 0f;
             Bezier3 _bezier = BezierXZ(bezier);
 
@@ -289,12 +265,11 @@ namespace PropLineTool.Math
 
             lengthOfSegment = Mathf.Abs(lengthOfSegment);
 
-            if (lengthOfSegment == 0f)
-            {
+            if (lengthOfSegment == 0f) {
                 tEnd = 0f;
                 return false;
             }
-            
+
             //initial guess
             float _t0 = 0.5f;
             //initial guess setup
@@ -313,12 +288,10 @@ namespace PropLineTool.Math
             float _iteratedDistance = Vector3.Distance(_bezier.Position(_t0), startPos);
 
             int _counter = 0;
-            while (_counter < 12 && Mathf.Pow(_iteratedDistance - lengthOfSegment, 2f) > _toleranceSqr)
-            {
-                _t = _t - _adjustmentScalar * (_errorFunc / _errorPrime);
+            while (_counter < 12 && Mathf.Pow(_iteratedDistance - lengthOfSegment, 2f) > _toleranceSqr) {
+                _t -= _adjustmentScalar * (_errorFunc / _errorPrime);
 
-                if (!allowBackwards && _t < 0f)
-                {
+                if (!allowBackwards && _t < 0f) {
                     _t = 1f;
                 }
 
@@ -326,20 +299,17 @@ namespace PropLineTool.Math
                 _errorPrime = PLTLinkErrorFunctionPrimeXZ(_bezier, _t, startPos);
 
                 _iteratedDistance = Vector3.Distance(_bezier.Position(_t), startPos);
-                
+
                 _counter++;
             }
 
             //finish
             tEnd = _t;
 
-            if (Mathf.Pow(_iteratedDistance - lengthOfSegment, 2f) > _toleranceSqr)
-            {
+            if (Mathf.Pow(_iteratedDistance - lengthOfSegment, 2f) > _toleranceSqr) {
                 //failed to converge
                 return false;
-            }
-            else
-            {
+            } else {
                 //success in convergence!
                 return true;
             }
@@ -353,8 +323,7 @@ namespace PropLineTool.Math
         /// <param name="t1"></param>
         /// <param name="t2"></param>
         /// <returns></returns>
-        public static float CubicBezierArcLengthXZGauss12(Bezier3 bezier, float t1, float t2)
-        {
+        public static float CubicBezierArcLengthXZGauss12(Bezier3 bezier, float t1, float t2) {
             float result = 0f;
             float _linearAdj = (t2 - t1) / 2f;
             float _p1 = CubicSpeedXZGaussPoint(bezier, 0.1252334085114689f, 0.2491470458134028f, t1, t2);
@@ -381,8 +350,7 @@ namespace PropLineTool.Math
         /// <param name="t1"></param>
         /// <param name="t2"></param>
         /// <returns></returns>
-        public static float CubicBezierArcLengthXZGauss04(Bezier3 bezier, float t1, float t2)
-        {
+        public static float CubicBezierArcLengthXZGauss04(Bezier3 bezier, float t1, float t2) {
             float result = 0f;
             float _linearAdj = (t2 - t1) / 2f;
             float _p1 = CubicSpeedXZGaussPoint(bezier, 0.3399810435848563f, 0.6521451548625461f, t1, t2);
@@ -401,8 +369,7 @@ namespace PropLineTool.Math
         /// <param name="t1"></param>
         /// <param name="t2"></param>
         /// <returns></returns>
-        public static float CubicBezierArcLengthXZGauss03(Bezier3 bezier, float t1, float t2)
-        {
+        public static float CubicBezierArcLengthXZGauss03(Bezier3 bezier, float t1, float t2) {
             float result = 0f;
             float _linearAdj = (t2 - t1) / 2f;
             float _p1 = CubicSpeedXZGaussPoint(bezier, 0.0f, 0.88888888f, t1, t2);
@@ -414,8 +381,7 @@ namespace PropLineTool.Math
 
         //returns a single point for Gaussian Quadrature
         //of cubic bezier arc length
-        private static float CubicSpeedXZGaussPoint(Bezier3 bezier, float x_i, float w_i, float a, float b)
-        {
+        private static float CubicSpeedXZGaussPoint(Bezier3 bezier, float x_i, float w_i, float a, float b) {
             float result = 0f;
             float _linearAdj = (b - a) / 2f;
             float _constantAdj = (a + b) / 2f;
@@ -426,8 +392,7 @@ namespace PropLineTool.Math
         //returns the integrand of the arc length function for a cubic bezier curve
         //constrained to the XZ-plane
         //at a specific t
-        private static float CubicSpeedXZ(Bezier3 bezier, float t)
-        {
+        private static float CubicSpeedXZ(Bezier3 bezier, float t) {
             float result = 0f;
             Vector3 _tangent = bezier.Tangent(t);
             float _derivX = _tangent.x;
@@ -443,8 +408,7 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="segment"></param>
         /// <returns></returns>
-        public static float LinearSpeedXZ(Segment3 segment)
-        {
+        public static float LinearSpeedXZ(Segment3 segment) {
             float result = 0f;
             Vector3 _tanVector = Vector3.zero;
             _tanVector = segment.b - segment.a;
@@ -463,12 +427,10 @@ namespace PropLineTool.Math
         /// <param name="tCenter">Center of the circle to intersect the curve.</param>
         /// <param name="radius">Radius of the circle to intersect the curve.</param>
         /// <returns></returns>
-        private static float PLTErrorFunctionXZ(Bezier3 bezier, float t, float tCenter, float radius)
-        {
+        private static float PLTErrorFunctionXZ(Bezier3 bezier, float t, float tCenter, float radius) {
             float result = 100f;
 
-            if (t == tCenter)
-            {
+            if (t == tCenter) {
                 return 0f;
             }
 
@@ -481,7 +443,7 @@ namespace PropLineTool.Math
             float _z = _guessPos.z;
 
             result = Mathf.Pow(_x - x_c, 2f) + Mathf.Pow(_z - z_c, 2f) - Mathf.Pow(radius, 2f);
-            
+
             return result;
         }
 
@@ -493,8 +455,7 @@ namespace PropLineTool.Math
         /// <param name="centerPos">Center of the circle to intersect the curve.</param>
         /// <param name="radius">Radius of the circle to intersect the curve.</param>
         /// <returns></returns>
-        private static float PLTLinkErrorFunctionXZ(Bezier3 bezier, float t, Vector3 centerPos, float radius)
-        {
+        private static float PLTLinkErrorFunctionXZ(Bezier3 bezier, float t, Vector3 centerPos, float radius) {
             float result = 100f;
 
             Vector3 _center = centerPos;
@@ -505,8 +466,7 @@ namespace PropLineTool.Math
             float _x = _guessPos.x;
             float _z = _guessPos.z;
 
-            if (_guessPos == centerPos)
-            {
+            if (_guessPos == centerPos) {
                 return 0f;
             }
 
@@ -522,12 +482,10 @@ namespace PropLineTool.Math
         /// <param name="t">Where are you guessing the intersection is?</param>
         /// <param name="tCenter">Center of the circle to intersect the curve.</param>
         /// <returns></returns>
-        private static float PLTErrorFunctionPrimeXZ(Bezier3 bezier, float t, float tCenter)
-        {
+        private static float PLTErrorFunctionPrimeXZ(Bezier3 bezier, float t, float tCenter) {
             float result = 0f;
 
-            if (t == tCenter)
-            {
+            if (t == tCenter) {
                 return 0f;
             }
 
@@ -555,8 +513,7 @@ namespace PropLineTool.Math
         /// <param name="t">Where are you guessing the intersection is?</param>
         /// <param name="centerPos">Center of the circle to intersect the curve.</param>
         /// <returns></returns>
-        private static float PLTLinkErrorFunctionPrimeXZ(Bezier3 bezier, float t, Vector3 centerPos)
-        {
+        private static float PLTLinkErrorFunctionPrimeXZ(Bezier3 bezier, float t, Vector3 centerPos) {
             float result = 0f;
 
             Vector3 _center = centerPos;
@@ -567,8 +524,7 @@ namespace PropLineTool.Math
             float _x = _guessPos.x; //x(t)
             float _z = _guessPos.z; //z(t)
 
-            if (_guessPos == centerPos)
-            {
+            if (_guessPos == centerPos) {
                 return 0f;
             }
 
@@ -589,14 +545,10 @@ namespace PropLineTool.Math
         /// <param name="radius"></param>
         /// <param name="pointOfInterest"></param>
         /// <returns></returns>
-        public static bool IsInsideCircleXZ(Vector3 circleCenter, float radius, Vector3 pointOfInterest)
-        {
-            if (radius == 0f)
-            {
+        public static bool IsInsideCircleXZ(Vector3 circleCenter, float radius, Vector3 pointOfInterest) {
+            if (radius == 0f) {
                 return pointOfInterest == circleCenter ? true : false;
-            }
-            else if (radius < 0f)
-            {
+            } else if (radius < 0f) {
                 radius = Mathf.Abs(radius);
             }
 
@@ -604,17 +556,14 @@ namespace PropLineTool.Math
             circleCenter.y = 0f;
             pointOfInterest.y = 0f;
 
-            
+
 
             float _radiusSqr = radius * radius;
             float _distanceSqr = (pointOfInterest - circleCenter).sqrMagnitude;
 
-            if (_distanceSqr <= _radiusSqr)
-            {
+            if (_distanceSqr <= _radiusSqr) {
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
@@ -627,14 +576,10 @@ namespace PropLineTool.Math
         /// <param name="pointOfInterest"></param>
         /// <param name="distance"></param>
         /// <returns></returns>
-        public static bool IsNearCircleOutlineXZ(Vector3 circleCenter, float circleRadius, Vector3 pointOfInterest, float distance)
-        {
-            if (distance == 0f)
-            {
+        public static bool IsNearCircleOutlineXZ(Vector3 circleCenter, float circleRadius, Vector3 pointOfInterest, float distance) {
+            if (distance == 0f) {
                 return pointOfInterest == circleCenter ? true : false;
-            }
-            else if (distance < 0f)
-            {
+            } else if (distance < 0f) {
                 distance = Mathf.Abs(distance);
             }
 
@@ -647,12 +592,9 @@ namespace PropLineTool.Math
             float _greaterRadiusSqr = Mathf.Pow(circleRadius + distance, 2f);
             float _distanceSqr = (pointOfInterest - circleCenter).sqrMagnitude;
 
-            if (_distanceSqr >= _lesserRadiusSqr && _distanceSqr <= _greaterRadiusSqr)
-            {
+            if (_distanceSqr >= _lesserRadiusSqr && _distanceSqr <= _greaterRadiusSqr) {
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
@@ -665,17 +607,13 @@ namespace PropLineTool.Math
         /// <param name="pointOfInterest"></param>
         /// <param name="distance"></param>
         /// <returns></returns>
-        public static bool IsNearCircleOutlineXZ(Circle3XZ circle, Vector3 pointOfInterest, float distance)
-        {
+        public static bool IsNearCircleOutlineXZ(Circle3XZ circle, Vector3 pointOfInterest, float distance) {
             Vector3 _circleCenter = circle.center;
             float _circleRadius = circle.radius;
 
-            if (distance == 0f)
-            {
+            if (distance == 0f) {
                 return pointOfInterest == _circleCenter ? true : false;
-            }
-            else if (distance < 0f)
-            {
+            } else if (distance < 0f) {
                 distance = Mathf.Abs(distance);
             }
 
@@ -688,12 +626,9 @@ namespace PropLineTool.Math
             float _greaterRadiusSqr = Mathf.Pow(_circleRadius + distance, 2f);
             float _distanceSqr = (pointOfInterest - _circleCenter).sqrMagnitude;
 
-            if (_distanceSqr >= _lesserRadiusSqr && _distanceSqr <= _greaterRadiusSqr)
-            {
+            if (_distanceSqr >= _lesserRadiusSqr && _distanceSqr <= _greaterRadiusSqr) {
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
@@ -706,8 +641,7 @@ namespace PropLineTool.Math
         /// <param name="pointOfInterest"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static bool IsCloseToCurveXZ(Bezier3 curve, float distanceThreshold, Vector3 pointOfInterest, out float t)
-        {
+        public static bool IsCloseToCurveXZ(Bezier3 curve, float distanceThreshold, Vector3 pointOfInterest, out float t) {
             //constrain to XZ plane
             curve = BezierXZ(curve);
             pointOfInterest.y = 0f;
@@ -718,12 +652,9 @@ namespace PropLineTool.Math
             float _radiusSqr = distanceThreshold * distanceThreshold;
             float _distanceSqr = curve.DistanceSqr(pointOfInterest, out t);
 
-            if (_distanceSqr <= _radiusSqr)
-            {
+            if (_distanceSqr <= _radiusSqr) {
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
@@ -736,8 +667,7 @@ namespace PropLineTool.Math
         /// <param name="pointOfInterest"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static bool IsCloseToSegmentXZ(Segment3 lineSegment, float distanceThreshold, Vector3 pointOfInterest, out float t)
-        {
+        public static bool IsCloseToSegmentXZ(Segment3 lineSegment, float distanceThreshold, Vector3 pointOfInterest, out float t) {
             //constrain to XZ plane
             lineSegment = SegmentXZ(lineSegment);
             pointOfInterest.y = 0f;
@@ -748,12 +678,9 @@ namespace PropLineTool.Math
             float _radiusSqr = distanceThreshold * distanceThreshold;
             float _distanceSqr = lineSegment.DistanceSqr(pointOfInterest, out t);
 
-            if (_distanceSqr <= _radiusSqr)
-            {
+            if (_distanceSqr <= _radiusSqr) {
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
@@ -766,8 +693,7 @@ namespace PropLineTool.Math
         /// <param name="pointOfInterest"></param>
         /// <param name="t"></param>
         /// <returns></returns>
-        public static bool IsCloseToCircle3XZ(Circle3XZ circle, float distanceThreshold, Vector3 pointOfInterest, out float t)
-        {
+        public static bool IsCloseToCircle3XZ(Circle3XZ circle, float distanceThreshold, Vector3 pointOfInterest, out float t) {
             Vector3 _circleCenter = circle.center;
             float _circleRadius = circle.radius;
 
@@ -777,27 +703,21 @@ namespace PropLineTool.Math
 
             //initialize output t
             t = 0.5f;
-            
-            if (distanceThreshold == 0f)
-            {
+
+            if (distanceThreshold == 0f) {
                 return pointOfInterest == _circleCenter ? true : false;
-            }
-            else if (distanceThreshold < 0f)
-            {
+            } else if (distanceThreshold < 0f) {
                 distanceThreshold = Mathf.Abs(distanceThreshold);
             }
-            
+
             float _lesserRadiusSqr = Mathf.Pow(_circleRadius - distanceThreshold, 2f);
             float _greaterRadiusSqr = Mathf.Pow(_circleRadius + distanceThreshold, 2f);
             //float _distanceSqr = (pointOfInterest - _circleCenter).sqrMagnitude;
             float _distanceSqr = circle.DistanceSqr(pointOfInterest, out t);
 
-            if (_distanceSqr >= _lesserRadiusSqr && _distanceSqr <= _greaterRadiusSqr)
-            {
+            if (_distanceSqr >= _lesserRadiusSqr && _distanceSqr <= _greaterRadiusSqr) {
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
@@ -806,16 +726,13 @@ namespace PropLineTool.Math
     }
 
 
-    public struct Circle2
-    {
+    public struct Circle2 {
         public Vector2 center;
 
         public float radius;
-        
-        public Circle2 unitCircle
-        {
-            get
-            {
+
+        public Circle2 unitCircle {
+            get {
                 return new Circle2(Vector2.zero, 1f);
             }
         }
@@ -825,8 +742,7 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="t">Generally from 0 to 1. [0, 1]</param>
         /// <returns></returns>
-        public Vector2 Position(float t)
-        {
+        public Vector2 Position(float t) {
             Vector2 _result = Vector2.zero;
 
             _result.x = center.x + radius * Mathf.Cos(2 * Mathf.PI * t);
@@ -840,8 +756,7 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="theta">Angle in radians. [0, 2pi]</param>
         /// <returns></returns>
-        public Vector2 PositionFromAngle(float theta)
-        {
+        public Vector2 PositionFromAngle(float theta) {
             Vector2 _result = Vector2.zero;
 
             _result.x = center.x + radius * Mathf.Cos(theta);
@@ -855,8 +770,7 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="theta">Angle in radians. [0, 2pi]</param>
         /// <returns></returns>
-        public static Vector3 Position3FromAngleXZ(Vector3 center, float radius, float theta)
-        {
+        public static Vector3 Position3FromAngleXZ(Vector3 center, float radius, float theta) {
             Vector3 _result = Vector3.zero;
 
             _result.x = center.x + radius * Mathf.Cos(theta);
@@ -870,11 +784,10 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="theta">Angle in degrees. [0, 360]</param>
         /// <returns></returns>
-        public Vector2 PositionFromAngleDegrees(float theta)
-        {
+        public Vector2 PositionFromAngleDegrees(float theta) {
             Vector2 _result = Vector2.zero;
 
-            theta = theta * Mathf.Deg2Rad;
+            theta *= Mathf.Deg2Rad;
 
             _result.x = center.x + radius * Mathf.Cos(theta);
             _result.y = center.y + radius * Mathf.Sin(theta);
@@ -884,8 +797,7 @@ namespace PropLineTool.Math
 
 
         //constructor
-        public Circle2(Vector2 center, float radius)
-        {
+        public Circle2(Vector2 center, float radius) {
             this.center = center;
             this.radius = radius;
         }
@@ -894,8 +806,7 @@ namespace PropLineTool.Math
     /// <summary>
     /// A circle that lies parallel to the XZ plane, with orientation towards start angle, and at a height of center.y.
     /// </summary>
-    public struct Circle3XZ
-    {
+    public struct Circle3XZ {
         public Vector3 center;
 
         public float radius;
@@ -905,18 +816,14 @@ namespace PropLineTool.Math
         /// </summary>
         public float angleStart;
 
-        public float circumference
-        {
-            get
-            {
+        public float circumference {
+            get {
                 return 2f * Mathf.PI * radius;
             }
         }
 
-        public float diameter
-        {
-            get
-            {
+        public float diameter {
+            get {
                 return 2f * radius;
             }
         }
@@ -939,10 +846,8 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="t">Generally from 0 to 1: [0, 1].</param>
         /// <returns></returns>
-        public Vector3 Position(float t)
-        {
-            if (radius == 0f)
-            {
+        public Vector3 Position(float t) {
+            if (radius == 0f) {
                 return center;
             }
 
@@ -959,10 +864,8 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="t">Generally from 0 to 1: [0, 1].</param>
         /// <returns></returns>
-        public Vector3 Tangent(float t)
-        {
-            if (radius == 0f)
-            {
+        public Vector3 Tangent(float t) {
+            if (radius == 0f) {
                 return Vector3.zero;
             }
 
@@ -975,20 +878,17 @@ namespace PropLineTool.Math
         }
 
         //use for non-fence mode
-        public float DeltaT(float distance)
-        {
-            if (distance == 0f)
-            {
+        public float DeltaT(float distance) {
+            if (distance == 0f) {
                 return 0f;
             }
-            if (radius == 0f)
-            {
+            if (radius == 0f) {
                 //return float.NaN;
                 return 1f;
             }
 
             float _deltaT = 0.10f;
-            
+
             _deltaT = distance / (2f * Mathf.PI * radius);
 
             return _deltaT;
@@ -1000,8 +900,7 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="distance"></param>
         /// <returns></returns>
-        public float DeltaAngle(float distance)
-        {
+        public float DeltaAngle(float distance) {
             float _deltaAngle = Mathf.PI;
 
             _deltaAngle = DeltaT(distance) * 2f * Mathf.PI;
@@ -1015,18 +914,14 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="chordLength"></param>
         /// <returns></returns>
-        public float ChordAngle(float chordLength)
-        {
-            if (chordLength == 0f)
-            {
+        public float ChordAngle(float chordLength) {
+            if (chordLength == 0f) {
                 return 0f;
             }
-            if (radius == 0f)
-            {
+            if (radius == 0f) {
                 return 2f * Mathf.PI;
             }
-            if (chordLength > this.diameter)
-            {
+            if (chordLength > this.diameter) {
                 return 2f * Mathf.PI;
             }
 
@@ -1036,32 +931,26 @@ namespace PropLineTool.Math
         }
 
         //use for fence mode?
-        public float ChordDeltaT(float chordLength)
-        {
-            if (chordLength == 0f)
-            {
+        public float ChordDeltaT(float chordLength) {
+            if (chordLength == 0f) {
                 return 0f;
             }
-            if (radius == 0f)
-            {
+            if (radius == 0f) {
                 return 1f;
             }
-            if (chordLength > this.diameter)
-            {
+            if (chordLength > this.diameter) {
                 return 1f;
             }
 
             //float _chordDeltaT = ChordAngle(chordLength) / this.circumference;
             float _chordDeltaT = ChordAngle(chordLength) / (2f * Mathf.PI);
-            
+
             return _chordDeltaT;
         }
 
         //use for non-fence mode
-        public float PerfectRadiusByArcs(float arcLength)
-        {
-            if (arcLength == 0f)
-            {
+        public float PerfectRadiusByArcs(float arcLength) {
+            if (arcLength == 0f) {
                 return this.radius;
             }
 
@@ -1071,21 +960,16 @@ namespace PropLineTool.Math
 
             float _radiusPerfect = _circumferencePerfect / (2f * Mathf.PI);
 
-            if (_radiusPerfect > 0f)
-            {
+            if (_radiusPerfect > 0f) {
                 return _radiusPerfect;
-            }
-            else
-            {
+            } else {
                 return this.radius;
             }
         }
 
         //use for fence mode
-        public float PerfectRadiusByChords(float chordLength)
-        {
-            if (chordLength == 0f)
-            {
+        public float PerfectRadiusByChords(float chordLength) {
+            if (chordLength == 0f) {
                 return this.radius;
             }
 
@@ -1093,8 +977,7 @@ namespace PropLineTool.Math
             float _numChordsRaw = Mathf.Abs(2f * Mathf.PI / _chordAngleRaw);
             float _numChordsPerfect = Mathf.Round(_numChordsRaw);
 
-            if (_numChordsPerfect <= 0f)
-            {
+            if (_numChordsPerfect <= 0f) {
                 return this.radius;
             }
 
@@ -1102,23 +985,18 @@ namespace PropLineTool.Math
 
             float _radiusPerfect = chordLength / (2f * Mathf.Sin(_chordAnglePerfect / 2f));
 
-            if (_radiusPerfect > 0f)
-            {
+            if (_radiusPerfect > 0f) {
                 return _radiusPerfect;
-            }
-            else
-            {
+            } else {
                 return this.radius;
             }
         }
 
-        public float DistanceSqr(Vector3 position, out float u)
-        {
+        public float DistanceSqr(Vector3 position, out float u) {
             float _distanceSqr = 0f;
             u = 0f;
 
-            if (position == this.center)
-            {
+            if (position == this.center) {
                 u = 0f;
                 return 0f;
             }
@@ -1141,8 +1019,7 @@ namespace PropLineTool.Math
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
-        public float AngleFromStartXZ(Vector3 position)
-        {
+        public float AngleFromStartXZ(Vector3 position) {
             float _angleFromStart = 0f;
 
             Vector3 _pointVector = position - this.center;
@@ -1153,8 +1030,7 @@ namespace PropLineTool.Math
             _zeroVector.Normalize();
 
             _angleFromStart = MathPLT.AngleSigned(_pointVector, _zeroVector, Vector3.up);
-            if (_angleFromStart < 0f)
-            {
+            if (_angleFromStart < 0f) {
                 _angleFromStart += 2f * Mathf.PI;
             }
 
@@ -1167,12 +1043,10 @@ namespace PropLineTool.Math
         /// <param name="t1">Generally [0, 1].</param>
         /// <param name="t2">Generally [0, 1].</param>
         /// <returns></returns>
-        public float AngleBetween(float t1, float t2)
-        {
+        public float AngleBetween(float t1, float t2) {
             float _angleBetween = 0f;
 
-            if (t2 == t1)
-            {
+            if (t2 == t1) {
                 return 0f;
             }
 
@@ -1201,35 +1075,29 @@ namespace PropLineTool.Math
         /// <param name="t1">Generally [0, 1].</param>
         /// <param name="t2">Generally [0, 1].</param>
         /// <returns></returns>
-        public float ArclengthBetween(float t1, float t2)
-        {
-            if (t2 == t1)
-            {
+        public float ArclengthBetween(float t1, float t2) {
+            if (t2 == t1) {
                 return 0f;
             }
 
             return AngleBetween(t1, t2) * radius;
         }
 
-        public Circle3XZ(Vector3 center, float radius)
-        {
+        public Circle3XZ(Vector3 center, float radius) {
             this.center = center;
             this.radius = radius;
             this.angleStart = 0f;
         }
 
         /// <param name="angleStart">Angle in radians.</param>
-        public Circle3XZ(Vector3 center, float radius, float angleStart)
-        {
+        public Circle3XZ(Vector3 center, float radius, float angleStart) {
             this.center = center;
             this.radius = radius;
             this.angleStart = angleStart;
         }
 
-        public Circle3XZ(Vector3 center, Vector3 pointOnCircle)
-        {
-            if (pointOnCircle == center)
-            {
+        public Circle3XZ(Vector3 center, Vector3 pointOnCircle) {
+            if (pointOnCircle == center) {
                 this.center = center;
                 this.radius = 0f;
                 this.angleStart = 0f;

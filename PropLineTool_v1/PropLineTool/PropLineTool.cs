@@ -1,4 +1,4 @@
-﻿using ColossalFramework;
+using ColossalFramework;
 using ColossalFramework.Math;
 using ColossalFramework.Globalization;
 using System;
@@ -21,11 +21,9 @@ using PropLineTool.Settings;
 //resolves the ambiguity between UnityEngine.Debug and SystemDiagnostics.Debug (:
 using Debug = UnityEngine.Debug;
 
-namespace PropLineTool
-{
+namespace PropLineTool {
     //Key Presses
-    public struct KeyPressEvent
-    {
+    public struct KeyPressEvent {
         //signal events
         public bool _mouseDown;
         public bool _mouseUp;
@@ -73,14 +71,13 @@ namespace PropLineTool
         public bool _ctrlOnlyLeftClick;
         public bool _shiftOnlyLeftClick;
 
-        private void Set(Event e)
-        {
+        private void Set(Event e) {
             //signals
             _mouseDown = (e.type == EventType.MouseDown);
             _mouseUp = (e.type == EventType.MouseUp);
             _keyDown = (e.type == EventType.KeyDown);
             _keyUp = (e.type == EventType.KeyUp);
-            
+
             //mouse events
             _leftClick = ((e.button == 0) && _mouseDown);
             _rightClick = ((e.button == 1) && _mouseDown);
@@ -119,13 +116,12 @@ namespace PropLineTool
             _ctrlOnlyLeftClick = (_ctrl && _leftClick && !_alt && !_shift);
             _shiftOnlyLeftClick = (_shift && _leftClick && !_alt && !_ctrl);
         }
-        
+
         /// <summary>
         /// Sets up the keypress event with a fix for the modifiers (ctrl, shift, alt).
         /// </summary>
         /// <param name="e"></param>
-        public void Set3(Event e)
-        {
+        public void Set3(Event e) {
             Set(e);
 
             //keyboard events
@@ -155,8 +151,7 @@ namespace PropLineTool
             _shiftOnlyLeftClick = (_shift && _leftClick && !_alt && !_ctrl);
         }
 
-        public void Reset()
-        {
+        public void Reset() {
             //signals
             _mouseDown = false;
             _mouseUp = false;
@@ -200,18 +195,16 @@ namespace PropLineTool
     }
 
     //where the *magic* happens!
-    public class PropLineTool : ToolBase
-    {
+    public class PropLineTool : ToolBase {
         //debug
         //PerformanceMeter _DEBUG_OnToolUpdate = new PerformanceMeter("OnToolUpdate", "PropLineTool");
         //PerformanceMeter _DEBUG_OnToolLateUpdate = new PerformanceMeter("OnToolLateUpdate", "PropLineTool");
-        
+
         //class instance
         public static PropLineTool instance;
-        
+
         //SnappingMode definition
-        public enum SnapMode
-        {
+        public enum SnapMode {
             Off = 0,
             Objects = 1,
             ZoneLines = 2
@@ -220,31 +213,24 @@ namespace PropLineTool
 
         //FenceMode definition
         private static bool m_fenceMode = false;
-        public static bool fenceMode
-        {
-            get
-            {
+        public static bool fenceMode {
+            get {
                 return m_fenceMode;
             }
-            set
-            {
+            set {
                 bool _oldValue = m_fenceMode;
                 m_fenceMode = value;
 
-                if (value != _oldValue)
-                {
+                if (value != _oldValue) {
                     OnFenceModeChanged(value);
                 }
 
-                if (value == true)
-                {
+                if (value == true) {
                     placementCalculator.angleOffset = 0f;
                     hoverAngle = 0f;
                     placementCalculator.SetDefaultSpacing();
                     placementCalculator.angleMode = PlacementCalculator.AngleMode.Dynamic;
-                }
-                else
-                {
+                } else {
                     placementCalculator.angleSingle = 0f;
                     placementCalculator.SetDefaultSpacing();
                 }
@@ -252,17 +238,12 @@ namespace PropLineTool
         }
         //FenceMode changed event
         public static event VoidObjectPropertyChangedEventHandler<bool> eventFenceModeChanged;
-        protected static void OnFenceModeChanged(bool state)
-        {
-            if (eventFenceModeChanged != null)
-            {
-                eventFenceModeChanged(state);
-            }
+        protected static void OnFenceModeChanged(bool state) {
+            eventFenceModeChanged?.Invoke(state);
         }
 
         //DrawMode definition
-        public enum DrawMode
-        {
+        public enum DrawMode {
             Single = 0,
             Straight = 1,
             Curved = 2,
@@ -271,41 +252,31 @@ namespace PropLineTool
         }
         //drawmode static member
         private static PropLineTool.DrawMode m_drawMode = DrawMode.Single;
-        public static PropLineTool.DrawMode drawMode
-        {
-            get
-            {
+        public static PropLineTool.DrawMode drawMode {
+            get {
                 return m_drawMode;
             }
-            set
-            {
+            set {
                 PropLineTool.DrawMode _oldValue = m_drawMode;
                 m_drawMode = value;
 
-                if (value != _oldValue)
-                {
+                if (value != _oldValue) {
                     OnDrawModeChanged(value);
                 }
             }
         }
         //drawmode changed event
         public static event VoidObjectPropertyChangedEventHandler<PropLineTool.DrawMode> eventDrawModeChanged;
-        protected static void OnDrawModeChanged(PropLineTool.DrawMode drawMode)
-        {
-            if (eventDrawModeChanged != null)
-            {
-                eventDrawModeChanged(drawMode);
-            }
+        protected static void OnDrawModeChanged(PropLineTool.DrawMode drawMode) {
+            eventDrawModeChanged?.Invoke(drawMode);
 
-            if (activeState == ActiveState.MaxFillContinue)
-            {
+            if (activeState == ActiveState.MaxFillContinue) {
                 placementCalculator.UpdateItemPlacementInfo();
             }
         }
-        
+
         //LockingMode definition
-        public enum LockingMode
-        {
+        public enum LockingMode {
             Off = 0,
             Lock = 1
         }
@@ -323,8 +294,7 @@ namespace PropLineTool
         private float lockBackupItemwiseT = 0f;
 
         //Hover Objects
-        public enum HoverState
-        {
+        public enum HoverState {
             Unbound,
             SpacingLocus,
             AngleLocus,
@@ -335,14 +305,11 @@ namespace PropLineTool
             ItemwiseItem
         }
         private static HoverState m_hoverState = HoverState.Unbound;
-        protected static HoverState hoverState
-        {
-            get
-            {
+        protected static HoverState hoverState {
+            get {
                 return m_hoverState;
             }
-            set
-            {
+            set {
                 m_hoverState = value;
             }
         }
@@ -359,86 +326,63 @@ namespace PropLineTool
         //Hovered Curve Position for Itemwise Placement
         private static float hoverItemwiseT = 0f;
         //Index for rendering spacing locus and angle locus around
-        private static int hoverItemPositionIndex
-        {
-            get
-            {
-                switch (controlMode)
-                {
-                    case ControlMode.Itemwise:
-                        {
-                            if (fenceMode)
-                            {
-                                return PlacementCalculator.ITEMWISE_FENCE_INDEX_START;
-                            }
-                            else
-                            {
-                                return PlacementCalculator.ITEMWISE_INDEX;
-                            }
+        private static int hoverItemPositionIndex {
+            get {
+                switch (controlMode) {
+                    case ControlMode.Itemwise: {
+                        if (fenceMode) {
+                            return PlacementCalculator.ITEMWISE_FENCE_INDEX_START;
+                        } else {
+                            return PlacementCalculator.ITEMWISE_INDEX;
                         }
-                    default:
-                        {
-                            return 1;
-                        }
+                    }
+                    default: {
+                        return 1;
+                    }
                 }
             }
         }
         //Index for rendering angle locus around
-        private static int hoverItemAngleCenterIndex
-        {
-            get
-            {
-                switch (controlMode)
-                {
-                    case ControlMode.Itemwise:
-                        {
-                            return PlacementCalculator.ITEMWISE_INDEX;
-                        }
-                    default:
-                        {
-                            return 1;
-                        }
+        private static int hoverItemAngleCenterIndex {
+            get {
+                switch (controlMode) {
+                    case ControlMode.Itemwise: {
+                        return PlacementCalculator.ITEMWISE_INDEX;
+                    }
+                    default: {
+                        return 1;
+                    }
                 }
             }
         }
 
         //ControlMode definition
-        public enum ControlMode
-        {
+        public enum ControlMode {
             Itemwise = 0,
             Spacing = 1
         }
         private static PropLineTool.ControlMode m_controlMode = ControlMode.Spacing;
-        public static PropLineTool.ControlMode controlMode
-        {
-            get
-            {
+        public static PropLineTool.ControlMode controlMode {
+            get {
                 return m_controlMode;
             }
-            set
-            {
+            set {
                 PropLineTool.ControlMode _oldValue = m_controlMode;
                 m_controlMode = value;
 
-                if (value != _oldValue)
-                {
+                if (value != _oldValue) {
                     OnControlModeChanged(value);
                 }
             }
         }
         public static event VoidObjectPropertyChangedEventHandler<PropLineTool.ControlMode> eventControlModeChanged;
-        protected static void OnControlModeChanged(PropLineTool.ControlMode controlMode)
-        {
+        protected static void OnControlModeChanged(PropLineTool.ControlMode controlMode) {
             //send out event signal
-            if (eventControlModeChanged != null)
-            {
-                eventControlModeChanged(controlMode);
-            }
+            eventControlModeChanged?.Invoke(controlMode);
         }
 
         //ActiveState definition
-        public enum ActiveState
-        {
+        public enum ActiveState {
             Undefined = 0,
             CreatePointFirst = 1,
             CreatePointSecond = 2,
@@ -455,113 +399,91 @@ namespace PropLineTool
             MaxFillContinue = 40
         }
         private static PropLineTool.ActiveState m_activeState = ActiveState.CreatePointFirst;
-        private static PropLineTool.ActiveState activeState
-        {
-            get
-            {
+        private static PropLineTool.ActiveState activeState {
+            get {
                 return m_activeState;
             }
-            set
-            {
+            set {
                 ActiveState _oldValue = m_activeState;
                 m_activeState = value;
-                if (value != _oldValue)
-                {
+                if (value != _oldValue) {
                     OnActiveStateChanged(value);
                 }
             }
         }
         public static event VoidObjectPropertyChangedEventHandler<ActiveState> eventActiveStateChanged;
-        private static void OnActiveStateChanged(ActiveState state)
-        {
-            if (eventActiveStateChanged != null)
-            {
-                eventActiveStateChanged(state);
-            }
+        private static void OnActiveStateChanged(ActiveState state) {
+            eventActiveStateChanged?.Invoke(state);
         }
 
-        public bool IsActiveStateAnItemRenderState()
-        {
+        public bool IsActiveStateAnItemRenderState() {
             bool _result = false;
 
-            switch (drawMode)
-            {
+            switch (drawMode) {
                 case DrawMode.Straight:
-                case DrawMode.Circle:
-                    {
-                        switch (activeState)
-                        {
-                            case ActiveState.CreatePointFirst:
-                                {
-                                    _result = false;
-                                    break;
-                                }
-                            case ActiveState.CreatePointSecond:
-                                {
-                                    _result = true;
-                                    break;
-                                }
-                            case ActiveState.CreatePointThird:
-                            case ActiveState.LockIdle:
-                            case ActiveState.MovePointFirst:
-                            case ActiveState.MovePointSecond:
-                            case ActiveState.MovePointThird:
-                            case ActiveState.MoveSegment:
-                            case ActiveState.ChangeSpacing:
-                            case ActiveState.ChangeAngle:
-                            case ActiveState.ItemwiseLock:
-                            case ActiveState.MoveItemwiseItem:
-                            case ActiveState.MaxFillContinue:
-                                {
-                                    _result = true;
-                                    break;
-                                }
-                            default:
-                                break;
+                case DrawMode.Circle: {
+                    switch (activeState) {
+                        case ActiveState.CreatePointFirst: {
+                            _result = false;
+                            break;
                         }
-                        break;
+                        case ActiveState.CreatePointSecond: {
+                            _result = true;
+                            break;
+                        }
+                        case ActiveState.CreatePointThird:
+                        case ActiveState.LockIdle:
+                        case ActiveState.MovePointFirst:
+                        case ActiveState.MovePointSecond:
+                        case ActiveState.MovePointThird:
+                        case ActiveState.MoveSegment:
+                        case ActiveState.ChangeSpacing:
+                        case ActiveState.ChangeAngle:
+                        case ActiveState.ItemwiseLock:
+                        case ActiveState.MoveItemwiseItem:
+                        case ActiveState.MaxFillContinue: {
+                            _result = true;
+                            break;
+                        }
+                        default:
+                            break;
                     }
+                    break;
+                }
                 case DrawMode.Curved:
-                case DrawMode.Freeform:
-                    {
-                        switch (activeState)
-                        {
-                            case ActiveState.CreatePointFirst:
-                            case ActiveState.CreatePointSecond:
-                                {
-                                    _result = false;
-                                    break;
-                                }
-                            case ActiveState.CreatePointThird:
-                                {
-                                    _result = true;
-                                    break;
-                                }
-                            case ActiveState.LockIdle:
-                            case ActiveState.MovePointFirst:
-                            case ActiveState.MovePointSecond:
-                            case ActiveState.MovePointThird:
-                            case ActiveState.MoveSegment:
-                            case ActiveState.ChangeSpacing:
-                            case ActiveState.ChangeAngle:
-                            case ActiveState.MaxFillContinue:
-                                {
-                                    _result = true;
-                                    break;
-                                }
-                            default:
-                                {
-                                    _result = false;
-                                    break;
-                                }
+                case DrawMode.Freeform: {
+                    switch (activeState) {
+                        case ActiveState.CreatePointFirst:
+                        case ActiveState.CreatePointSecond: {
+                            _result = false;
+                            break;
                         }
-                        break;
+                        case ActiveState.CreatePointThird: {
+                            _result = true;
+                            break;
+                        }
+                        case ActiveState.LockIdle:
+                        case ActiveState.MovePointFirst:
+                        case ActiveState.MovePointSecond:
+                        case ActiveState.MovePointThird:
+                        case ActiveState.MoveSegment:
+                        case ActiveState.ChangeSpacing:
+                        case ActiveState.ChangeAngle:
+                        case ActiveState.MaxFillContinue: {
+                            _result = true;
+                            break;
+                        }
+                        default: {
+                            _result = false;
+                            break;
+                        }
                     }
-                default:
-                    {
-                        _result = false;
-                        break; 
-                    }
+                    break;
+                }
+                default: {
+                    _result = false;
+                    break;
+                }
             }
 
 
@@ -572,57 +494,45 @@ namespace PropLineTool
         private static KeyPressEvent m_keyPressEvent;
 
         //ObjectMode definition
-        public enum ObjectMode
-        {
+        public enum ObjectMode {
             Undefined = 0,
             Props = 1,
             Trees = 2
         }
         private static ObjectMode m_objectMode = ObjectMode.Undefined;//same as itemMode -> pick one!
-        public static PropLineTool.ObjectMode objectMode
-        {
-            get
-            {
+        public static PropLineTool.ObjectMode objectMode {
+            get {
                 return m_objectMode;
             }
-            set
-            {
+            set {
                 ObjectMode _oldValue = m_objectMode;
                 m_objectMode = value;
 
-                if (value != _oldValue)
-                {
+                if (value != _oldValue) {
                     OnObjectModeChanged(value);
                 }
             }
         }
         public static event VoidObjectPropertyChangedEventHandler<ObjectMode> eventObjectModeChanged;
-        private static void OnObjectModeChanged(ObjectMode mode)
-        {
-            if (eventObjectModeChanged != null)
-            {
-                eventObjectModeChanged(mode);
-            }
+        private static void OnObjectModeChanged(ObjectMode mode) {
+            eventObjectModeChanged?.Invoke(mode);
 
             //call before UpdateItemPlacementInfo()
-            if (userSettingsControlPanel.autoDefaultSpacing == true)
-            {
+            if (userSettingsControlPanel.autoDefaultSpacing == true) {
                 placementCalculator.SetDefaultSpacing();
             }
 
             placementCalculator.UpdateItemPlacementInfo();
-            
+
         }
-        
+
         //control points
-        public struct ControlPoint
-        {
+        public struct ControlPoint {
             public Vector3 m_position;
             public Vector3 m_direction;
             public bool m_outside;
 
-            public void Clear()
-            {
+            public void Clear() {
                 m_position = Vector3.zero;
                 m_direction = Vector3.zero;
                 m_outside = false;
@@ -630,54 +540,44 @@ namespace PropLineTool
         }
 
         //used to determine if control points are visible
-        public bool IsOneControlPointVisible()
-        {
+        public bool IsOneControlPointVisible() {
             bool _result = false;
 
             RenderManager.CameraInfo _cameraInfo = RenderManager.instance.CurrentCameraInfo;
-            if (_cameraInfo != null)
-            {
+            if (_cameraInfo != null) {
                 Vector3 _p0 = m_controlPoints[0].m_position;
                 Vector3 _p1 = m_controlPoints[1].m_position;
                 Vector3 _p2 = m_controlPoints[2].m_position;
 
                 float _radius = hoverPointDiameter;
 
-                switch (activeState)
-                {
-                    case ActiveState.CreatePointFirst:
-                        {
-                            _result = _cameraInfo.Intersect(_p0, _radius);
-                            break; 
-                        }
-                    case ActiveState.CreatePointSecond:
-                        {
-                            _result = _cameraInfo.Intersect(_p1, _radius) || _cameraInfo.Intersect(_p0, _radius);
-                            break;
-                        }
-                    case ActiveState.CreatePointThird:
-                        {
-                            switch (drawMode)
-                            {
-                                case DrawMode.Straight:
-                                case DrawMode.Circle:
-                                    {
-                                        _result = _cameraInfo.Intersect(_p1, _radius) || _cameraInfo.Intersect(_p0, _radius);
-                                        break;
-                                    }
-                                case DrawMode.Curved:
-                                case DrawMode.Freeform:
-                                    {
-                                        _result = _cameraInfo.Intersect(_p2, _radius) || _cameraInfo.Intersect(_p1, _radius) || _cameraInfo.Intersect(_p0, _radius);
-                                        break; 
-                                    }
-                                default:
-                                    {
-                                        break;
-                                    }
+                switch (activeState) {
+                    case ActiveState.CreatePointFirst: {
+                        _result = _cameraInfo.Intersect(_p0, _radius);
+                        break;
+                    }
+                    case ActiveState.CreatePointSecond: {
+                        _result = _cameraInfo.Intersect(_p1, _radius) || _cameraInfo.Intersect(_p0, _radius);
+                        break;
+                    }
+                    case ActiveState.CreatePointThird: {
+                        switch (drawMode) {
+                            case DrawMode.Straight:
+                            case DrawMode.Circle: {
+                                _result = _cameraInfo.Intersect(_p1, _radius) || _cameraInfo.Intersect(_p0, _radius);
+                                break;
                             }
-                            break;
+                            case DrawMode.Curved:
+                            case DrawMode.Freeform: {
+                                _result = _cameraInfo.Intersect(_p2, _radius) || _cameraInfo.Intersect(_p1, _radius) || _cameraInfo.Intersect(_p0, _radius);
+                                break;
+                            }
+                            default: {
+                                break;
+                            }
                         }
+                        break;
+                    }
                     case ActiveState.LockIdle:
                     case ActiveState.MovePointFirst:
                     case ActiveState.MovePointSecond:
@@ -687,42 +587,36 @@ namespace PropLineTool
                     case ActiveState.ChangeAngle:
                     case ActiveState.ItemwiseLock:
                     case ActiveState.MoveItemwiseItem:
-                    case ActiveState.MaxFillContinue:
-                        {
-                            switch (drawMode)
-                            {
-                                case DrawMode.Straight:
-                                case DrawMode.Circle:
-                                    {
-                                        _result = _cameraInfo.Intersect(_p1, _radius) || _cameraInfo.Intersect(_p0, _radius);
-                                        break;
-                                    }
-                                case DrawMode.Curved:
-                                case DrawMode.Freeform:
-                                    {
-                                        _result = _cameraInfo.Intersect(_p2, _radius) || _cameraInfo.Intersect(_p1, _radius) || _cameraInfo.Intersect(_p0, _radius);
-                                        break;
-                                    }
-                                default:
-                                    {
-                                        break;
-                                    }
+                    case ActiveState.MaxFillContinue: {
+                        switch (drawMode) {
+                            case DrawMode.Straight:
+                            case DrawMode.Circle: {
+                                _result = _cameraInfo.Intersect(_p1, _radius) || _cameraInfo.Intersect(_p0, _radius);
+                                break;
                             }
-                            break;
+                            case DrawMode.Curved:
+                            case DrawMode.Freeform: {
+                                _result = _cameraInfo.Intersect(_p2, _radius) || _cameraInfo.Intersect(_p1, _radius) || _cameraInfo.Intersect(_p0, _radius);
+                                break;
+                            }
+                            default: {
+                                break;
+                            }
                         }
-                    default:
-                        {
-                            break; 
-                        }
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
                 }
             }
-            
+
             return _result;
         }
 
         //maybe this should be in the userParameters struct
         public static bool m_useCOBezierMethod = true; //if true, rounds out tight re-curves (or tight curves)
-        
+
         //Geometry
         //   Main
         private static Segment3 m_mainSegment;
@@ -740,8 +634,7 @@ namespace PropLineTool
 
         //Item Placement Info
         public const int MAX_ITEM_ARRAY_LENGTH = 256;
-        public struct ItemPlacementInfo
-        {
+        public struct ItemPlacementInfo {
             //position stuff
             public float t; //where on the curve it is located (endpoint location for fence mode)
             public Vector3 position;
@@ -757,43 +650,33 @@ namespace PropLineTool
             /// <summary>
             /// Set only after angle and position have been set.
             /// </summary>
-            private Vector3 centerCorrection
-            {
-                set
-                {
+            private Vector3 centerCorrection {
+                set {
                     m_centerCorrection = value;
                 }
             }
             /// <summary>
             /// Only use for rendering geometry and placing items!
             /// </summary>
-            public Vector3 meshPosition
-            {
-                get
-                {
-                    if (userSettingsControlPanel.useMeshCenterCorrection)
-                    {
+            public Vector3 meshPosition {
+                get {
+                    if (userSettingsControlPanel.useMeshCenterCorrection) {
                         return this.position + this.m_centerCorrection;
-                    }
-                    else
-                    {
+                    } else {
                         return this.position;
                     }
                 }
             }
-            private void CalculateCenterCorrection(Vector3 orthogonalCenterCorrection)
-            {
-                if (!PropLineTool.userSettingsControlPanel.useMeshCenterCorrection)
-                {
+            private void CalculateCenterCorrection(Vector3 orthogonalCenterCorrection) {
+                if (!PropLineTool.userSettingsControlPanel.useMeshCenterCorrection) {
                     this.centerCorrection = Vector3.zero;
                     return;
                 }
-                if (orthogonalCenterCorrection.magnitude == 0f)
-                {
+                if (orthogonalCenterCorrection.magnitude == 0f) {
                     this.centerCorrection = Vector3.zero;
                     return;
                 }
-                
+
                 Vector3 _centerCorrection = orthogonalCenterCorrection;
                 //use negative angle since Unity is left-handed / CW rotation
                 Quaternion _rotation = Quaternion.AngleAxis(-this.angle * Mathf.Rad2Deg, Vector3.up);
@@ -810,23 +693,17 @@ namespace PropLineTool
             /// <summary>
             /// Set only after angle and position have been set.
             /// </summary>
-            public PropInfo propInfo
-            {
-                get
-                {
+            public PropInfo propInfo {
+                get {
                     return PrefabCollection<PropInfo>.GetPrefab((uint)this.propInfoIndex);
                 }
-                set
-                {
+                set {
                     this.propInfoIndex = (ushort)Mathf.Clamp(value.m_prefabDataIndex, 0, 65535);
 
                     Vector3 _centerCorrectionOrthogonal = new Vector3();
-                    if (value.IsMeshCenterOffset(true, out _centerCorrectionOrthogonal))
-                    {
+                    if (value.IsMeshCenterOffset(true, out _centerCorrectionOrthogonal)) {
                         CalculateCenterCorrection(_centerCorrectionOrthogonal);
-                    }
-                    else
-                    {
+                    } else {
                         this.m_centerCorrection = Vector3.zero;
                     }
                 }
@@ -838,74 +715,60 @@ namespace PropLineTool
             /// <summary>
             /// Set only after angle and position have been set.
             /// </summary>
-            public TreeInfo treeInfo
-            {
-                get
-                {
+            public TreeInfo treeInfo {
+                get {
                     return PrefabCollection<TreeInfo>.GetPrefab((uint)this.treeInfoIndex);
                 }
-                set
-                {
+                set {
                     this.treeInfoIndex = (ushort)Mathf.Clamp(value.m_prefabDataIndex, 0, 65535);
 
                     Vector3 _centerCorrectionOrthogonal = new Vector3();
-                    if (value.IsMeshCenterOffset(true, out _centerCorrectionOrthogonal))
-                    {
+                    if (value.IsMeshCenterOffset(true, out _centerCorrectionOrthogonal)) {
                         CalculateCenterCorrection(_centerCorrectionOrthogonal);
-                    }
-                    else
-                    {
+                    } else {
                         this.m_centerCorrection = Vector3.zero;
                     }
                 }
             }
             //prop and tree
             public float scale;
-            
+
             //error checking
             public bool isValidPlacement;
             public ItemCollisionType collisionFlags;
 
-            
+
 
             //use whenever curve changes (tight->round or ->extended or ->shallow etc; whenever a control point is moved)
-            public void SetTAndPosition(float t)
-            {
+            public void SetTAndPosition(float t) {
                 this.t = t;
-                switch (drawMode)
-                {
-                    case DrawMode.Straight:
-                        {
-                            position = Math.MathPLT.LinePosition(m_mainSegment, t);
-                            break; 
-                        }
+                switch (drawMode) {
+                    case DrawMode.Straight: {
+                        position = Math.MathPLT.LinePosition(m_mainSegment, t);
+                        break;
+                    }
                     case DrawMode.Curved:
-                    case DrawMode.Freeform:
-                        {
-                            position = m_mainBezier.Position(t);
-                            break;
-                        }
-                    case DrawMode.Circle:
-                        {
-                            position = m_mainCircle.Position(t);
-                            break;
-                        }
-                    default:
-                        {
-                            //do nothing
-                            break;
-                        }
+                    case DrawMode.Freeform: {
+                        position = m_mainBezier.Position(t);
+                        break;
+                    }
+                    case DrawMode.Circle: {
+                        position = m_mainCircle.Position(t);
+                        break;
+                    }
+                    default: {
+                        //do nothing
+                        break;
+                    }
                 }
             }
 
-            public void SetTAndPosition(float t, Vector3 position)
-            {
+            public void SetTAndPosition(float t, Vector3 position) {
                 this.t = t;
                 this.position = position;
             }
-            
-            public void SetDirectionsXZ(Vector3 itemDirection)
-            {
+
+            public void SetDirectionsXZ(Vector3 itemDirection) {
                 Vector3 _itemDir = itemDirection;
                 _itemDir.y = 0f;
                 _itemDir.Normalize();
@@ -913,31 +776,27 @@ namespace PropLineTool
                 CalculateOffsetDirectionXZ();
             }
 
-            public void CalculateOffsetDirectionXZ()
-            {
-                Vector3 _offsetDir = new Vector3();
-                _offsetDir.x = itemDirection.z;
-                _offsetDir.z = -itemDirection.x;
+            public void CalculateOffsetDirectionXZ() {
+                Vector3 _offsetDir = new Vector3 {
+                    x = itemDirection.z,
+                    z = -itemDirection.x
+                };
                 offsetDirection = _offsetDir;
             }
 
-            
+
 
         }
         private static ItemPlacementInfo[] m_placementInfo = new ItemPlacementInfo[MAX_ITEM_ARRAY_LENGTH];
         private static Vector3[] m_fenceEndPoints = new Vector3[MAX_ITEM_ARRAY_LENGTH + 1];
         private static int[] m_randInts = new int[MAX_ITEM_ARRAY_LENGTH];
-        public static bool GetRandIntFromIndex(int index, out int randomInteger)
-        {
+        public static bool GetRandIntFromIndex(int index, out int randomInteger) {
             randomInteger = 0;
 
             bool result = false;
-            if (PlacementCalculator.IsIndexWithinBounds(index, false))
-            {
+            if (PlacementCalculator.IsIndexWithinBounds(index, false)) {
                 result = true;
-            }
-            else
-            {
+            } else {
                 result = false;
             }
 
@@ -951,107 +810,82 @@ namespace PropLineTool
         /// </summary>
         /// <param name="min">Minimum integer value. Generally 0.</param>
         /// <param name="max">Maximum integer value. Generally 10,000.</param>
-        public static void PopulateRandIntArray(int min, int max)
-        {
+        public static void PopulateRandIntArray(int min, int max) {
             Randomizer _randomizer = new Randomizer((ulong)DateTime.Now.Ticks);
-            for (int i = 0; i < m_randInts.Length; i++)
-            {
+            for (int i = 0; i < m_randInts.Length; i++) {
                 m_randInts[i] = _randomizer.Int32(min, max);
             }
         }
 
         //becomes true as soon as alt-click is pressed, otherwise false
         private static bool m_isCopyPlacing = false;
-        public static bool isCopyPlacing
-        {
-            get
-            {
+        public static bool isCopyPlacing {
+            get {
                 return m_isCopyPlacing;
             }
-            private set
-            {
+            private set {
                 m_isCopyPlacing = value;
             }
         }
 
         //methods to calculate placement
-        public class PlacementCalculator
-        {
+        public class PlacementCalculator {
             private int m_itemCount;
             private float m_spacingSingle = 8f;
             private float m_angleSingle = 0f;     //absolute angle, in radians
             private float m_angleOffset = 0f;   //absolute angle, in radians
             private float m_tolerance = 0.001f;
-            public float tolerance
-            {
-                get
-                {
+            public float tolerance {
+                get {
                     return m_tolerance;
                 }
             }
-            
+
             public const int ITEMWISE_INDEX = 0;
             public const int ITEMWISE_FENCE_INDEX_START = 0;
             public const int ITEMWISE_FENCE_INDEX_END = 1;
-            
+
             //170527: now many in one
             private SegmentState m_segmentState = new SegmentState();
-            public SegmentState segmentState
-            {
-                get
-                {
+            public SegmentState segmentState {
+                get {
                     return m_segmentState;
                 }
-                private set
-                {
+                private set {
                     m_segmentState = value;
                 }
             }
 
-            public ItemPlacementInfo finalItem
-            {
-                get
-                {
+            public ItemPlacementInfo finalItem {
+                get {
                     return m_placementInfo[Mathf.Clamp(m_itemCount - 1, 0, MAX_ITEM_ARRAY_LENGTH - 1)];
                 }
             }
             /// <summary>
             /// Returns the position of the final item in the segment, or the far endpoint of the final item for fenceMode enabled.
             /// </summary>
-            public Vector3 finalItemPosition
-            {
-                get
-                {
-                    if (fenceMode)
-                    {
+            public Vector3 finalItemPosition {
+                get {
+                    if (fenceMode) {
                         return GetFenceEndpoint(m_itemCount);
-                    }
-                    else
-                    {
+                    } else {
                         return GetItemPosition(m_itemCount - 1);
                     }
                 }
             }
-            public ItemPlacementInfo initialItem
-            {
-                get
-                {
+            public ItemPlacementInfo initialItem {
+                get {
                     return m_placementInfo[0];
                 }
             }
             /// <summary>
             /// Returns the position of the initial item in the segment, or the close endpoint of the initial item for fenceMode enabled.
             /// </summary>
-            public Vector3 initialItemPosition
-            {
-                get
-                {
-                    if (fenceMode)
-                    {
+            public Vector3 initialItemPosition {
+                get {
+                    if (fenceMode) {
                         return GetFenceEndpoint(0);
-                    }
-                    else
-                    {
+                    } else {
                         return GetItemPosition(0);
                     }
                 }
@@ -1063,72 +897,55 @@ namespace PropLineTool
             private float m_assetLength;
 
             private PropInfo m_propInfo;
-            public PropInfo propInfo
-            {
-                get
-                {
+            public PropInfo propInfo {
+                get {
                     return m_propInfo;
                 }
-                set
-                {
+                set {
                     m_propInfo = value;
                 }
             }
             private TreeInfo m_treeInfo;
-            public TreeInfo treeInfo
-            {
-                get
-                {
+            public TreeInfo treeInfo {
+                get {
                     return m_treeInfo;
                 }
-                set
-                {
+                set {
                     m_treeInfo = value;
                 }
             }
 
             //randomizer stuff
             private const int SEED_INT = 8675309;
-            public static Randomizer randomizerFresh
-            {
-                get
-                {
-                    switch (objectMode)
-                    {
-                        case ObjectMode.Props:
-                            {
-                                ushort seed = Singleton<PropManager>.instance.m_props.NextFreeItem();
-                                return new Randomizer(seed);
-                            }
-                        case ObjectMode.Trees:
-                            {
-                                uint seed = Singleton<TreeManager>.instance.m_trees.NextFreeItem();
-                                return new Randomizer(seed);
-                            }
-                        default:
-                            {
-                                return new Randomizer(SEED_INT);
-                            }
+            public static Randomizer randomizerFresh {
+                get {
+                    switch (objectMode) {
+                        case ObjectMode.Props: {
+                            ushort seed = Singleton<PropManager>.instance.m_props.NextFreeItem();
+                            return new Randomizer(seed);
+                        }
+                        case ObjectMode.Trees: {
+                            uint seed = Singleton<TreeManager>.instance.m_trees.NextFreeItem();
+                            return new Randomizer(seed);
+                        }
+                        default: {
+                            return new Randomizer(SEED_INT);
+                        }
                     }
                 }
             }
-            public static Randomizer RandomizerNextRandom(Randomizer seedRandomizer)
-            {
-                    switch (objectMode)
-                    {
-                        case ObjectMode.Props:
-                            {
+            public static Randomizer RandomizerNextRandom(Randomizer seedRandomizer) {
+                switch (objectMode) {
+                    case ObjectMode.Props: {
 
                         ushort seed = Singleton<PropManager>.instance.m_props.NextFreeItem(ref seedRandomizer);
                         return new Randomizer(seed);
                     }
-                        case ObjectMode.Trees:
-                            {
+                    case ObjectMode.Trees: {
                         uint seed = Singleton<TreeManager>.instance.m_trees.NextFreeItem(ref seedRandomizer);
                         return new Randomizer(seed);
                     }
-                    default:
-                            {
+                    default: {
                         return new Randomizer(SEED_INT);
                     }
                 }
@@ -1159,25 +976,21 @@ namespace PropLineTool
             //    }
             //}
 
-            
+
 
             //base mod params
             //spacing and angle getters and setters
-            internal float spacingSingle
-            {
-                get
-                {
+            internal float spacingSingle {
+                get {
                     return m_spacingSingle;
                 }
-                set
-                {
+                set {
                     float _oldValue = m_spacingSingle;
 
                     value = Mathf.Clamp(value, UserParameters.SPACING_MIN, UserParameters.SPACING_MAX);
                     m_spacingSingle = value;
 
-                    if (value != _oldValue)
-                    {
+                    if (value != _oldValue) {
                         OnSpacingSingleChanged(value);
                     }
                 }
@@ -1185,21 +998,17 @@ namespace PropLineTool
             /// <summary>
             /// Angle in radians.
             /// </summary>
-            internal float angleSingle
-            {
-                get
-                {
+            internal float angleSingle {
+                get {
                     return m_angleSingle;
                 }
-                set
-                {
+                set {
                     float _oldValue = m_angleSingle;
 
-                    value = value % (2f * Mathf.PI);
+                    value %= (2f * Mathf.PI);
                     m_angleSingle = value;
 
-                    if (value != _oldValue)
-                    {
+                    if (value != _oldValue) {
                         OnAngleOffsetChanged(value);
                     }
                 }
@@ -1207,44 +1016,35 @@ namespace PropLineTool
             /// <summary>
             /// Angle in radians.
             /// </summary>
-            internal float angleOffset
-            {
-                get
-                {
+            internal float angleOffset {
+                get {
                     return m_angleOffset;
                 }
-                set
-                {
+                set {
                     float _oldValue = m_angleOffset;
 
-                    value = value % (2f * Mathf.PI);
+                    value %= (2f * Mathf.PI);
                     m_angleOffset = value;
 
-                    if (value != _oldValue)
-                    {
+                    if (value != _oldValue) {
                         OnAngleOffsetChanged(value);
                     }
                 }
             }
-            public enum AngleMode
-            {
+            public enum AngleMode {
                 Dynamic,
                 Single
             }
             internal AngleMode m_angleMode = AngleMode.Dynamic;
-            internal AngleMode angleMode
-            {
-                get
-                {
+            internal AngleMode angleMode {
+                get {
                     return m_angleMode;
                 }
-                set
-                {
+                set {
                     AngleMode _oldValue = m_angleMode;
                     m_angleMode = value;
 
-                    if (value != _oldValue)
-                    {
+                    if (value != _oldValue) {
                         OnAngleModeChanged(value);
                     }
                 }
@@ -1256,95 +1056,64 @@ namespace PropLineTool
             public event ObjectPropertyChangedEventHandler<float> eventAngleSingleChanged;
             public event ObjectPropertyChangedEventHandler<float> eventAngleOffsetChanged;
             public event ObjectPropertyChangedEventHandler<AngleMode> eventAngleModeChanged;
-            protected void OnBaseParameterChanged()
-            {
-                if (eventBaseParameterChanged != null)
-                {
-                    eventBaseParameterChanged();
-                }
+            protected void OnBaseParameterChanged() {
+                eventBaseParameterChanged?.Invoke();
                 UpdateItemPlacementInfo(segmentState.isContinueDrawing, segmentState.keepLastOffsets);
             }
-            protected void OnSpacingSingleChanged(float value)
-            {
+            protected void OnSpacingSingleChanged(float value) {
                 //nullcheck added 161103 2234
-                if (eventSpacingSingleChanged != null)
-                {
-                    eventSpacingSingleChanged(this, value);
-                }
-                
+                eventSpacingSingleChanged?.Invoke(this, value);
+
                 OnBaseParameterChanged();
             }
-            protected void OnAngleSingleChanged(float value)
-            {
-                if (eventAngleSingleChanged != null)
-                {
-                    eventAngleSingleChanged(this, value);
-                }
-                
+            protected void OnAngleSingleChanged(float value) {
+                eventAngleSingleChanged?.Invoke(this, value);
+
                 OnBaseParameterChanged();
             }
-            protected void OnAngleOffsetChanged(float value)
-            {
-                if (eventAngleOffsetChanged != null)
-                {
-                    eventAngleOffsetChanged(this, value);
-                }
-                
+            protected void OnAngleOffsetChanged(float value) {
+                eventAngleOffsetChanged?.Invoke(this, value);
+
                 OnBaseParameterChanged();
             }
-            protected void OnAngleModeChanged(AngleMode mode)
-            {
-                if (eventAngleModeChanged != null)
-                {
-                    eventAngleModeChanged(this, mode);
-                }
-                
+            protected void OnAngleModeChanged(AngleMode mode) {
+                eventAngleModeChanged?.Invoke(this, mode);
+
                 OnBaseParameterChanged();
             }
 
 
             //length and width getters and setters
-            public float getLength
-            {
-                get
-                {
+            public float getLength {
+                get {
                     return m_assetLength;
                 }
             }
-            public float getWidth
-            {
-                get
-                {
+            public float getWidth {
+                get {
                     return m_assetWidth;
                 }
             }
 
             //defaults getters and setters
-            public float getDefaultSpacing
-            {
-                get
-                {
+            public float getDefaultSpacing {
+                get {
                     return GetDefaultSpacing();
                 }
             }
 
             //called on PropLineTool.OnEnable
-            public void SetupPropPrefab(PropInfo propPrefab)
-            {
-                if (propPrefab == null)
-                {
+            public void SetupPropPrefab(PropInfo propPrefab) {
+                if (propPrefab == null) {
                     return;
                 }
-                
+
                 m_assetModelX = 2f * propPrefab.m_mesh.bounds.extents.x;
                 m_assetModelZ = 2f * propPrefab.m_mesh.bounds.extents.z;
-                if (m_assetModelX < m_assetModelZ)
-                {
+                if (m_assetModelX < m_assetModelZ) {
                     m_assetWidth = m_assetModelX;
                     m_assetLength = m_assetModelZ;
-                }
-                else
-                {
+                } else {
                     m_assetWidth = m_assetModelZ;
                     m_assetLength = m_assetModelX;
                 }
@@ -1352,22 +1121,17 @@ namespace PropLineTool
                 propInfo = propPrefab;
             }
             //called on PropLineTool.OnEnable
-            public void SetupTreePrefab(TreeInfo treePrefab)
-            {
-                if (treePrefab == null)
-                {
+            public void SetupTreePrefab(TreeInfo treePrefab) {
+                if (treePrefab == null) {
                     return;
                 }
 
                 m_assetModelX = 2f * treePrefab.m_mesh.bounds.extents.x;
                 m_assetModelZ = 2f * treePrefab.m_mesh.bounds.extents.z;
-                if (m_assetModelX < m_assetModelZ)
-                {
+                if (m_assetModelX < m_assetModelZ) {
                     m_assetWidth = m_assetModelX;
                     m_assetLength = m_assetModelZ;
-                }
-                else
-                {
+                } else {
                     m_assetWidth = m_assetModelZ;
                     m_assetLength = m_assetModelX;
                 }
@@ -1375,23 +1139,19 @@ namespace PropLineTool
                 treeInfo = treePrefab;
             }
 
-            public void GetPrefabData(PropInfo propInfo, TreeInfo treeInfo)
-            {
-                switch (objectMode)
-                {
-                    case ObjectMode.Props:
-                        {
-                            SetupPropPrefab(propInfo);
-                            break; 
-                        }
-                    case ObjectMode.Trees:
-                        {
-                            SetupTreePrefab(treeInfo);
-                            break; 
-                        }
+            public void GetPrefabData(PropInfo propInfo, TreeInfo treeInfo) {
+                switch (objectMode) {
+                    case ObjectMode.Props: {
+                        SetupPropPrefab(propInfo);
+                        break;
+                    }
+                    case ObjectMode.Trees: {
+                        SetupTreePrefab(treeInfo);
+                        break;
+                    }
                 }
             }
-            
+
 
             public void Reset() //used like Awake()
             {
@@ -1402,39 +1162,33 @@ namespace PropLineTool
                 segmentState = new SegmentState();
             }
 
-            public void SetContinueDrawing(bool continueDrawing)
-            {
+            public void SetContinueDrawing(bool continueDrawing) {
                 segmentState.isContinueDrawing = continueDrawing;
             }
 
-            internal Vector3 GetLastFenceEndpoint()
-            {
+            internal Vector3 GetLastFenceEndpoint() {
                 return segmentState.lastFenceEndpoint;
             }
-            
-            public static float GetCurveLength(Bezier3 curve)
-            {
+
+            public static float GetCurveLength(Bezier3 curve) {
                 float result = 0f;
                 result = Math.MathPLT.CubicBezierArcLengthXZGauss12(curve, 0f, 1f);
                 return result;
             }
-            public static float GetCurveLength(Segment3 line)
-            {
+            public static float GetCurveLength(Segment3 line) {
                 float result = 0f;
                 result = line.LengthXZ();
                 return result;
             }
-            public int GetItemCountActual()
-            {
+            public int GetItemCountActual() {
                 int result = 0;
                 result = Mathf.Clamp(m_itemCount, 0, MAX_ITEM_ARRAY_LENGTH);
                 return result;
             }
-            
+
 
             //called primarily in ProcessKeyInputImpl
-            public bool FinalizeForPlacement(bool continueDrawing)
-            {
+            public bool FinalizeForPlacement(bool continueDrawing) {
                 //new as of 160622
                 m_itemCount = 0;
 
@@ -1447,55 +1201,46 @@ namespace PropLineTool
             /// <param name="lastFinalOffset"></param>
             /// <param name="lastFenceEndpoint"></param>
             /// <returns></returns>
-            internal bool RevertLastContinueParameters(float lastFinalOffset, Vector3 lastFenceEndpoint)
-            {
+            internal bool RevertLastContinueParameters(float lastFinalOffset, Vector3 lastFenceEndpoint) {
                 segmentState.RevertLastContinueParameters(lastFinalOffset, lastFenceEndpoint);
 
                 //return FinalizeForPlacement(true);
                 return true;
             }
 
-            public void ResetLastContinueParameters()
-            {
+            public void ResetLastContinueParameters() {
                 segmentState.lastFenceEndpoint = Vector3.down;
                 segmentState.lastFinalOffset = 0f;
                 UpdateItemPlacementInfo();
             }
 
-            public bool UpdateItemPlacementInfo()
-            {
+            public bool UpdateItemPlacementInfo() {
                 return UpdateItemPlacementInfo(segmentState.isContinueDrawing, segmentState.keepLastOffsets);
             }
 
-            public bool UpdateItemPlacementInfo(bool forceContinueDrawing)
-            {
+            public bool UpdateItemPlacementInfo(bool forceContinueDrawing) {
                 return UpdateItemPlacementInfo(forceContinueDrawing, segmentState.keepLastOffsets);
             }
 
             //called primarily in OnToolLateUpdate
             //and in ProcessKeyInputImpl
             //*** CALL AFTER UPDATECURVES ***
-            public bool UpdateItemPlacementInfo(bool forceContinueDrawing, bool forceKeepLastOffsets)
-            {
+            public bool UpdateItemPlacementInfo(bool forceContinueDrawing, bool forceKeepLastOffsets) {
                 bool result = false;
-                if (PropLineTool.isCopyPlacing)
-                {
+                if (PropLineTool.isCopyPlacing) {
                     segmentState.keepLastOffsets = true;
                     result = CalculateAll(true);
-                }
-                else
-                {
+                } else {
                     segmentState.keepLastOffsets = forceKeepLastOffsets;
                     result = CalculateAll(forceContinueDrawing || segmentState.isContinueDrawing);
                 }
 
                 segmentState.isContinueDrawing = forceContinueDrawing;
-                
+
                 return result;
             }
-            
-            private bool CalculateAll(bool continueDrawing)
-            {
+
+            private bool CalculateAll(bool continueDrawing) {
                 //MOVED TO: CalculateAllPositions()
                 //float _initialOffset = 0f;
                 //Vector3 _lastFenceEndPoint = Vector3.down;
@@ -1522,153 +1267,119 @@ namespace PropLineTool
                 int _count = Mathf.Min(MAX_ITEM_ARRAY_LENGTH, _userMaxCount);
                 _count = Mathf.Clamp(_count, 0, _count);
                 m_itemCount = _count;   //not sure about setting m_itemCount here, before CalculateAllPositions
-                
+
                 //original as of 161111 2308
                 //if (CalculateAllPositions(_initialOffset, _lastFenceEndPoint))
                 //new as of 161111 2308
-                if (CalculateAllPositions(continueDrawing))
-                {
-                    
-                    if (CalculateAllDirections())
-                    {
-                        
+                if (CalculateAllPositions(continueDrawing)) {
+
+                    if (CalculateAllDirections()) {
+
                         CalculateAllAnglesBase();
-                        
+
                         SetAllItemPrefabInfos();
-                        
+
                         UpdatePlacementErrors();
 
                         return true;
                     }
-                    
-                }
-                else
-                {
+
+                } else {
                     //Debug.Log("[PLT]: CalculateAllPositions returned false");
 
                     segmentState.maxItemCountExceeded = false;
                 }
                 return false;
             }
-            
-            public void TranslateAllPositions(Vector3 originalRefPoint, Vector3 finalRefPoint)
-            {
+
+            public void TranslateAllPositions(Vector3 originalRefPoint, Vector3 finalRefPoint) {
                 Vector3 _translation = finalRefPoint - originalRefPoint;
                 //items
-                for (int i = 0; i < m_itemCount; i++)
-                {
+                for (int i = 0; i < m_itemCount; i++) {
                     IncrementPosition(i, _translation);
                 }
                 //fence endpoints
-                for (int i = 0; i < m_itemCount + 1; i++)
-                {
+                for (int i = 0; i < m_itemCount + 1; i++) {
                     IncrementFenceEndpoint(i, _translation);
                 }
             }
-            public void TranslateAllPositions(Vector3 translation)
-            {
+            public void TranslateAllPositions(Vector3 translation) {
                 //items
-                for (int i = 0; i < m_itemCount; i++)
-                {
+                for (int i = 0; i < m_itemCount; i++) {
                     IncrementPosition(i, translation);
                 }
 
                 //fence endpoints
-                for (int i = 0; i < m_itemCount + 1; i++)
-                {
+                for (int i = 0; i < m_itemCount + 1; i++) {
                     IncrementFenceEndpoint(i, translation);
                 }
             }
-            
+
             //================================  SPACING  ================================|================================================================
-            
-            public void SetDefaultSpacing()
-            {
+
+            public void SetDefaultSpacing() {
                 spacingSingle = GetDefaultSpacing();
             }
-            public float GetDefaultSpacing()
-            {
+            public float GetDefaultSpacing() {
                 float _result = 8f;
 
-                if (fenceMode == true)
-                {
+                if (fenceMode == true) {
                     _result = DefaultSpacingFenceMode();
-                }
-                else
-                {
+                } else {
                     _result = DefaultSpacingNonFence();
                 }
 
-                if (fenceMode == false && objectMode == ObjectMode.Props && _result < 2f)
-                {
+                if (fenceMode == false && objectMode == ObjectMode.Props && _result < 2f) {
                     _result = 2f;
                 }
 
                 return _result;
             }
-            public float GetAssetLength()
-            {
+            public float GetAssetLength() {
                 return this.m_assetLength;
             }
-            public float GetAssetWidth()
-            {
+            public float GetAssetWidth() {
                 return this.m_assetWidth;
             }
-            
-            private float DefaultSpacingNonFence()
-            {
+
+            private float DefaultSpacingNonFence() {
                 float _scaleFactor = 1f;
-                switch (objectMode)
-                {
-                    case ObjectMode.Props:
-                        {
-                            if (m_assetLength < 4f && fenceMode == false)
-                            {
-                                _scaleFactor = 2.2f;
-                            }
-                            break; 
+                switch (objectMode) {
+                    case ObjectMode.Props: {
+                        if (m_assetLength < 4f && fenceMode == false) {
+                            _scaleFactor = 2.2f;
                         }
-                    case ObjectMode.Trees:
-                        {
-                            if (m_assetLength > 7f)
-                            {
-                                _scaleFactor = 1.1f;
-                            }
-                            else
-                            {
-                                _scaleFactor = 2f;
-                            }
-                            break; 
-                        }
-                    default:
-                        {
+                        break;
+                    }
+                    case ObjectMode.Trees: {
+                        if (m_assetLength > 7f) {
+                            _scaleFactor = 1.1f;
+                        } else {
                             _scaleFactor = 2f;
-                            break;
                         }
+                        break;
+                    }
+                    default: {
+                        _scaleFactor = 2f;
+                        break;
+                    }
                 }
 
                 float _result = Mathf.Clamp(m_assetLength * _scaleFactor, 0f, UserParameters.SPACING_MAX);
-                if (_result != 0f)
-                {
+                if (_result != 0f) {
                     return _result;
-                }
-                else
-                {
+                } else {
                     return 8f;
                 }
             }
-            private float DefaultSpacingFenceMode()
-            {
+            private float DefaultSpacingFenceMode() {
                 //original: nearest half-number
                 //float _result = Mathf.Clamp(Mathf.Round(m_assetLength) + Mathf.Round(2f * (m_assetLength % 0.5f)) * 0.5f, 0f, UserParameters.SPACING_MAX);
                 //new: nearest whole-number
                 float _result = Mathf.Clamp(Mathf.Round(m_assetLength), 0f, UserParameters.SPACING_MAX);
-                if (_result != 0f)
-                {
+                if (_result != 0f) {
                     return _result;
-                }
-                else
-                {
+                } else {
                     return 8f;
                 }
             }
@@ -1678,49 +1389,33 @@ namespace PropLineTool
             /// Calculates all item positions for all PLT modes and all control modes.
             /// </summary>
             /// <returns></returns>
-            private bool CalculateAllPositions(bool continueDrawing)
-            {
+            private bool CalculateAllPositions(bool continueDrawing) {
                 bool _result = false;
 
                 //moved from CalculateAll()
                 float _initialOffset = 0f;
                 Vector3 _lastFenceEndPoint = Vector3.down;
 
-                if (continueDrawing)
-                {
+                if (continueDrawing) {
                     _initialOffset = segmentState.lastFinalOffset;
                     _lastFenceEndPoint = segmentState.lastFenceEndpoint;
-                }
-                else
-                {
-                    switch (drawMode)
-                    {
-                        default:
-                        case DrawMode.Straight:
-                            {
-                                _lastFenceEndPoint = PropLineTool.m_mainSegment.b;
-                                break;
-                            }
-                    }
+                } else {
+                    _lastFenceEndPoint = PropLineTool.m_mainSegment.b;
                 }
 
-                switch (PropLineTool.controlMode)
-                {
-                    case ControlMode.Itemwise:
-                        {
-                            _result = CalculateItemwisePosition(spacingSingle, _initialOffset, _lastFenceEndPoint);
-                            break; 
-                        }
-                    case ControlMode.Spacing:
-                        {
-                            _result = CalculateAllPositionsBySpacing(spacingSingle, _initialOffset, _lastFenceEndPoint);
-                            break;
-                        }
-                    default:
-                        {
-                            _result = false;
-                            break;
-                        }
+                switch (PropLineTool.controlMode) {
+                    case ControlMode.Itemwise: {
+                        _result = CalculateItemwisePosition(spacingSingle, _initialOffset, _lastFenceEndPoint);
+                        break;
+                    }
+                    case ControlMode.Spacing: {
+                        _result = CalculateAllPositionsBySpacing(spacingSingle, _initialOffset, _lastFenceEndPoint);
+                        break;
+                    }
+                    default: {
+                        _result = false;
+                        break;
+                    }
                 }
 
                 return _result;
@@ -1734,10 +1429,8 @@ namespace PropLineTool
             /// <param name="initialOffset"></param>
             /// <param name="lastFenceEndpoint"></param>
             /// <returns></returns>
-            private bool CalculateItemwisePosition(float fencePieceLength, float initialOffset, Vector3 lastFenceEndpoint)
-            {
-                if (!IsIndexWithinBounds(ITEMWISE_INDEX, false))
-                {
+            private bool CalculateItemwisePosition(float fencePieceLength, float initialOffset, Vector3 lastFenceEndpoint) {
+                if (!IsIndexWithinBounds(ITEMWISE_INDEX, false)) {
                     return false;
                 }
 
@@ -1746,179 +1439,158 @@ namespace PropLineTool
 
                 if (PropLineTool.fenceMode == true) //FenceMode = ON
                 {
-                    switch (PropLineTool.drawMode)
-                    {
+                    switch (PropLineTool.drawMode) {
                         // ====== STRAIGHT FENCE ======
-                        case DrawMode.Straight:
-                            {
-                                float _lengthFull = GetCurveLength(m_mainSegment);
-                                float _speed = Math.MathPLT.LinearSpeedXZ(m_mainSegment);
+                        case DrawMode.Straight: {
+                            float _lengthFull = GetCurveLength(m_mainSegment);
+                            float _speed = Math.MathPLT.LinearSpeedXZ(m_mainSegment);
 
-                                float _mouseT = PropLineTool.hoverItemwiseT;
-                                float _deltaT = fencePieceLength / _speed;
+                            float _mouseT = PropLineTool.hoverItemwiseT;
+                            float _deltaT = fencePieceLength / _speed;
 
-                                float _itemTStart = _mouseT;
-                                float _sumT = _mouseT + _deltaT;
+                            float _itemTStart = _mouseT;
+                            float _sumT = _mouseT + _deltaT;
 
-                                //check if out of bounds
-                                if (_sumT > 1f && _lengthFull >= fencePieceLength)
-                                {
-                                    _itemTStart += (1f - _sumT);
-                                }
-
-                                float _itemTEnd = _itemTStart + _deltaT;
-
-                                //calculate endpoints
-                                Vector3 _positionStart = Math.MathPLT.LinePosition(m_mainSegment, _itemTStart);
-                                Vector3 _positionEnd = Math.MathPLT.LinePosition(m_mainSegment, _itemTEnd);
-                                SetFenceEndpoint(ITEMWISE_FENCE_INDEX_START, _positionStart);
-                                SetFenceEndpoint(ITEMWISE_FENCE_INDEX_END, _positionEnd);
-
-                                //then calculate midpoints
-                                Vector3 _midpoint = m_mainSegment.b;
-                                _midpoint = Vector3.Lerp(_positionStart, _positionEnd, 0.50f);
-                                SetPosition(ITEMWISE_INDEX, _midpoint);
-
-                                break; 
+                            //check if out of bounds
+                            if (_sumT > 1f && _lengthFull >= fencePieceLength) {
+                                _itemTStart += (1f - _sumT);
                             }
+
+                            float _itemTEnd = _itemTStart + _deltaT;
+
+                            //calculate endpoints
+                            Vector3 _positionStart = Math.MathPLT.LinePosition(m_mainSegment, _itemTStart);
+                            Vector3 _positionEnd = Math.MathPLT.LinePosition(m_mainSegment, _itemTEnd);
+                            SetFenceEndpoint(ITEMWISE_FENCE_INDEX_START, _positionStart);
+                            SetFenceEndpoint(ITEMWISE_FENCE_INDEX_END, _positionEnd);
+
+                            //then calculate midpoints
+                            Vector3 _midpoint = m_mainSegment.b;
+                            _midpoint = Vector3.Lerp(_positionStart, _positionEnd, 0.50f);
+                            SetPosition(ITEMWISE_INDEX, _midpoint);
+
+                            break;
+                        }
                         // ====== CURVED/FREEFORM FENCE ======
                         case DrawMode.Curved:
-                        case DrawMode.Freeform:
-                            {
-                                float _lengthFull = GetCurveLength(m_mainBezier);
+                        case DrawMode.Freeform: {
+                            float _lengthFull = GetCurveLength(m_mainBezier);
 
-                                //early exit
-                                if (fencePieceLength > _lengthFull)
-                                {
-                                    m_itemCount = 0;
-                                    return false;
-                                }
-
-                                float _mouseT = PropLineTool.hoverItemwiseT;
-                                float _itemTStart = _mouseT;
-                                float _itemTEnd = 1f;
-                                
-                                Vector3 _mouseCurvePosition = m_mainBezier.Position(_mouseT);
-                                if (!Math.MathPLT.CircleCurveFenceIntersectXZ(m_mainBezier, _itemTStart, fencePieceLength, m_tolerance, out _itemTEnd, false))
-                                {
-                                    
-                                }
-
-                                //check if out of bounds
-                                if (_itemTEnd > 1f)
-                                {
-                                    //out of bounds? -> attempt to snap to d-end of curve
-                                    //invert the curve to go "backwards"
-                                    _itemTEnd = 0f;
-                                    Bezier3 _inverseBezier = m_mainBezier.Invert();
-                                    if (!Math.MathPLT.CircleCurveFenceIntersectXZ(_inverseBezier, _itemTEnd, fencePieceLength, m_tolerance, out _itemTStart, false))
-                                    {
-                                        //failed to snap to d-end of curve
-                                        m_itemCount = 0;
-                                        return false;
-                                    }
-                                    else
-                                    {
-                                        _itemTStart = 1f - _itemTStart;
-                                        _itemTEnd = 1f - _itemTEnd;
-                                    }
-                                }
-                                 
-                                //set fence endpoints
-                                Vector3 _positionStart = m_mainBezier.Position(_itemTStart);
-                                Vector3 _positionEnd = m_mainBezier.Position(_itemTEnd);
-                                SetFenceEndpoint(ITEMWISE_FENCE_INDEX_START, _positionStart);
-                                SetFenceEndpoint(ITEMWISE_FENCE_INDEX_END, _positionEnd);
-                                //then set midpoint
-                                Vector3 _midpoint = _positionStart;
-                                _midpoint = Vector3.Lerp(_positionStart, _positionEnd, 0.50f);
-                                SetPosition(ITEMWISE_INDEX, _midpoint);
-                                
-                                break; 
-                            }
-                        // ====== CIRCLE FENCE ======
-                        case DrawMode.Circle:
-                            {
-                                //early exit
-                                if (PropLineTool.m_mainCircle.radius == 0f)
-                                {
-                                    m_itemCount = 0;
-                                    return false;
-                                }
-                                if (fencePieceLength > PropLineTool.m_mainCircle.diameter)
-                                {
-                                    m_itemCount = 0;
-                                    return false;
-                                }
-
-                                float _mouseT = PropLineTool.hoverItemwiseT;
-                                float _itemTStart = _mouseT;
-
-                                float _deltaT = PropLineTool.m_mainCircle.ChordDeltaT(fencePieceLength);
-                                if (_deltaT <= 0f || _deltaT >= 1f)
-                                {
-                                    m_itemCount = 0;
-                                    return false;
-                                }
-
-                                float _itemTEnd = _itemTStart + _deltaT;
-
-                                //set fence endpoints
-                                Vector3 _positionStart = m_mainCircle.Position(_itemTStart);
-                                Vector3 _positionEnd = m_mainCircle.Position(_itemTEnd);
-                                SetFenceEndpoint(ITEMWISE_FENCE_INDEX_START, _positionStart);
-                                SetFenceEndpoint(ITEMWISE_FENCE_INDEX_END, _positionEnd);
-                                //then set midpoint
-                                Vector3 _midpoint = _positionStart;
-                                _midpoint = Vector3.Lerp(_positionStart, _positionEnd, 0.50f);
-                                SetPosition(ITEMWISE_INDEX, _midpoint);
-
-                                break;
-                            }
-                        default:
-                            {
+                            //early exit
+                            if (fencePieceLength > _lengthFull) {
                                 m_itemCount = 0;
                                 return false;
                             }
-                    }
-                    
-                    
-                }
-                else //Non-fence mode
-                {
-                    switch (PropLineTool.drawMode)
-                    {
-                        // ====== STRAIGHT ======
-                        case DrawMode.Straight:
-                            {
-                                //Vector3 _position = m_mainSegment.Position(PropLineTool.hoverCurveT);
-                                Vector3 _position = Math.MathPLT.LinePosition(m_mainSegment, PropLineTool.hoverItemwiseT);
-                                SetTAndPosition(ITEMWISE_INDEX, PropLineTool.hoverItemwiseT, _position);
-                                break;
+
+                            float _mouseT = PropLineTool.hoverItemwiseT;
+                            float _itemTStart = _mouseT;
+                            float _itemTEnd = 1f;
+
+                            Vector3 _mouseCurvePosition = m_mainBezier.Position(_mouseT);
+                            if (!Math.MathPLT.CircleCurveFenceIntersectXZ(m_mainBezier, _itemTStart, fencePieceLength, m_tolerance, out _itemTEnd, false)) {
+
                             }
+
+                            //check if out of bounds
+                            if (_itemTEnd > 1f) {
+                                //out of bounds? -> attempt to snap to d-end of curve
+                                //invert the curve to go "backwards"
+                                _itemTEnd = 0f;
+                                Bezier3 _inverseBezier = m_mainBezier.Invert();
+                                if (!Math.MathPLT.CircleCurveFenceIntersectXZ(_inverseBezier, _itemTEnd, fencePieceLength, m_tolerance, out _itemTStart, false)) {
+                                    //failed to snap to d-end of curve
+                                    m_itemCount = 0;
+                                    return false;
+                                } else {
+                                    _itemTStart = 1f - _itemTStart;
+                                    _itemTEnd = 1f - _itemTEnd;
+                                }
+                            }
+
+                            //set fence endpoints
+                            Vector3 _positionStart = m_mainBezier.Position(_itemTStart);
+                            Vector3 _positionEnd = m_mainBezier.Position(_itemTEnd);
+                            SetFenceEndpoint(ITEMWISE_FENCE_INDEX_START, _positionStart);
+                            SetFenceEndpoint(ITEMWISE_FENCE_INDEX_END, _positionEnd);
+                            //then set midpoint
+                            Vector3 _midpoint = _positionStart;
+                            _midpoint = Vector3.Lerp(_positionStart, _positionEnd, 0.50f);
+                            SetPosition(ITEMWISE_INDEX, _midpoint);
+
+                            break;
+                        }
+                        // ====== CIRCLE FENCE ======
+                        case DrawMode.Circle: {
+                            //early exit
+                            if (PropLineTool.m_mainCircle.radius == 0f) {
+                                m_itemCount = 0;
+                                return false;
+                            }
+                            if (fencePieceLength > PropLineTool.m_mainCircle.diameter) {
+                                m_itemCount = 0;
+                                return false;
+                            }
+
+                            float _mouseT = PropLineTool.hoverItemwiseT;
+                            float _itemTStart = _mouseT;
+
+                            float _deltaT = PropLineTool.m_mainCircle.ChordDeltaT(fencePieceLength);
+                            if (_deltaT <= 0f || _deltaT >= 1f) {
+                                m_itemCount = 0;
+                                return false;
+                            }
+
+                            float _itemTEnd = _itemTStart + _deltaT;
+
+                            //set fence endpoints
+                            Vector3 _positionStart = m_mainCircle.Position(_itemTStart);
+                            Vector3 _positionEnd = m_mainCircle.Position(_itemTEnd);
+                            SetFenceEndpoint(ITEMWISE_FENCE_INDEX_START, _positionStart);
+                            SetFenceEndpoint(ITEMWISE_FENCE_INDEX_END, _positionEnd);
+                            //then set midpoint
+                            Vector3 _midpoint = _positionStart;
+                            _midpoint = Vector3.Lerp(_positionStart, _positionEnd, 0.50f);
+                            SetPosition(ITEMWISE_INDEX, _midpoint);
+
+                            break;
+                        }
+                        default: {
+                            m_itemCount = 0;
+                            return false;
+                        }
+                    }
+
+
+                } else //Non-fence mode
+                  {
+                    switch (PropLineTool.drawMode) {
+                        // ====== STRAIGHT ======
+                        case DrawMode.Straight: {
+                            //Vector3 _position = m_mainSegment.Position(PropLineTool.hoverCurveT);
+                            Vector3 _position = Math.MathPLT.LinePosition(m_mainSegment, PropLineTool.hoverItemwiseT);
+                            SetTAndPosition(ITEMWISE_INDEX, PropLineTool.hoverItemwiseT, _position);
+                            break;
+                        }
                         // ====== CURVED/FREEFORM ======
                         case DrawMode.Curved:
-                        case DrawMode.Freeform:
-                            {
-                                Vector3 _position = m_mainBezier.Position(PropLineTool.hoverItemwiseT);
-                                SetTAndPosition(ITEMWISE_INDEX, PropLineTool.hoverItemwiseT, _position);
-                                break;
-                            }
+                        case DrawMode.Freeform: {
+                            Vector3 _position = m_mainBezier.Position(PropLineTool.hoverItemwiseT);
+                            SetTAndPosition(ITEMWISE_INDEX, PropLineTool.hoverItemwiseT, _position);
+                            break;
+                        }
                         // ====== CIRCLE ======
-                        case DrawMode.Circle:
-                            {
-                                Vector3 _position = m_mainCircle.Position(PropLineTool.hoverItemwiseT);
-                                SetTAndPosition(ITEMWISE_INDEX, PropLineTool.hoverItemwiseT, _position);
-                                break;
-                            }
-                        default:
-                            {
-                                m_itemCount = 0;
-                                return false;
-                            }
+                        case DrawMode.Circle: {
+                            Vector3 _position = m_mainCircle.Position(PropLineTool.hoverItemwiseT);
+                            SetTAndPosition(ITEMWISE_INDEX, PropLineTool.hoverItemwiseT, _position);
+                            break;
+                        }
+                        default: {
+                            m_itemCount = 0;
+                            return false;
+                        }
                     }
                 }
-                
+
                 return true;
             }
 
@@ -1929,8 +1601,7 @@ namespace PropLineTool
             /// <param name="initialOffset"></param>
             /// <param name="lastFenceEndpoint"></param>
             /// <returns></returns>
-            private bool CalculateAllPositionsBySpacing(float spacing, float initialOffset, Vector3 lastFenceEndpoint)
-            {
+            private bool CalculateAllPositionsBySpacing(float spacing, float initialOffset, Vector3 lastFenceEndpoint) {
                 int _numItems = 0;
                 float _initialT = 0f;
                 float _finalT = 0f;
@@ -1941,21 +1612,18 @@ namespace PropLineTool
                 initialOffset = Mathf.Abs(initialOffset);
 
                 //first early exit condition
-                if (spacing == 0)
-                {
+                if (spacing == 0) {
                     m_itemCount = 0;
                     return false;
                 }
-                
-                if (!PropLineTool.IsCurveLengthLongEnoughXZ())
-                {
+
+                if (!PropLineTool.IsCurveLengthLongEnoughXZ()) {
                     m_itemCount = 0;
                     return false;
                 }
-                
+
                 //   more early exit conditions
-                if ((drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform))
-                {
+                if ((drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform)) {
                     if (fenceMode == true)
                     //if (m_fenceMode == true && Vector3.Distance(m_mainBezier.Position(0.50f), m_mainBezier.a) < m_spacing)
                     {
@@ -1969,625 +1637,532 @@ namespace PropLineTool
                     }
                 }
 
-                
-                
+
+
 
                 //begin code after passing early exit conditions
 
                 if (fenceMode == true)   //FenceMode = ON
                 {
-                    switch (drawMode)
-                    {
+                    switch (drawMode) {
                         // ====== STRAIGHT FENCE ======
-                        case DrawMode.Straight:
-                            {
-                                float _lengthFull = GetCurveLength(m_mainSegment);
-                                float _speed = Math.MathPLT.LinearSpeedXZ(m_mainSegment);
+                        case DrawMode.Straight: {
+                            float _lengthFull = GetCurveLength(m_mainSegment);
+                            float _speed = Math.MathPLT.LinearSpeedXZ(m_mainSegment);
 
-                                float _lengthAfterFirst = segmentState.isMaxFillContinue ? _lengthFull - Mathf.Abs(initialOffset) : _lengthFull;
+                            float _lengthAfterFirst = segmentState.isMaxFillContinue ? _lengthFull - Mathf.Abs(initialOffset) : _lengthFull;
 
-                                float _numItemsFloat =  Mathf.Abs(_lengthAfterFirst / spacing);
+                            float _numItemsFloat = Mathf.Abs(_lengthAfterFirst / spacing);
 
-                                _numItemsRaw = Mathf.FloorToInt(_numItemsFloat);
-                                _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
+                            _numItemsRaw = Mathf.FloorToInt(_numItemsFloat);
+                            _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
 
-                                //add an extra item at the end if within 75% of spacing
-                                bool _extraItem = false;
-                                float _remainder = _lengthAfterFirst % spacing;
-                                float _remFraction = _remainder / spacing;
-                                if (_remFraction >= 0.75f && _numItems < MAX_ITEM_ARRAY_LENGTH)
-                                {
-                                    _numItems += 1;
+                            //add an extra item at the end if within 75% of spacing
+                            bool _extraItem = false;
+                            float _remainder = _lengthAfterFirst % spacing;
+                            float _remFraction = _remainder / spacing;
+                            if (_remFraction >= 0.75f && _numItems < MAX_ITEM_ARRAY_LENGTH) {
+                                _numItems += 1;
 
-                                    _extraItem = true;
-                                }
-                                
-                                //If not MaxFillContinue:
-                                //In straight fence mode, no segment-linking occurs
-                                //   so we don't use initialOffset here
-                                //the continuous draw resets the first control point to the last fence endpoint
+                                _extraItem = true;
+                            }
 
-                                //distance = speed * t
-                                //t = distance / speed
-                                _deltaT = spacing / _speed;
+                            //If not MaxFillContinue:
+                            //In straight fence mode, no segment-linking occurs
+                            //   so we don't use initialOffset here
+                            //the continuous draw resets the first control point to the last fence endpoint
 
-                                float _t = 0f;
-                                Vector3 _position = Vector3.zero;
+                            //distance = speed * t
+                            //t = distance / speed
+                            _deltaT = spacing / _speed;
 
-                                //Max Fill Continue
-                                if (segmentState.isMaxFillContinue && initialOffset > 0f)
-                                {
-                                    _t = initialOffset / _lengthFull;
-                                }
-                                
-                                //calculate endpoints
-                                for (int i = 0; i < _numItems + 1; i++)
-                                {
-                                    _position = Math.MathPLT.LinePosition(m_mainSegment, _t);
-                                    SetFenceEndpoint(i, _position);
+                            float _t = 0f;
+                            Vector3 _position = Vector3.zero;
 
-                                    _t = _t + _deltaT;
-                                }
+                            //Max Fill Continue
+                            if (segmentState.isMaxFillContinue && initialOffset > 0f) {
+                                _t = initialOffset / _lengthFull;
+                            }
 
-                                //then calculate midpoints
-                                Vector3 _midpoint = lastFenceEndpoint;
-                                for (int i = 0; i < _numItems; i++)
-                                {
-                                    Vector3 _endp0 = GetFenceEndpoint(i);
-                                    Vector3 _endp1 = GetFenceEndpoint(i + 1);
-                                    _midpoint = Vector3.Lerp(GetFenceEndpoint(i), GetFenceEndpoint(i + 1), 0.50f);
-                                    SetPosition(i, _midpoint);
-                                }
+                            //calculate endpoints
+                            for (int i = 0; i < _numItems + 1; i++) {
+                                _position = Math.MathPLT.LinePosition(m_mainSegment, _t);
+                                SetFenceEndpoint(i, _position);
 
-                                //linear fence fill
-                                bool _realizedLinearFenceFill = false;
-                                if (userSettingsControlPanel.linearFenceFill)
-                                {
-                                    //check conditions first
-                                    if (_numItems > 0 && _numItems < MAX_ITEM_ARRAY_LENGTH)
-                                    {
-                                        if (_numItems == 1)
-                                        {
-                                            if (_lengthFull > spacing)
-                                            {
-                                                _realizedLinearFenceFill = true;
-                                            }
-                                        }
-                                        else
-                                        {
+                                _t += _deltaT;
+                            }
+
+                            //then calculate midpoints
+                            Vector3 _midpoint = lastFenceEndpoint;
+                            for (int i = 0; i < _numItems; i++) {
+                                Vector3 _endp0 = GetFenceEndpoint(i);
+                                Vector3 _endp1 = GetFenceEndpoint(i + 1);
+                                _midpoint = Vector3.Lerp(GetFenceEndpoint(i), GetFenceEndpoint(i + 1), 0.50f);
+                                SetPosition(i, _midpoint);
+                            }
+
+                            //linear fence fill
+                            bool _realizedLinearFenceFill = false;
+                            if (userSettingsControlPanel.linearFenceFill) {
+                                //check conditions first
+                                if (_numItems > 0 && _numItems < MAX_ITEM_ARRAY_LENGTH) {
+                                    if (_numItems == 1) {
+                                        if (_lengthFull > spacing) {
                                             _realizedLinearFenceFill = true;
                                         }
-                                    }
-
-                                    //if conditions for linear fence fill are met
-                                    if (_realizedLinearFenceFill)
-                                    {
-                                        //account for extra item
-                                        if (!_extraItem)
-                                        {
-                                            _numItems++;
-                                        }
-
-                                        Vector3 _p0 = m_mainSegment.a;
-                                        Vector3 _p1 = m_mainSegment.b;
-                                        _p0.y = 0f;
-                                        _p1.y = 0f;
-
-                                        SetFenceEndpoint(_numItems, _p1);
-
-                                        Vector3 _localX = (_p1 - _p0).normalized;
-                                        Vector3 _localZ = new Vector3(_localX.z, 0f, -1f * _localX.x);
-                                        Vector3 _finalOffset = (0.00390625f * _localX) + (0.00390625f * _localZ);
-
-                                        Vector3 _finalFenceMidpoint = _p1 + (0.5f * spacing) * ((_p0 - _p1).normalized);
-                                        _finalFenceMidpoint += _finalOffset;    //correct for z-fighting
-                                        SetPosition(_numItems - 1, _finalFenceMidpoint);
-
-                                        //add _deltaT to account for subsequent subtraction of _deltaT
-                                        _finalT = 1f + _deltaT;
+                                    } else {
+                                        _realizedLinearFenceFill = true;
                                     }
                                 }
 
-                                _finalT = _t - _deltaT;
-                                Vector3 _finalPos = MathPLT.LinePosition(m_mainSegment, _finalT);
-                                
-                                //prep for MaxFillContinue
-                                if (segmentState.isReadyForMaxContinue)
-                                {
-                                    segmentState.newFinalOffset = Vector3.Distance(m_mainSegment.a, _finalPos);
-                                }
-                                else
-                                {
-                                    segmentState.newFinalOffset = Vector3.Distance(_finalPos, m_mainSegment.b);
-                                }
+                                //if conditions for linear fence fill are met
+                                if (_realizedLinearFenceFill) {
+                                    //account for extra item
+                                    if (!_extraItem) {
+                                        _numItems++;
+                                    }
 
-                                break;
+                                    Vector3 _p0 = m_mainSegment.a;
+                                    Vector3 _p1 = m_mainSegment.b;
+                                    _p0.y = 0f;
+                                    _p1.y = 0f;
+
+                                    SetFenceEndpoint(_numItems, _p1);
+
+                                    Vector3 _localX = (_p1 - _p0).normalized;
+                                    Vector3 _localZ = new Vector3(_localX.z, 0f, -1f * _localX.x);
+                                    Vector3 _finalOffset = (0.00390625f * _localX) + (0.00390625f * _localZ);
+
+                                    Vector3 _finalFenceMidpoint = _p1 + (0.5f * spacing) * ((_p0 - _p1).normalized);
+                                    _finalFenceMidpoint += _finalOffset;    //correct for z-fighting
+                                    SetPosition(_numItems - 1, _finalFenceMidpoint);
+
+                                    //add _deltaT to account for subsequent subtraction of _deltaT
+                                    _finalT = 1f + _deltaT;
+                                }
                             }
+
+                            _finalT = _t - _deltaT;
+                            Vector3 _finalPos = MathPLT.LinePosition(m_mainSegment, _finalT);
+
+                            //prep for MaxFillContinue
+                            if (segmentState.isReadyForMaxContinue) {
+                                segmentState.newFinalOffset = Vector3.Distance(m_mainSegment.a, _finalPos);
+                            } else {
+                                segmentState.newFinalOffset = Vector3.Distance(_finalPos, m_mainSegment.b);
+                            }
+
+                            break;
+                        }
                         // ====== CURVED/FREEFORM FENCE ======
                         case DrawMode.Curved:
-                        case DrawMode.Freeform:
-                            {
-                                float _lengthFull = GetCurveLength(m_mainBezier);
-                                float _lengthAfterFirst = segmentState.isMaxFillContinue ? _lengthFull - Mathf.Abs(initialOffset) : _lengthFull;
+                        case DrawMode.Freeform: {
+                            float _lengthFull = GetCurveLength(m_mainBezier);
+                            float _lengthAfterFirst = segmentState.isMaxFillContinue ? _lengthFull - Mathf.Abs(initialOffset) : _lengthFull;
 
-                                _numItemsRaw = Mathf.CeilToInt(_lengthAfterFirst / spacing);
-                                _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
-                                
-                                //old 161111 2246
-                                //if (_lengthFull < Vector3.Distance(m_mainBezier.a, m_mainBezier.d))
-                                //new 161111 2246
-                                if (spacing > _lengthFull)
-                                {
-                                    m_itemCount = 0;
-                                    return false;
+                            _numItemsRaw = Mathf.CeilToInt(_lengthAfterFirst / spacing);
+                            _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
+
+                            //old 161111 2246
+                            //if (_lengthFull < Vector3.Distance(m_mainBezier.a, m_mainBezier.d))
+                            //new 161111 2246
+                            if (spacing > _lengthFull) {
+                                m_itemCount = 0;
+                                return false;
+                            }
+
+                            if (_numItems > MAX_ITEM_ARRAY_LENGTH) {
+                                _numItems = Mathf.Clamp(_numItems, 0, MAX_ITEM_ARRAY_LENGTH);
+                            }
+
+                            float _t = 0f;
+                            float _penultimateT = 0f;
+
+                            int _forLoopStart = 0;
+                            Vector3 _position = lastFenceEndpoint;
+
+                            //max fill continue
+                            if (segmentState.isMaxFillContinue && initialOffset > 0f) {
+                                _forLoopStart = 0;
+                                MathPLT.StepDistanceCurve(m_mainBezier, 0f, initialOffset, tolerance, out _t);
+
+                                goto label_endpointsForLoop;
+                            }
+                            //link curves in continuous draw
+                            else if (initialOffset > 0f && lastFenceEndpoint != Vector3.down) {
+                                //first continueDrawing if (1/4)
+                                if (!SetFenceEndpoint(0, lastFenceEndpoint)) {
+                                    _numItems = 0; //correct
+                                    goto label_endpointsFinish;
                                 }
-
-                                if (_numItems > MAX_ITEM_ARRAY_LENGTH)
-                                {
-                                    _numItems = Mathf.Clamp(_numItems, 0, MAX_ITEM_ARRAY_LENGTH);
-                                }
-
-                                float _t = 0f;
-                                float _penultimateT = 0f;
-
-                                int _forLoopStart = 0;
-                                Vector3 _position = lastFenceEndpoint;
-
-                                //max fill continue
-                                if (segmentState.isMaxFillContinue && initialOffset > 0f)
-                                {
+                                //second continueDrawing if (2/4)
+                                if (!Math.MathPLT.LinkCircleCurveFenceIntersectXZ(m_mainBezier, lastFenceEndpoint, spacing, m_tolerance, out _t, false)) {
+                                    //could not link segments, so start at t = 0 instead
                                     _forLoopStart = 0;
-                                    MathPLT.StepDistanceCurve(m_mainBezier, 0f, initialOffset, tolerance, out _t);
-                                    
+                                    _t = 0f;
                                     goto label_endpointsForLoop;
                                 }
-                                //link curves in continuous draw
-                                else if (initialOffset > 0f && lastFenceEndpoint != Vector3.down)
-                                {
-                                    //first continueDrawing if (1/4)
-                                    if (!SetFenceEndpoint(0, lastFenceEndpoint))
-                                    {
-                                        _numItems = 0; //correct
-                                        goto label_endpointsFinish;
-                                    }
-                                    //second continueDrawing if (2/4)
-                                    if (!Math.MathPLT.LinkCircleCurveFenceIntersectXZ(m_mainBezier, lastFenceEndpoint, spacing, m_tolerance, out _t, false))
-                                    {
-                                        //could not link segments, so start at t = 0 instead
-                                        _forLoopStart = 0;
-                                        _t = 0f;
-                                        goto label_endpointsForLoop;
-                                    }
-                                    _position = m_mainBezier.Position(_t);
-                                    //third continueDrawing if (3/4)
-                                    if (!SetFenceEndpoint(1, _position))
-                                    {
-                                        _numItems = 0;
-                                        goto label_endpointsFinish;
-                                    }
-
-                                    float _tFirstFencepoint = _t;
-
-                                    //fourth continueDrawing if (4/4)
-                                    if (!Math.MathPLT.CircleCurveFenceIntersectXZ(m_mainBezier, _t, spacing, m_tolerance, out _t, false))
-                                    {
-                                        //failed to converge
-                                        _numItems = 1;
-                                        goto label_endpointsFinish;
-                                    }
-
-                                    _forLoopStart = 2;
-
-                                }
-                                else
-                                {
-                                    //nothing here...
+                                _position = m_mainBezier.Position(_t);
+                                //third continueDrawing if (3/4)
+                                if (!SetFenceEndpoint(1, _position)) {
+                                    _numItems = 0;
+                                    goto label_endpointsFinish;
                                 }
 
-                            label_endpointsForLoop:
+                                float _tFirstFencepoint = _t;
 
-                                for (int i = _forLoopStart; i < _numItems + 1; i++)
-                                {
-                                    //this should be the first if (1/3)
-                                    //this is necessary for bendy fence mode since we didn't estimate count
-                                    if (_t > 1f)
-                                    {
-                                        _numItems = i - 1;
-                                        goto label_endpointsFinish;
-                                    }
-
-                                    //second if (2/3)
-                                    _position = m_mainBezier.Position(_t);
-                                    if (!SetFenceEndpoint(i, _position))
-                                    {
-                                        _numItems = i - 1;
-                                        goto label_endpointsFinish;
-                                    }
-
-                                    //_finalT = _t;
-                                    _penultimateT = _t;
-
-                                    //third if (3/3)
-                                    if (!Math.MathPLT.CircleCurveFenceIntersectXZ(m_mainBezier, _t, spacing, m_tolerance, out _t, false))
-                                    {
-                                        //failed to converge
-                                        _numItems = i - 1;
-                                        goto label_endpointsFinish;
-                                    }
+                                //fourth continueDrawing if (4/4)
+                                if (!Math.MathPLT.CircleCurveFenceIntersectXZ(m_mainBezier, _t, spacing, m_tolerance, out _t, false)) {
+                                    //failed to converge
+                                    _numItems = 1;
+                                    goto label_endpointsFinish;
                                 }
 
-                            //outside of for loop
-                            label_endpointsFinish:
-                                {
-                                    _numItems = Mathf.Clamp(_numItems, 0, MAX_ITEM_ARRAY_LENGTH);
-                                }
+                                _forLoopStart = 2;
 
-                                _finalT = _t;
-
-                                //then calculate midpoints
-                                Vector3 _midpoint = this.segmentState.lastFenceEndpoint;
-                                for (int i = 0; i < _numItems; i++)
-                                {
-                                    _midpoint = Vector3.Lerp(GetFenceEndpoint(i), GetFenceEndpoint(i + 1), 0.50f);
-                                    if (!SetPosition(i, _midpoint))
-                                    {
-                                        _numItems = i;
-                                        break;
-                                    }
-                                }
-
-                                //prep for MaxFillContinue
-                                if (segmentState.isReadyForMaxContinue)
-                                {
-                                    segmentState.newFinalOffset = MathPLT.CubicBezierArcLengthXZGauss12(m_mainBezier, 0f, _penultimateT);
-                                }
-                                else
-                                {
-                                    segmentState.newFinalOffset = MathPLT.CubicBezierArcLengthXZGauss04(m_mainBezier, _finalT, 1f);
-                                }
-
-                                break;
+                            } else {
+                                //nothing here...
                             }
+
+                        label_endpointsForLoop:
+
+                            for (int i = _forLoopStart; i < _numItems + 1; i++) {
+                                //this should be the first if (1/3)
+                                //this is necessary for bendy fence mode since we didn't estimate count
+                                if (_t > 1f) {
+                                    _numItems = i - 1;
+                                    goto label_endpointsFinish;
+                                }
+
+                                //second if (2/3)
+                                _position = m_mainBezier.Position(_t);
+                                if (!SetFenceEndpoint(i, _position)) {
+                                    _numItems = i - 1;
+                                    goto label_endpointsFinish;
+                                }
+
+                                //_finalT = _t;
+                                _penultimateT = _t;
+
+                                //third if (3/3)
+                                if (!Math.MathPLT.CircleCurveFenceIntersectXZ(m_mainBezier, _t, spacing, m_tolerance, out _t, false)) {
+                                    //failed to converge
+                                    _numItems = i - 1;
+                                    goto label_endpointsFinish;
+                                }
+                            }
+
+                        //outside of for loop
+                        label_endpointsFinish:
+                            {
+                                _numItems = Mathf.Clamp(_numItems, 0, MAX_ITEM_ARRAY_LENGTH);
+                            }
+
+                            _finalT = _t;
+
+                            //then calculate midpoints
+                            Vector3 _midpoint = this.segmentState.lastFenceEndpoint;
+                            for (int i = 0; i < _numItems; i++) {
+                                _midpoint = Vector3.Lerp(GetFenceEndpoint(i), GetFenceEndpoint(i + 1), 0.50f);
+                                if (!SetPosition(i, _midpoint)) {
+                                    _numItems = i;
+                                    break;
+                                }
+                            }
+
+                            //prep for MaxFillContinue
+                            if (segmentState.isReadyForMaxContinue) {
+                                segmentState.newFinalOffset = MathPLT.CubicBezierArcLengthXZGauss12(m_mainBezier, 0f, _penultimateT);
+                            } else {
+                                segmentState.newFinalOffset = MathPLT.CubicBezierArcLengthXZGauss04(m_mainBezier, _finalT, 1f);
+                            }
+
+                            break;
+                        }
                         // ====== CIRCLE FENCE ======
-                        case DrawMode.Circle:
-                            {
-                                float _chordAngle = m_mainCircle.ChordAngle(spacing);
+                        case DrawMode.Circle: {
+                            float _chordAngle = m_mainCircle.ChordAngle(spacing);
 
-                                //early exit
-                                if (_chordAngle <= 0f)
-                                {
-                                    _numItems = 0;
-                                    break;
-                                }
-                                if (_chordAngle > Mathf.PI)
-                                {
-                                    _numItems = 0;
-                                    break;
-                                }
-                                if (m_mainCircle.radius <= 0f)
-                                {
-                                    _numItems = 0;
-                                    break;
-                                }
-
-                                float _angleFull = 2f * Mathf.PI;
-
-                                float _initialAngle = Mathf.Abs(initialOffset) / m_mainCircle.radius;
-                                float _angleAfterFirst = segmentState.isMaxFillContinue ? _angleFull - _initialAngle : _angleFull;
-
-                                if (userSettingsControlPanel.perfectCircles)
-                                {
-                                    _numItemsRaw = Mathf.RoundToInt(_angleAfterFirst / _chordAngle);
-                                    _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
-                                }
-                                else
-                                {
-                                    _numItemsRaw = Mathf.FloorToInt(_angleAfterFirst / _chordAngle);
-                                    _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
-                                }
-
-                                _deltaT = m_mainCircle.ChordDeltaT(spacing);
-                                
-                                //If No MaxFillContinue:
-                                //In circle fence mode, no segment-linking occurs
-                                //   so we don't use initialOffset here
-
-                                float _t = 0f;
-                                float _penultimateT = 0f;
-
-                                //Max Fill Continue
-                                if (segmentState.isMaxFillContinue && initialOffset > 0f)
-                                {
-                                    _t = m_mainCircle.DeltaT(initialOffset);
-                                    _penultimateT = _t;
-                                }
-
-                                Vector3 _position = m_mainCircle.Position(_t);
-                                Vector3 _center = m_mainCircle.center;
-                                Vector3 _radiusVector = _position - _center;
-
-                                Quaternion _rotation = Quaternion.AngleAxis(-1f * _chordAngle * Mathf.Rad2Deg, Vector3.up);
-                                
-                                //calculate endpoints
-                                for (int i = 0; i < _numItems + 1; i++)
-                                {
-                                    _penultimateT = _t;
-
-                                    SetFenceEndpoint(i, _position);
-                                    _radiusVector = _rotation * _radiusVector;
-                                    _position = _center + _radiusVector;
-
-                                    _t = _t + _deltaT;
-                                }
-
-                                //then calculate midpoints
-                                Vector3 _midpoint = _position;
-                                for (int i = 0; i < _numItems; i++)
-                                {
-                                    Vector3 _endp0 = GetFenceEndpoint(i);
-                                    Vector3 _endp1 = GetFenceEndpoint(i + 1);
-                                    _midpoint = Vector3.Lerp(GetFenceEndpoint(i), GetFenceEndpoint(i + 1), 0.50f);
-                                    SetPosition(i, _midpoint);
-                                }
-
-                                _finalT = _t;
-
-                                //prep for MaxFillContinue
-                                if (segmentState.isReadyForMaxContinue)
-                                {
-                                    segmentState.newFinalOffset = m_mainCircle.ArclengthBetween(0f, _penultimateT);
-                                }
-                                else
-                                {
-                                    segmentState.newFinalOffset = m_mainCircle.ArclengthBetween(_t, 1f);
-                                }
-
-
-                                break; 
-                            }
-                        default:
-                            {
+                            //early exit
+                            if (_chordAngle <= 0f) {
                                 _numItems = 0;
                                 break;
                             }
-                    }
-                    
+                            if (_chordAngle > Mathf.PI) {
+                                _numItems = 0;
+                                break;
+                            }
+                            if (m_mainCircle.radius <= 0f) {
+                                _numItems = 0;
+                                break;
+                            }
 
-                    if (_numItems > 0 && _numItems <= MAX_ITEM_ARRAY_LENGTH)
-                    {
+                            float _angleFull = 2f * Mathf.PI;
+
+                            float _initialAngle = Mathf.Abs(initialOffset) / m_mainCircle.radius;
+                            float _angleAfterFirst = segmentState.isMaxFillContinue ? _angleFull - _initialAngle : _angleFull;
+
+                            if (userSettingsControlPanel.perfectCircles) {
+                                _numItemsRaw = Mathf.RoundToInt(_angleAfterFirst / _chordAngle);
+                                _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
+                            } else {
+                                _numItemsRaw = Mathf.FloorToInt(_angleAfterFirst / _chordAngle);
+                                _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
+                            }
+
+                            _deltaT = m_mainCircle.ChordDeltaT(spacing);
+
+                            //If No MaxFillContinue:
+                            //In circle fence mode, no segment-linking occurs
+                            //   so we don't use initialOffset here
+
+                            float _t = 0f;
+                            float _penultimateT = 0f;
+
+                            //Max Fill Continue
+                            if (segmentState.isMaxFillContinue && initialOffset > 0f) {
+                                _t = m_mainCircle.DeltaT(initialOffset);
+                                _penultimateT = _t;
+                            }
+
+                            Vector3 _position = m_mainCircle.Position(_t);
+                            Vector3 _center = m_mainCircle.center;
+                            Vector3 _radiusVector = _position - _center;
+
+                            Quaternion _rotation = Quaternion.AngleAxis(-1f * _chordAngle * Mathf.Rad2Deg, Vector3.up);
+
+                            //calculate endpoints
+                            for (int i = 0; i < _numItems + 1; i++) {
+                                _penultimateT = _t;
+
+                                SetFenceEndpoint(i, _position);
+                                _radiusVector = _rotation * _radiusVector;
+                                _position = _center + _radiusVector;
+
+                                _t += _deltaT;
+                            }
+
+                            //then calculate midpoints
+                            Vector3 _midpoint = _position;
+                            for (int i = 0; i < _numItems; i++) {
+                                Vector3 _endp0 = GetFenceEndpoint(i);
+                                Vector3 _endp1 = GetFenceEndpoint(i + 1);
+                                _midpoint = Vector3.Lerp(GetFenceEndpoint(i), GetFenceEndpoint(i + 1), 0.50f);
+                                SetPosition(i, _midpoint);
+                            }
+
+                            _finalT = _t;
+
+                            //prep for MaxFillContinue
+                            if (segmentState.isReadyForMaxContinue) {
+                                segmentState.newFinalOffset = m_mainCircle.ArclengthBetween(0f, _penultimateT);
+                            } else {
+                                segmentState.newFinalOffset = m_mainCircle.ArclengthBetween(_t, 1f);
+                            }
+
+
+                            break;
+                        }
+                        default: {
+                            _numItems = 0;
+                            break;
+                        }
+                    }
+
+
+                    if (_numItems > 0 && _numItems <= MAX_ITEM_ARRAY_LENGTH) {
                         Vector3 _finalEndpointPos = GetFenceEndpoint(_numItems);
                         segmentState.newFenceEndpoint = _finalEndpointPos;
 
                         //Vector3 _finalPos = GetItemPosition(_numItems - 1);
                         //segmentState.newFinalOffset = Vector3.Distance(_finalPos, m_mainSegment.b);
-                    }
-                    else
-                    {
+                    } else {
                         m_itemCount = 0;
                         return false;
                     }
-                    
-                }
-                else   //Non-fence mode
-                {
-                    switch (drawMode)
-                    {
+
+                } else   //Non-fence mode
+                  {
+                    switch (drawMode) {
                         // ====== STRAIGHT ======
-                        case DrawMode.Straight:
-                            {
-                                float _lengthFull = GetCurveLength(m_mainSegment);
-                                float _lengthAfterFirst = _lengthFull - initialOffset;
-                                float _speed = Math.MathPLT.LinearSpeedXZ(m_mainSegment);
+                        case DrawMode.Straight: {
+                            float _lengthFull = GetCurveLength(m_mainSegment);
+                            float _lengthAfterFirst = _lengthFull - initialOffset;
+                            float _speed = Math.MathPLT.LinearSpeedXZ(m_mainSegment);
 
-                                //use ceiling for non-fence, because the point at the beginning is an extra point
-                                _numItemsRaw = Mathf.CeilToInt(_lengthAfterFirst / spacing);
-                                _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
+                            //use ceiling for non-fence, because the point at the beginning is an extra point
+                            _numItemsRaw = Mathf.CeilToInt(_lengthAfterFirst / spacing);
+                            _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
 
-                                if (_speed == 0)
-                                {
-                                    return false;
-                                }
-
-                                //distance = speed * t
-                                //t = distance / speed
-                                _deltaT = spacing / _speed;
-
-                                float _t = 0f;
-                                if (initialOffset > 0f)
-                                {
-                                    //calculate initial _t
-                                    _initialT = initialOffset / _speed;
-                                    _t = _initialT;
-                                }
-
-                                Vector3 _position = Vector3.zero;
-
-                                for (int i = 0; i < _numItems; i++)
-                                {
-                                    _position = Math.MathPLT.LinePosition(m_mainSegment, _t);
-                                    SetTAndPosition(i, _t, _position);
-                                    _t = _t + _deltaT;
-                                }
-
-                                Vector3 _finalPos = Vector3.zero;
-                                if (!GetItemT(_numItems - 1, out _finalT) || !GetItemPosition(_numItems - 1, out _finalPos))
-                                {
-                                    ResetLastContinueParameters();
-                                    _finalT = 1f;
-                                }
-                                else
-                                {
-                                    if (segmentState.isReadyForMaxContinue)
-                                    {
-                                        segmentState.newFinalOffset = spacing + Vector3.Distance(m_mainSegment.a, _finalPos);
-                                    }
-                                    else
-                                    {
-                                        segmentState.newFinalOffset = spacing - Vector3.Distance(_finalPos, m_mainSegment.b);
-                                    }
-                                    
-                                }
-                                break; 
+                            if (_speed == 0) {
+                                return false;
                             }
+
+                            //distance = speed * t
+                            //t = distance / speed
+                            _deltaT = spacing / _speed;
+
+                            float _t = 0f;
+                            if (initialOffset > 0f) {
+                                //calculate initial _t
+                                _initialT = initialOffset / _speed;
+                                _t = _initialT;
+                            }
+
+                            Vector3 _position = Vector3.zero;
+
+                            for (int i = 0; i < _numItems; i++) {
+                                _position = Math.MathPLT.LinePosition(m_mainSegment, _t);
+                                SetTAndPosition(i, _t, _position);
+                                _t += _deltaT;
+                            }
+
+                            Vector3 _finalPos = Vector3.zero;
+                            if (!GetItemT(_numItems - 1, out _finalT) || !GetItemPosition(_numItems - 1, out _finalPos)) {
+                                ResetLastContinueParameters();
+                                _finalT = 1f;
+                            } else {
+                                if (segmentState.isReadyForMaxContinue) {
+                                    segmentState.newFinalOffset = spacing + Vector3.Distance(m_mainSegment.a, _finalPos);
+                                } else {
+                                    segmentState.newFinalOffset = spacing - Vector3.Distance(_finalPos, m_mainSegment.b);
+                                }
+
+                            }
+                            break;
+                        }
                         // ====== CURVED/FREEFORM ======
                         case DrawMode.Curved:
-                        case DrawMode.Freeform:
-                            {
-                                if (m_mainArm1.Length() + m_mainArm2.Length() <= 0.01f)
-                                {
-                                    return false;
-                                }
-
-                                float _lengthFull = GetCurveLength(m_mainBezier);
-                                float _lengthAfterFirst = _lengthFull - initialOffset;
-
-                                //use ceiling for non-fence, because the point at the beginning is an extra point
-                                _numItemsRaw = Mathf.CeilToInt(_lengthAfterFirst / spacing);
-                                _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
-
-                                float _t = 0f;
-                                if (initialOffset > 0f)
-                                {
-                                    //calculate initial _t
-                                    Math.MathPLT.StepDistanceCurve(m_mainBezier, 0f, initialOffset, m_tolerance, out _t);
-                                }
-
-                                Vector3 _position = Vector3.zero;
-
-                                for (int i = 0; i < _numItems; i++)
-                                {
-                                    _position = m_mainBezier.Position(_t);
-                                    SetTAndPosition(i, _t, _position);
-                                    Math.MathPLT.StepDistanceCurve(m_mainBezier, _t, spacing, m_tolerance, out _t);
-                                }
-
-                                Vector3 _finalPos = Vector3.down;
-                                if (!GetItemT(_numItems - 1, out _finalT) || !GetItemPosition(_numItems - 1, out _finalPos))
-                                {
-                                    ResetLastContinueParameters();
-                                    _finalT = 1f;
-                                }
-                                else
-                                {
-                                    if (segmentState.isReadyForMaxContinue)
-                                    {
-                                        segmentState.newFinalOffset = spacing + MathPLT.CubicBezierArcLengthXZGauss12(m_mainBezier, 0f, _finalT);
-                                    }
-                                    else
-                                    {
-                                        segmentState.newFinalOffset = spacing - Math.MathPLT.CubicBezierArcLengthXZGauss04(m_mainBezier, _finalT, 1f);
-                                    }
-                                    
-
-                                }
-                                break;
+                        case DrawMode.Freeform: {
+                            if (m_mainArm1.Length() + m_mainArm2.Length() <= 0.01f) {
+                                return false;
                             }
+
+                            float _lengthFull = GetCurveLength(m_mainBezier);
+                            float _lengthAfterFirst = _lengthFull - initialOffset;
+
+                            //use ceiling for non-fence, because the point at the beginning is an extra point
+                            _numItemsRaw = Mathf.CeilToInt(_lengthAfterFirst / spacing);
+                            _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
+
+                            float _t = 0f;
+                            if (initialOffset > 0f) {
+                                //calculate initial _t
+                                Math.MathPLT.StepDistanceCurve(m_mainBezier, 0f, initialOffset, m_tolerance, out _t);
+                            }
+
+                            Vector3 _position = Vector3.zero;
+
+                            for (int i = 0; i < _numItems; i++) {
+                                _position = m_mainBezier.Position(_t);
+                                SetTAndPosition(i, _t, _position);
+                                Math.MathPLT.StepDistanceCurve(m_mainBezier, _t, spacing, m_tolerance, out _t);
+                            }
+
+                            Vector3 _finalPos = Vector3.down;
+                            if (!GetItemT(_numItems - 1, out _finalT) || !GetItemPosition(_numItems - 1, out _finalPos)) {
+                                ResetLastContinueParameters();
+                                _finalT = 1f;
+                            } else {
+                                if (segmentState.isReadyForMaxContinue) {
+                                    segmentState.newFinalOffset = spacing + MathPLT.CubicBezierArcLengthXZGauss12(m_mainBezier, 0f, _finalT);
+                                } else {
+                                    segmentState.newFinalOffset = spacing - Math.MathPLT.CubicBezierArcLengthXZGauss04(m_mainBezier, _finalT, 1f);
+                                }
+
+
+                            }
+                            break;
+                        }
                         // ====== CIRCLE ======
-                        case DrawMode.Circle:
-                            {
-                                _deltaT = m_mainCircle.DeltaT(spacing);
+                        case DrawMode.Circle: {
+                            _deltaT = m_mainCircle.DeltaT(spacing);
 
-                                //early exit
-                                if (_deltaT <= 0f)
-                                {
-                                    _numItems = 0;
-                                    break;
-                                }
-                                if (_deltaT > 1f)
-                                {
-                                    _numItems = 0;
-                                    break;
-                                }
-                                if (m_mainCircle.radius <= 0f)
-                                {
-                                    _numItems = 0;
-                                    break;
-                                }
-
-
-                                float _t = 0f;
-                                float _remainingSpace = m_mainCircle.circumference;
-
-
-                                //if (activeState == ActiveState.MaxFillContinue || (activeState == ActiveState.LockIdle && segmentState.isMaxFillContinue))
-                                if (segmentState.isMaxFillContinue)
-                                {
-                                    if (m_mainCircle.circumference > 0f)
-                                    {
-                                        _t = initialOffset / m_mainCircle.circumference;
-                                        _remainingSpace -= initialOffset;
-                                    }
-                                    else
-                                    {
-                                        _numItems = 0;
-                                        break;
-                                    }
-                                }
-
-                                _initialT = _t;
-
-                                
-
-                                //use ceiling for non-fence, because the point at the beginning is an extra point
-                                _numItemsRaw = Mathf.CeilToInt(_remainingSpace / spacing);
-                                _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
-
-                                
-
-                                Vector3 _position = m_mainCircle.Position(_t);
-                                Vector3 _center = m_mainCircle.center;
-                                Vector3 _radiusVector = _position - _center;
-
-                                float _deltaAngle = m_mainCircle.DeltaAngle(spacing);
-                                Quaternion _rotation = Quaternion.AngleAxis(-1f * _deltaAngle * Mathf.Rad2Deg, Vector3.up);
-
-                                for (int i = 0; i < _numItems; i++)
-                                {
-                                    SetTAndPosition(i, _t, _position);
-
-                                    _radiusVector = _rotation * _radiusVector;
-                                    _position = _center + _radiusVector;
-
-                                    _t = _t + _deltaT;
-                                }
-
-                                Vector3 _finalPos = Vector3.zero;
-                                if (!GetItemT(_numItems - 1, out _finalT) || !GetItemPosition(_numItems - 1, out _finalPos))
-                                {
-                                    ResetLastContinueParameters();
-                                    _finalT = 1f;
-                                }
-                                else
-                                {
-                                    if (segmentState.isReadyForMaxContinue)
-                                    {
-                                        segmentState.newFinalOffset = spacing + m_mainCircle.ArclengthBetween(0f, _finalT);
-                                    }
-                                    else
-                                    {
-                                        //segmentState.newFinalOffset = m_mainCircle.radius * Mathf.PI * (1f - _t);
-                                        segmentState.newFinalOffset = m_mainCircle.ArclengthBetween(_t, 1f);
-                                    }
-
-                                }
-                                break;
-                            }
-                        default:
-                            {
+                            //early exit
+                            if (_deltaT <= 0f) {
                                 _numItems = 0;
                                 break;
                             }
+                            if (_deltaT > 1f) {
+                                _numItems = 0;
+                                break;
+                            }
+                            if (m_mainCircle.radius <= 0f) {
+                                _numItems = 0;
+                                break;
+                            }
+
+
+                            float _t = 0f;
+                            float _remainingSpace = m_mainCircle.circumference;
+
+
+                            //if (activeState == ActiveState.MaxFillContinue || (activeState == ActiveState.LockIdle && segmentState.isMaxFillContinue))
+                            if (segmentState.isMaxFillContinue) {
+                                if (m_mainCircle.circumference > 0f) {
+                                    _t = initialOffset / m_mainCircle.circumference;
+                                    _remainingSpace -= initialOffset;
+                                } else {
+                                    _numItems = 0;
+                                    break;
+                                }
+                            }
+
+                            _initialT = _t;
+
+
+
+                            //use ceiling for non-fence, because the point at the beginning is an extra point
+                            _numItemsRaw = Mathf.CeilToInt(_remainingSpace / spacing);
+                            _numItems = Mathf.Min(m_itemCount, Mathf.Clamp(_numItemsRaw, 0, MAX_ITEM_ARRAY_LENGTH));
+
+
+
+                            Vector3 _position = m_mainCircle.Position(_t);
+                            Vector3 _center = m_mainCircle.center;
+                            Vector3 _radiusVector = _position - _center;
+
+                            float _deltaAngle = m_mainCircle.DeltaAngle(spacing);
+                            Quaternion _rotation = Quaternion.AngleAxis(-1f * _deltaAngle * Mathf.Rad2Deg, Vector3.up);
+
+                            for (int i = 0; i < _numItems; i++) {
+                                SetTAndPosition(i, _t, _position);
+
+                                _radiusVector = _rotation * _radiusVector;
+                                _position = _center + _radiusVector;
+
+                                _t += _deltaT;
+                            }
+
+                            Vector3 _finalPos = Vector3.zero;
+                            if (!GetItemT(_numItems - 1, out _finalT) || !GetItemPosition(_numItems - 1, out _finalPos)) {
+                                ResetLastContinueParameters();
+                                _finalT = 1f;
+                            } else {
+                                if (segmentState.isReadyForMaxContinue) {
+                                    segmentState.newFinalOffset = spacing + m_mainCircle.ArclengthBetween(0f, _finalT);
+                                } else {
+                                    //segmentState.newFinalOffset = m_mainCircle.radius * Mathf.PI * (1f - _t);
+                                    segmentState.newFinalOffset = m_mainCircle.ArclengthBetween(_t, 1f);
+                                }
+
+                            }
+                            break;
+                        }
+                        default: {
+                            _numItems = 0;
+                            break;
+                        }
                     }
 
-                    
-                    
+
+
 
                     //non-fence tDiff
-                    if (_deltaT == 0f)
-                    {
+                    if (_deltaT == 0f) {
                         _deltaT = m_placementInfo[1].t - m_placementInfo[0].t;
                     }
-                    
+
 
                 }
 
@@ -2595,84 +2170,66 @@ namespace PropLineTool
                 m_itemCount = _numItems;
 
                 //flag if not enough item slots
-                if (Mathf.FloorToInt(_numItemsRaw) > MAX_ITEM_ARRAY_LENGTH)
-                {
+                if (Mathf.FloorToInt(_numItemsRaw) > MAX_ITEM_ARRAY_LENGTH) {
                     segmentState.maxItemCountExceeded = true;
-                }
-                else
-                {
+                } else {
                     segmentState.maxItemCountExceeded = false;
                 }
 
                 return true;
             }
-            
-            public static bool IsIndexWithinBounds(int index, bool isFenceEndPoint)
-            {
+
+            public static bool IsIndexWithinBounds(int index, bool isFenceEndPoint) {
                 bool result = false;
                 int _adj = 0;
-                if (isFenceEndPoint)
-                {
+                if (isFenceEndPoint) {
                     _adj = 1;
                 }
-                if (index >= 0 && index < (MAX_ITEM_ARRAY_LENGTH + _adj))
-                {
+                if (index >= 0 && index < (MAX_ITEM_ARRAY_LENGTH + _adj)) {
                     result = true;
                 }
                 return result;
             }
-            
-            private Vector3 GetFenceEndpoint(int index)
-            {
-                if(IsIndexWithinBounds(index, true))
-                {
+
+            private Vector3 GetFenceEndpoint(int index) {
+                if (IsIndexWithinBounds(index, true)) {
                     return m_fenceEndPoints[index];
                 }
                 return Vector3.down;
             }
-            public bool GetFenceEndpoint(int index, out Vector3 fenceEndpoint)
-            {
-                if (IsIndexWithinBounds(index, true))
-                {
+            public bool GetFenceEndpoint(int index, out Vector3 fenceEndpoint) {
+                if (IsIndexWithinBounds(index, true)) {
                     fenceEndpoint = m_fenceEndPoints[index];
                 }
                 fenceEndpoint = Vector3.down;
                 return false;
             }
-            public bool GetItemT(int index, out float itemT)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            public bool GetItemT(int index, out float itemT) {
+                if (IsIndexWithinBounds(index, false)) {
                     itemT = m_placementInfo[index].t;
                     return true;
                 }
                 itemT = 0f;
                 return false;
             }
-            public float GetItemT(int index)
-            {
+            public float GetItemT(int index) {
                 float _itemT = 0f;
 
-                if (IsIndexWithinBounds(index, false))
-                {
+                if (IsIndexWithinBounds(index, false)) {
                     _itemT = m_placementInfo[index].t;
                 }
                 return _itemT;
             }
-            public static bool GetItemPosition(int index, out Vector3 itemPosition)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            public static bool GetItemPosition(int index, out Vector3 itemPosition) {
+                if (IsIndexWithinBounds(index, false)) {
                     itemPosition = m_placementInfo[index].position;
                     return true;
                 }
                 itemPosition = Vector3.zero;
                 return false;
             }
-            public static Vector3 GetItemPosition(int index)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            public static Vector3 GetItemPosition(int index) {
+                if (IsIndexWithinBounds(index, false)) {
                     return m_placementInfo[index].position;
                 }
                 return Vector3.down;
@@ -2680,10 +2237,8 @@ namespace PropLineTool
             /// <summary>
             /// Only use for rendering geometry and placing items!
             /// </summary>
-            public static bool GetItemMeshPosition(int index, out Vector3 itemPosition)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            public static bool GetItemMeshPosition(int index, out Vector3 itemPosition) {
+                if (IsIndexWithinBounds(index, false)) {
                     itemPosition = m_placementInfo[index].meshPosition;
                     return true;
                 }
@@ -2693,37 +2248,29 @@ namespace PropLineTool
             /// <summary>
             /// Only use for rendering geometry and placing items!
             /// </summary>
-            public static Vector3 GetMeshItemPosition(int index)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            public static Vector3 GetMeshItemPosition(int index) {
+                if (IsIndexWithinBounds(index, false)) {
                     return m_placementInfo[index].meshPosition;
                 }
                 return Vector3.down;
             }
-            private bool SetFenceEndpoint(int index, Vector3 position)
-            {
-                if (IsIndexWithinBounds(index, true))
-                {
+            private bool SetFenceEndpoint(int index, Vector3 position) {
+                if (IsIndexWithinBounds(index, true)) {
                     m_fenceEndPoints[index] = position;
                     return true;
                 }
                 return false;
             }
-            private bool SetPosition(int index, Vector3 position)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            private bool SetPosition(int index, Vector3 position) {
+                if (IsIndexWithinBounds(index, false)) {
                     m_placementInfo[index].position = position;
                     m_placementInfo[index].position.y = GetDetailHeight(position);
                     return true;
                 }
                 return false;
             }
-            private bool SetTAndPosition(int index, float t, Vector3 position)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            private bool SetTAndPosition(int index, float t, Vector3 position) {
+                if (IsIndexWithinBounds(index, false)) {
                     m_placementInfo[index].t = t;
                     m_placementInfo[index].position = position;
                     m_placementInfo[index].position.y = GetDetailHeight(position);
@@ -2731,39 +2278,30 @@ namespace PropLineTool
                 }
                 return false;
             }
-            
-            private bool IncrementPosition(int index, Vector3 increment)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+
+            private bool IncrementPosition(int index, Vector3 increment) {
+                if (IsIndexWithinBounds(index, false)) {
                     Vector3 _oldPos = m_placementInfo[index].position;
                     Vector3 _newPos = _oldPos + increment;
                     m_placementInfo[index].position = _newPos;
                     m_placementInfo[index].position.y = GetDetailHeight(_newPos);
                     return true;
-                }
-                else
-                {
+                } else {
                     return false;
                 }
             }
-            private bool IncrementFenceEndpoint(int index, Vector3 increment)
-            {
-                if (IsIndexWithinBounds(index, true))
-                {
+            private bool IncrementFenceEndpoint(int index, Vector3 increment) {
+                if (IsIndexWithinBounds(index, true)) {
                     Vector3 _oldPos = m_fenceEndPoints[index];
                     Vector3 _newPos = _oldPos + increment;
                     m_fenceEndPoints[index] = _newPos;
                     m_fenceEndPoints[index].y = GetDetailHeight(_newPos);
                     return true;
-                }
-                else
-                {
+                } else {
                     return false;
                 }
             }
-            private float GetDetailHeight(Vector3 position)
-            {
+            private float GetDetailHeight(Vector3 position) {
                 float result = 0f;
                 result = Singleton<TerrainManager>.instance.SampleDetailHeight(position);
                 return result;
@@ -2771,121 +2309,92 @@ namespace PropLineTool
 
             //================================  DIRECTION  ================================|================================================================
             //MUST BE CALLED AFTER CALCULATEALLPOSITIONS()
-            private bool CalculateAllDirections()
-            {
-                switch (drawMode)
-                {
-                    case DrawMode.Straight:
-                        {
-                            Vector3 _itemDir = new Vector3();
-                            //calculate from segment
-                            _itemDir = m_mainSegment.b - m_mainSegment.a;
+            private bool CalculateAllDirections() {
+                switch (drawMode) {
+                    case DrawMode.Straight: {
+                        Vector3 _itemDir = new Vector3();
+                        //calculate from segment
+                        _itemDir = m_mainSegment.b - m_mainSegment.a;
 
-                            //this function takes care of the normalization for you
-                            for (int i = 0; i < m_itemCount; i++)
-                            {
+                        //this function takes care of the normalization for you
+                        for (int i = 0; i < m_itemCount; i++) {
+                            SetItemDirectionsXZ(i, _itemDir);
+                        }
+                        break;
+                    }
+                    case DrawMode.Curved:
+                    case DrawMode.Freeform: {
+                        if (fenceMode == true) {
+                            Vector3 _itemDir = new Vector3();
+                            //calculate fenceEndpoint to fenceEndpoint
+                            for (int i = 0; i < m_itemCount; i++) {
+                                _itemDir = m_fenceEndPoints[i + 1] - m_fenceEndPoints[i];
                                 SetItemDirectionsXZ(i, _itemDir);
                             }
-                            break; 
-                        }
-                    case DrawMode.Curved:
-                    case DrawMode.Freeform:
-                        {
-                            if (fenceMode == true)
-                            {
-                                Vector3 _itemDir = new Vector3();
-                                //calculate fenceEndpoint to fenceEndpoint
-                                for (int i = 0; i < m_itemCount; i++)
-                                {
-                                    _itemDir = m_fenceEndPoints[i + 1] - m_fenceEndPoints[i];
-                                    SetItemDirectionsXZ(i, _itemDir);
-                                }
+                        } else {
+                            Vector3 _itemDir = new Vector3();
+                            //calculate from curve tangent
+                            for (int i = 0; i < m_itemCount; i++) {
+                                _itemDir = m_mainBezier.Tangent(m_placementInfo[i].t);
+                                SetItemDirectionsXZ(i, _itemDir);
                             }
-                            else
-                            {
-                                Vector3 _itemDir = new Vector3();
-                                //calculate from curve tangent
-                                for (int i = 0; i < m_itemCount; i++)
-                                {
-                                    _itemDir = m_mainBezier.Tangent(m_placementInfo[i].t);
-                                    SetItemDirectionsXZ(i, _itemDir);
-                                }
-                            }
-                            break; 
                         }
-                    case DrawMode.Circle:
-                        {
-                            if (fenceMode == true)
-                            {
-                                Vector3 _itemDir = new Vector3();
-                                //calculate fenceEndpoint to fenceEndpoint
-                                for (int i = 0; i < m_itemCount; i++)
-                                {
-                                    _itemDir = m_fenceEndPoints[i + 1] - m_fenceEndPoints[i];
-                                    SetItemDirectionsXZ(i, _itemDir);
-                                }
+                        break;
+                    }
+                    case DrawMode.Circle: {
+                        if (fenceMode == true) {
+                            Vector3 _itemDir = new Vector3();
+                            //calculate fenceEndpoint to fenceEndpoint
+                            for (int i = 0; i < m_itemCount; i++) {
+                                _itemDir = m_fenceEndPoints[i + 1] - m_fenceEndPoints[i];
+                                SetItemDirectionsXZ(i, _itemDir);
                             }
-                            else
-                            {
-                                Vector3 _itemDir = new Vector3();
-                                //calculate from curve tangent
-                                for (int i = 0; i < m_itemCount; i++)
-                                {
-                                    _itemDir = m_mainCircle.Tangent(m_placementInfo[i].t);
-                                    SetItemDirectionsXZ(i, _itemDir);
-                                }
+                        } else {
+                            Vector3 _itemDir = new Vector3();
+                            //calculate from curve tangent
+                            for (int i = 0; i < m_itemCount; i++) {
+                                _itemDir = m_mainCircle.Tangent(m_placementInfo[i].t);
+                                SetItemDirectionsXZ(i, _itemDir);
                             }
-                            break; 
                         }
-                    default:
-                        {
-                            return false;
-                        }
+                        break;
+                    }
+                    default: {
+                        return false;
+                    }
                 }
-                
+
                 return true;
             }
 
-            private bool GetItemDirection(int index, out Vector3 itemDirection)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            private bool GetItemDirection(int index, out Vector3 itemDirection) {
+                if (IsIndexWithinBounds(index, false)) {
                     itemDirection = m_placementInfo[index].itemDirection;
-                    if (itemDirection.magnitude < 0.9998f || itemDirection.magnitude > 1.0002f)
-                    {
+                    if (itemDirection.magnitude < 0.9998f || itemDirection.magnitude > 1.0002f) {
                         itemDirection = Vector3.zero;
                         return false;
                     }
                     return true;
-                }
-                else
-                {
+                } else {
                     itemDirection = Vector3.zero;
                     return false;
                 }
             }
-            private bool GetOffsetDirection(int index, out Vector3 offsetDirection)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            private bool GetOffsetDirection(int index, out Vector3 offsetDirection) {
+                if (IsIndexWithinBounds(index, false)) {
                     offsetDirection = m_placementInfo[index].offsetDirection;
-                    if (offsetDirection.magnitude < 0.9998f || offsetDirection.magnitude > 1.0002f)
-                    {
+                    if (offsetDirection.magnitude < 0.9998f || offsetDirection.magnitude > 1.0002f) {
                         offsetDirection = Vector3.zero;
                         return false;
                     }
                     return true;
-                }
-                else
-                {
+                } else {
                     offsetDirection = Vector3.zero;
                     return false;
                 }
             }
-            private bool SetItemDirectionsXZ(int index, Vector3 direction)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            private bool SetItemDirectionsXZ(int index, Vector3 direction) {
+                if (IsIndexWithinBounds(index, false)) {
                     m_placementInfo[index].SetDirectionsXZ(direction);
                     return true;
                 }
@@ -2898,16 +2407,14 @@ namespace PropLineTool
             //   if dynamic rotation, CalculateAnglesDynamic()
             //   if single rotation, CalculateAnglesSingle()
             //then apply transforms
-                
+
             /// <summary>
             /// Base mod method to calculate all angles in Dynamic or Single angle modes.
             /// </summary>
-            private void CalculateAllAnglesBase()
-            {
-                if (fenceMode == true)
-                {
+            private void CalculateAllAnglesBase() {
+                if (fenceMode == true) {
                     CalculateAnglesDynamic();
-                    
+
                     float _offsetAngle = 0f;
 
                     //_offsetAngle = modelAngleOffset + angleFlip180;
@@ -2916,56 +2423,47 @@ namespace PropLineTool
                     _offsetAngle += angleOffset;
 
                     OffsetAnglesUniformRadians(_offsetAngle);
-                }
-                else
-                {
-                    switch (angleMode)
-                    {
-                        case AngleMode.Dynamic:
-                            {
-                                CalculateAnglesDynamic();
+                } else {
+                    switch (angleMode) {
+                        case AngleMode.Dynamic: {
+                            CalculateAnglesDynamic();
 
-                                float _offsetAngle = angleOffset;
+                            float _offsetAngle = angleOffset;
 
-                                //_offsetAngle = modelAngleOffset + angleFlip180;
-                                _offsetAngle = totalPropertyAngleOffset;
+                            //_offsetAngle = modelAngleOffset + angleFlip180;
+                            _offsetAngle = totalPropertyAngleOffset;
 
-                                _offsetAngle += angleOffset;
+                            _offsetAngle += angleOffset;
 
-                                OffsetAnglesUniformRadians(_offsetAngle);
-                                break;
-                            }
-                        case AngleMode.Single:
-                            {
-                                float _singleAngle = angleSingle;
-                                
-                                //_singleAngle = modelAngleOffset + angleFlip180;
-                                _singleAngle = totalPropertyAngleOffset;
+                            OffsetAnglesUniformRadians(_offsetAngle);
+                            break;
+                        }
+                        case AngleMode.Single: {
+                            float _singleAngle = angleSingle;
 
-                                _singleAngle += angleSingle;
+                            //_singleAngle = modelAngleOffset + angleFlip180;
+                            _singleAngle = totalPropertyAngleOffset;
 
-                                CalculateAnglesSingleRadians(_singleAngle);
-                                break;
-                            }
-                        default:
-                            {
-                                return;
-                            }
+                            _singleAngle += angleSingle;
+
+                            CalculateAnglesSingleRadians(_singleAngle);
+                            break;
+                        }
+                        default: {
+                            return;
+                        }
                     }
                 }
             }
-            
+
             //base function to calculate angles
-            private void CalculateAnglesDynamic()
-            {
+            private void CalculateAnglesDynamic() {
                 float _angle = 0f;
                 Vector3 _itemDir = Vector3.right;
                 Vector3 _xAxis = Vector3.right;
                 Vector3 _yAxis = Vector3.up;
-                for (int i = 0; i < m_itemCount; i++)
-                {
-                    if(!GetItemDirection(i, out _itemDir))
-                    {
+                for (int i = 0; i < m_itemCount; i++) {
+                    if (!GetItemDirection(i, out _itemDir)) {
                         //early exit if index is incorrect
                         //or itemDir isn't set
                         m_itemCount = i;
@@ -2973,52 +2471,29 @@ namespace PropLineTool
                     }
                     //_angle = MathPLT.AngleSigned(_xAxis, _itemDir, _yAxis) + Mathf.PI;
                     _angle = Math.MathPLT.AngleSigned(_itemDir, _xAxis, _yAxis) + Mathf.PI;
-                    if (!SetAngle(i, _angle))
-                    {
+                    if (!SetAngle(i, _angle)) {
                         m_itemCount = i;
                         return;
                     }
                 }
             }
             //base function to set all angles to same value
-            private void CalculateAnglesSingle(float singleAngleInDegrees /*in Degrees*/)
-            {
+            private void CalculateAnglesSingle(float singleAngleInDegrees /*in Degrees*/) {
                 float _angle = 0f;
                 _angle = singleAngleInDegrees;
-                for (int i = 0; i < m_itemCount; i++)
-                {
-                    if (!SetAngleInDegrees(i, _angle))
-                    {
+                for (int i = 0; i < m_itemCount; i++) {
+                    if (!SetAngleInDegrees(i, _angle)) {
                         m_itemCount = i;
                         return;
                     }
                 }
             }
 
-            private void CalculateAnglesSingleRadians(float singleAngleInRadians /*in Radians*/)
-            {
+            private void CalculateAnglesSingleRadians(float singleAngleInRadians /*in Radians*/) {
                 float _angle = 0f;
                 _angle = singleAngleInRadians * Mathf.Rad2Deg;
-                for (int i = 0; i < m_itemCount; i++)
-                {
-                    if (!SetAngleInDegrees(i, _angle))
-                    {
-                        m_itemCount = i;
-                        return;
-                    }
-                }
-            }
-            
-            //called after setting up base angles
-            //used by ActiveState.ChangeAngle
-            private void OffsetAnglesUniformRadians(float relativeAngleOffsetInRadians /*in Radians*/)
-            {
-                float _angle = 0f;
-                _angle = relativeAngleOffsetInRadians * Mathf.Rad2Deg;
-                for (int i = 0; i < m_itemCount; i++)
-                {
-                    if (!IncrementAngleInDegrees(i, _angle))
-                    {
+                for (int i = 0; i < m_itemCount; i++) {
+                    if (!SetAngleInDegrees(i, _angle)) {
                         m_itemCount = i;
                         return;
                     }
@@ -3027,14 +2502,24 @@ namespace PropLineTool
 
             //called after setting up base angles
             //used by ActiveState.ChangeAngle
-            private void OffsetAnglesUniformDegrees(float relativeAngleOffsetInDegrees /*in Degrees*/)
-            {
+            private void OffsetAnglesUniformRadians(float relativeAngleOffsetInRadians /*in Radians*/) {
+                float _angle = 0f;
+                _angle = relativeAngleOffsetInRadians * Mathf.Rad2Deg;
+                for (int i = 0; i < m_itemCount; i++) {
+                    if (!IncrementAngleInDegrees(i, _angle)) {
+                        m_itemCount = i;
+                        return;
+                    }
+                }
+            }
+
+            //called after setting up base angles
+            //used by ActiveState.ChangeAngle
+            private void OffsetAnglesUniformDegrees(float relativeAngleOffsetInDegrees /*in Degrees*/) {
                 float _angle = 0f;
                 _angle = relativeAngleOffsetInDegrees;
-                for (int i = 0; i < m_itemCount; i++)
-                {
-                    if (!IncrementAngleInDegrees(i, _angle))
-                    {
+                for (int i = 0; i < m_itemCount; i++) {
+                    if (!IncrementAngleInDegrees(i, _angle)) {
                         m_itemCount = i;
                         return;
                     }
@@ -3043,44 +2528,34 @@ namespace PropLineTool
 
             //individual
             /// <param name="itemAngle">Angle in radians.</param>
-            public bool GetAngle(int index, out float itemAngle)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            public bool GetAngle(int index, out float itemAngle) {
+                if (IsIndexWithinBounds(index, false)) {
                     itemAngle = m_placementInfo[index].angle;
                     return true;
-                }
-                else
-                {
+                } else {
                     itemAngle = 0f;
                     return false;
                 }
             }
-            private bool SetAngle(int index, float angleInRadians /*absolute angle, in radians*/)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            private bool SetAngle(int index, float angleInRadians /*absolute angle, in radians*/) {
+                if (IsIndexWithinBounds(index, false)) {
                     float _angle = (angleInRadians % (2f * Mathf.PI));
                     m_placementInfo[index].angle = _angle;
                     return true;
                 }
                 return false;
             }
-            private bool SetAngleInDegrees(int index, float angleInDegrees /*absolute angle, in degrees*/)
-            {
-                
-                if (IsIndexWithinBounds(index, false))
-                {
+            private bool SetAngleInDegrees(int index, float angleInDegrees /*absolute angle, in degrees*/) {
+
+                if (IsIndexWithinBounds(index, false)) {
                     float _angle = Mathf.Deg2Rad * (angleInDegrees % 360f);
                     m_placementInfo[index].angle = _angle;
                     return true;
                 }
                 return false;
             }
-            private bool IncrementAngleInDegrees(int index, float angleIncrementInDegrees /*relative angle, in degrees*/)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            private bool IncrementAngleInDegrees(int index, float angleIncrementInDegrees /*relative angle, in degrees*/) {
+                if (IsIndexWithinBounds(index, false)) {
                     float _increment = Mathf.Deg2Rad * (angleIncrementInDegrees % 360f);
                     float _oldAngle = m_placementInfo[index].angle;
                     float _newAngle = _oldAngle + _increment;
@@ -3093,10 +2568,8 @@ namespace PropLineTool
             /// <summary>
             /// Either 0 or pi/2 [radians].
             /// </summary>
-            public float modelAngleOffset
-            {
-                get
-                {
+            public float modelAngleOffset {
+                get {
                     return m_assetModelZ > m_assetModelX ? Mathf.PI / 2f : 0f;
                 }
             }
@@ -3104,10 +2577,8 @@ namespace PropLineTool
             /// <summary>
             /// Either 0 or pi [radians].
             /// </summary>
-            public float angleFlip180
-            {
-                get
-                {
+            public float angleFlip180 {
+                get {
                     return userSettingsControlPanel.angleFlip180 == true ? Mathf.PI : 0f;
                 }
             }
@@ -3115,10 +2586,8 @@ namespace PropLineTool
             /// <summary>
             /// Depends on multiple things [radians].
             /// </summary>
-            public float totalPropertyAngleOffset
-            {
-                get
-                {
+            public float totalPropertyAngleOffset {
+                get {
                     return modelAngleOffset + angleFlip180;
                 }
             }
@@ -3128,10 +2597,8 @@ namespace PropLineTool
             /// </summary>
             /// <param name="directionVector"></param>
             /// <returns></returns>
-            public static float AngleDynamicXZ(Vector3 directionVector)
-            {
-                if (directionVector == Vector3.zero)
-                {
+            public static float AngleDynamicXZ(Vector3 directionVector) {
+                if (directionVector == Vector3.zero) {
                     return 0f;
                 }
 
@@ -3145,22 +2612,19 @@ namespace PropLineTool
                 Vector3 _yAxis = Vector3.up;
 
                 _angle = Math.MathPLT.AngleSigned(_itemDir, _xAxis, _yAxis) + Mathf.PI;
-                
+
                 return _angle;
             }
 
 
             //================================  ERROR CHECKING  ================================|================================================================
-            
-            public void UpdatePlacementErrors()
-            {
-                if (userSettingsControlPanel.errorChecking == false)
-                {
+
+            public void UpdatePlacementErrors() {
+                if (userSettingsControlPanel.errorChecking == false) {
                     Vector3 _position = Vector3.zero;
                     ItemCollisionType _collisionFlags = ItemCollisionType.None;
 
-                    for (int i = 0; i < m_itemCount; i++)
-                    {
+                    for (int i = 0; i < m_itemCount; i++) {
                         SetItemCollisionFlags(i, _collisionFlags);
                         SetItemValidPlacement(i, true);
                     }
@@ -3169,92 +2633,68 @@ namespace PropLineTool
                 }
 
                 bool _itemsValid = true;
-                
-                switch (objectMode)
-                {
-                    case ObjectMode.Props:
-                        {
-                            if (propInfo != null)
-                            {
-                                Vector3 _position = Vector3.zero;
-                                ItemCollisionType _collisionFlags = ItemCollisionType.None;
-                                PropInfo _propInfo = propInfo;
 
-                                for (int i = 0; i < m_itemCount; i++)
-                                {
-                                    if (GetItemPosition(i, out _position))
-                                    {
-                                        _propInfo = m_placementInfo[i].propInfo;
+                switch (objectMode) {
+                    case ObjectMode.Props: {
+                        if (propInfo != null) {
+                            Vector3 _position = Vector3.zero;
+                            ItemCollisionType _collisionFlags = ItemCollisionType.None;
+                            PropInfo _propInfo = propInfo;
 
-                                        _collisionFlags = ErrorChecker.CheckAllCollisionsProp(_position, _propInfo);
-                                        SetItemCollisionFlags(i, _collisionFlags);
-                                        
-                                        if (_collisionFlags == ItemCollisionType.None)
-                                        {
-                                            SetItemValidPlacement(i, true);
-                                        }
-                                        else if (userSettingsControlPanel.anarchyPLT)
-                                        {
-                                            SetItemValidPlacement(i, true);
-                                        }
-                                        else if (userSettingsControlPanel.placeBlockedItems && _collisionFlags == ItemCollisionType.Blocked)
-                                        {
-                                            SetItemValidPlacement(i, true);
-                                        }
-                                        else
-                                        {
-                                            SetItemValidPlacement(i, false);
-                                            _itemsValid = false;
-                                        }
+                            for (int i = 0; i < m_itemCount; i++) {
+                                if (GetItemPosition(i, out _position)) {
+                                    _propInfo = m_placementInfo[i].propInfo;
+
+                                    _collisionFlags = ErrorChecker.CheckAllCollisionsProp(_position, _propInfo);
+                                    SetItemCollisionFlags(i, _collisionFlags);
+
+                                    if (_collisionFlags == ItemCollisionType.None) {
+                                        SetItemValidPlacement(i, true);
+                                    } else if (userSettingsControlPanel.anarchyPLT) {
+                                        SetItemValidPlacement(i, true);
+                                    } else if (userSettingsControlPanel.placeBlockedItems && _collisionFlags == ItemCollisionType.Blocked) {
+                                        SetItemValidPlacement(i, true);
+                                    } else {
+                                        SetItemValidPlacement(i, false);
+                                        _itemsValid = false;
                                     }
                                 }
                             }
-                            break; 
                         }
-                    case ObjectMode.Trees:
-                        {
-                            if (treeInfo != null)
-                            {
-                                Vector3 _position = Vector3.zero;
-                                ItemCollisionType _collisionFlags = ItemCollisionType.None;
-                                TreeInfo _treeInfo = treeInfo;
+                        break;
+                    }
+                    case ObjectMode.Trees: {
+                        if (treeInfo != null) {
+                            Vector3 _position = Vector3.zero;
+                            ItemCollisionType _collisionFlags = ItemCollisionType.None;
+                            TreeInfo _treeInfo = treeInfo;
 
-                                for (int i = 0; i < m_itemCount; i++)
-                                {
-                                    if (GetItemPosition(i, out _position))
-                                    {
-                                        _treeInfo = m_placementInfo[i].treeInfo;
+                            for (int i = 0; i < m_itemCount; i++) {
+                                if (GetItemPosition(i, out _position)) {
+                                    _treeInfo = m_placementInfo[i].treeInfo;
 
-                                        _collisionFlags = ErrorChecker.CheckAllCollisionsTree(_position, treeInfo);
-                                        SetItemCollisionFlags(i, _collisionFlags);
+                                    _collisionFlags = ErrorChecker.CheckAllCollisionsTree(_position, treeInfo);
+                                    SetItemCollisionFlags(i, _collisionFlags);
 
-                                        if (_collisionFlags == ItemCollisionType.None)
-                                        {
-                                            SetItemValidPlacement(i, true);
-                                        }
-                                        else if (userSettingsControlPanel.anarchyPLT)
-                                        {
-                                            SetItemValidPlacement(i, true);
-                                        }
-                                        else if (userSettingsControlPanel.placeBlockedItems && _collisionFlags == ItemCollisionType.Blocked)
-                                        {
-                                            SetItemValidPlacement(i, true);
-                                        }
-                                        else
-                                        {
-                                            SetItemValidPlacement(i, false);
-                                            _itemsValid = false;
-                                        }
+                                    if (_collisionFlags == ItemCollisionType.None) {
+                                        SetItemValidPlacement(i, true);
+                                    } else if (userSettingsControlPanel.anarchyPLT) {
+                                        SetItemValidPlacement(i, true);
+                                    } else if (userSettingsControlPanel.placeBlockedItems && _collisionFlags == ItemCollisionType.Blocked) {
+                                        SetItemValidPlacement(i, true);
+                                    } else {
+                                        SetItemValidPlacement(i, false);
+                                        _itemsValid = false;
                                     }
                                 }
                             }
-                            break; 
                         }
-                    default:
-                        {
-                            segmentState.allItemsValid = true;
-                            break; 
-                        }
+                        break;
+                    }
+                    default: {
+                        segmentState.allItemsValid = true;
+                        break;
+                    }
                 }
 
                 segmentState.allItemsValid = _itemsValid;
@@ -3263,10 +2703,8 @@ namespace PropLineTool
             /// <summary>
             /// Sets an item's collision flags to its current flags AND the input flags. (through Or Equals, |=)
             /// </summary>
-            private bool AddItemCollisionFlags(int index, ItemCollisionType collisionFlags)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            private bool AddItemCollisionFlags(int index, ItemCollisionType collisionFlags) {
+                if (IsIndexWithinBounds(index, false)) {
                     m_placementInfo[index].collisionFlags |= collisionFlags;
                     return true;
                 }
@@ -3275,19 +2713,15 @@ namespace PropLineTool
             /// <summary>
             /// Sets an item's collision flags to ONLY the input flags.
             /// </summary>
-            private bool SetItemCollisionFlags(int index, ItemCollisionType collisionFlags)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            private bool SetItemCollisionFlags(int index, ItemCollisionType collisionFlags) {
+                if (IsIndexWithinBounds(index, false)) {
                     m_placementInfo[index].collisionFlags = collisionFlags;
                     return true;
                 }
                 return false;
             }
-            private bool SetItemValidPlacement(int index, bool isValidPlacement)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            private bool SetItemValidPlacement(int index, bool isValidPlacement) {
+                if (IsIndexWithinBounds(index, false)) {
                     m_placementInfo[index].isValidPlacement = isValidPlacement;
                     return true;
                 }
@@ -3295,20 +2729,16 @@ namespace PropLineTool
             }
 
 
-            public static bool GetItemCollisionFlags(int index, out ItemCollisionType collisionFlags)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            public static bool GetItemCollisionFlags(int index, out ItemCollisionType collisionFlags) {
+                if (IsIndexWithinBounds(index, false)) {
                     collisionFlags = m_placementInfo[index].collisionFlags;
                     return true;
                 }
                 collisionFlags = ItemCollisionType.None;
                 return false;
             }
-            public static bool GetItemValidPlacement(int index, out bool isValidPlacement)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            public static bool GetItemValidPlacement(int index, out bool isValidPlacement) {
+                if (IsIndexWithinBounds(index, false)) {
                     isValidPlacement = m_placementInfo[index].isValidPlacement;
                     return true;
                 }
@@ -3318,19 +2748,15 @@ namespace PropLineTool
 
 
 
-            public static bool SetTreeID(int index, uint treeID)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            public static bool SetTreeID(int index, uint treeID) {
+                if (IsIndexWithinBounds(index, false)) {
                     m_placementInfo[index].treeID = treeID;
                     return true;
                 }
                 return false;
             }
-            public static bool SetPropID(int index, ushort propID)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            public static bool SetPropID(int index, ushort propID) {
+                if (IsIndexWithinBounds(index, false)) {
                     m_placementInfo[index].propID = propID;
                     return true;
                 }
@@ -3339,168 +2765,133 @@ namespace PropLineTool
 
 
             //================================  VARIATION MANAGEMENT  ================================|================================================================
-            public void SetAllItemPrefabInfos()
-            {
+            public void SetAllItemPrefabInfos() {
                 //make sure to use the same randomizer as item placement (PropLineTool.FinalizePlacement)
                 Randomizer _randomizer1 = randomizerFresh;
 
-                switch (objectMode)
-                {
-                    case ObjectMode.Props:
-                        {
-                            if (propInfo != null)
-                            {
-                                if (propInfo.m_variations.Length > 0)
-                                {
-                                    PropInfo _propInfo = propInfo;
-                                    Randomizer _randomizer2 = randomizerFresh;
+                switch (objectMode) {
+                    case ObjectMode.Props: {
+                        if (propInfo != null) {
+                            if (propInfo.m_variations.Length > 0) {
+                                PropInfo _propInfo = propInfo;
+                                Randomizer _randomizer2 = randomizerFresh;
 
-                                    for (int i = 0; i < m_itemCount; i++)
-                                    {
-                                        if (IsIndexWithinBounds(i, false))
-                                        {
-                                            _propInfo = propInfo.GetVariation(ref _randomizer1);
-                                            m_placementInfo[i].propInfo = _propInfo;
+                                for (int i = 0; i < m_itemCount; i++) {
+                                    if (IsIndexWithinBounds(i, false)) {
+                                        _propInfo = propInfo.GetVariation(ref _randomizer1);
+                                        m_placementInfo[i].propInfo = _propInfo;
 
-                                            //incorrect with variation props
-                                            //m_placementInfo[i].scale = _propInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (_propInfo.m_maxScale - _propInfo.m_minScale) * 0.0001f;
-                                            //m_placementInfo[i].color = _propInfo.GetColor(ref _randomizer2);
+                                        //incorrect with variation props
+                                        //m_placementInfo[i].scale = _propInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (_propInfo.m_maxScale - _propInfo.m_minScale) * 0.0001f;
+                                        //m_placementInfo[i].color = _propInfo.GetColor(ref _randomizer2);
 
-                                            //nope
-                                            //test with variation props
-                                            //m_placementInfo[i].scale = _propInfo.m_minScale + (float)_randomizer1.Int32(10000u) * (_propInfo.m_maxScale - _propInfo.m_minScale) * 0.0001f;
-                                            //m_placementInfo[i].color = _propInfo.GetColor(ref _randomizer1);
+                                        //nope
+                                        //test with variation props
+                                        //m_placementInfo[i].scale = _propInfo.m_minScale + (float)_randomizer1.Int32(10000u) * (_propInfo.m_maxScale - _propInfo.m_minScale) * 0.0001f;
+                                        //m_placementInfo[i].color = _propInfo.GetColor(ref _randomizer1);
 
-                                            //third times the charm
-                                            _randomizer2 = RandomizerNextRandom(_randomizer1);
-                                            m_placementInfo[i].scale = _propInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (_propInfo.m_maxScale - _propInfo.m_minScale) * 0.0001f;
-                                            m_placementInfo[i].color = _propInfo.GetColor(ref _randomizer2);
-                                        }
+                                        //third times the charm
+                                        _randomizer2 = RandomizerNextRandom(_randomizer1);
+                                        m_placementInfo[i].scale = _propInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (_propInfo.m_maxScale - _propInfo.m_minScale) * 0.0001f;
+                                        m_placementInfo[i].color = _propInfo.GetColor(ref _randomizer2);
                                     }
                                 }
-                                else
-                                {
-                                    //accurate single item
-                                    //see PropTool.RenderGeometry
-                                    if (controlMode == ControlMode.Itemwise && m_itemCount == 1)
-                                    {
-                                        m_placementInfo[ITEMWISE_INDEX].propInfo = propInfo;
+                            } else {
+                                //accurate single item
+                                //see PropTool.RenderGeometry
+                                if (controlMode == ControlMode.Itemwise && m_itemCount == 1) {
+                                    m_placementInfo[ITEMWISE_INDEX].propInfo = propInfo;
 
-                                        ushort _seed = Singleton<PropManager>.instance.m_props.NextFreeItem(ref _randomizer1);
-                                        Randomizer _randomizer2 = new Randomizer((int)_seed);
+                                    ushort _seed = Singleton<PropManager>.instance.m_props.NextFreeItem(ref _randomizer1);
+                                    Randomizer _randomizer2 = new Randomizer((int)_seed);
 
-                                        m_placementInfo[ITEMWISE_INDEX].scale = propInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (propInfo.m_maxScale - propInfo.m_minScale) * 0.0001f;
-                                        m_placementInfo[ITEMWISE_INDEX].color = propInfo.GetColor(ref _randomizer2);
-                                    }
-                                    else
-                                    {
-                                        for (int i = 0; i < m_itemCount; i++)
-                                        {
-                                            if (IsIndexWithinBounds(i, false))
-                                            {
-                                                m_placementInfo[i].propInfo = propInfo;
+                                    m_placementInfo[ITEMWISE_INDEX].scale = propInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (propInfo.m_maxScale - propInfo.m_minScale) * 0.0001f;
+                                    m_placementInfo[ITEMWISE_INDEX].color = propInfo.GetColor(ref _randomizer2);
+                                } else {
+                                    for (int i = 0; i < m_itemCount; i++) {
+                                        if (IsIndexWithinBounds(i, false)) {
+                                            m_placementInfo[i].propInfo = propInfo;
 
-                                                m_placementInfo[i].scale = propInfo.m_minScale + (float)_randomizer1.Int32(10000u) * (propInfo.m_maxScale - propInfo.m_minScale) * 0.0001f;
-                                                m_placementInfo[i].color = propInfo.GetColor(ref _randomizer1);
-                                            }
+                                            m_placementInfo[i].scale = propInfo.m_minScale + (float)_randomizer1.Int32(10000u) * (propInfo.m_maxScale - propInfo.m_minScale) * 0.0001f;
+                                            m_placementInfo[i].color = propInfo.GetColor(ref _randomizer1);
                                         }
                                     }
                                 }
                             }
-                            else
-                            {
-                                m_itemCount = 0;
-                            }
-                            break;
-                        }
-                    case ObjectMode.Trees:
-                        {
-                            if (treeInfo != null)
-                            {
-                                if (treeInfo.m_variations.Length > 0)
-                                {
-                                    TreeInfo _treeInfo = treeInfo;
-                                    Randomizer _randomizer2 = randomizerFresh;
-
-                                    for (int i = 0; i < m_itemCount; i++)
-                                    {
-                                        if (IsIndexWithinBounds(i, false))
-                                        {
-                                            _treeInfo = treeInfo.GetVariation(ref _randomizer1);
-                                            m_placementInfo[i].treeInfo = _treeInfo;
-
-                                            //incorrect for variation with trees
-                                            //m_placementInfo[i].scale = _treeInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (_treeInfo.m_maxScale - _treeInfo.m_minScale) * 0.0001f;
-                                            //m_placementInfo[i].brightness = _treeInfo.m_minBrightness + (float)_randomizer2.Int32(10000u) * (_treeInfo.m_maxBrightness - _treeInfo.m_minBrightness) * 0.0001f;
-
-                                            //test for variation with trees
-                                            //correct for itemwise
-                                            //m_placementInfo[i].scale = _treeInfo.m_minScale + (float)_randomizer1.Int32(10000u) * (_treeInfo.m_maxScale - _treeInfo.m_minScale) * 0.0001f;
-                                            //m_placementInfo[i].brightness = _treeInfo.m_minBrightness + (float)_randomizer1.Int32(10000u) * (_treeInfo.m_maxBrightness - _treeInfo.m_minBrightness) * 0.0001f;
-
-                                            //third times the charm
-                                            _randomizer2 = RandomizerNextRandom(_randomizer1);
-                                            m_placementInfo[i].scale = _treeInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (_treeInfo.m_maxScale - _treeInfo.m_minScale) * 0.0001f;
-                                            m_placementInfo[i].brightness = _treeInfo.m_minBrightness + (float)_randomizer2.Int32(10000u) * (_treeInfo.m_maxBrightness - _treeInfo.m_minBrightness) * 0.0001f;
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    //accurate single item
-                                    //see TreeTool.RenderGeometry
-                                    if (controlMode == ControlMode.Itemwise && m_itemCount == 1)
-                                    {
-                                        m_placementInfo[ITEMWISE_INDEX].treeInfo = treeInfo;
-
-                                        uint _seed = Singleton<TreeManager>.instance.m_trees.NextFreeItem(ref _randomizer1);
-                                        Randomizer _randomizer2 = new Randomizer(_seed);
-
-                                        m_placementInfo[ITEMWISE_INDEX].scale = treeInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (treeInfo.m_maxScale - treeInfo.m_minScale) * 0.0001f;
-                                        m_placementInfo[ITEMWISE_INDEX].brightness = treeInfo.m_minBrightness + (float)_randomizer2.Int32(10000u) * (treeInfo.m_maxBrightness - treeInfo.m_minBrightness) * 0.0001f;
-                                    }
-                                    else
-                                    {
-                                        for (int i = 0; i < m_itemCount; i++)
-                                        {
-                                            if (IsIndexWithinBounds(i, false))
-                                            {
-                                                m_placementInfo[i].treeInfo = treeInfo;
-
-                                                m_placementInfo[i].scale = treeInfo.m_minScale + (float)_randomizer1.Int32(10000u) * (treeInfo.m_maxScale - treeInfo.m_minScale) * 0.0001f;
-                                                m_placementInfo[i].brightness = treeInfo.m_minBrightness + (float)_randomizer1.Int32(10000u) * (treeInfo.m_maxBrightness - treeInfo.m_minBrightness) * 0.0001f;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                m_itemCount = 0;
-                            }
-                            break;
-                        }
-                    default:
-                        {
+                        } else {
                             m_itemCount = 0;
-                            break;
                         }
+                        break;
+                    }
+                    case ObjectMode.Trees: {
+                        if (treeInfo != null) {
+                            if (treeInfo.m_variations.Length > 0) {
+                                TreeInfo _treeInfo = treeInfo;
+                                Randomizer _randomizer2 = randomizerFresh;
+
+                                for (int i = 0; i < m_itemCount; i++) {
+                                    if (IsIndexWithinBounds(i, false)) {
+                                        _treeInfo = treeInfo.GetVariation(ref _randomizer1);
+                                        m_placementInfo[i].treeInfo = _treeInfo;
+
+                                        //incorrect for variation with trees
+                                        //m_placementInfo[i].scale = _treeInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (_treeInfo.m_maxScale - _treeInfo.m_minScale) * 0.0001f;
+                                        //m_placementInfo[i].brightness = _treeInfo.m_minBrightness + (float)_randomizer2.Int32(10000u) * (_treeInfo.m_maxBrightness - _treeInfo.m_minBrightness) * 0.0001f;
+
+                                        //test for variation with trees
+                                        //correct for itemwise
+                                        //m_placementInfo[i].scale = _treeInfo.m_minScale + (float)_randomizer1.Int32(10000u) * (_treeInfo.m_maxScale - _treeInfo.m_minScale) * 0.0001f;
+                                        //m_placementInfo[i].brightness = _treeInfo.m_minBrightness + (float)_randomizer1.Int32(10000u) * (_treeInfo.m_maxBrightness - _treeInfo.m_minBrightness) * 0.0001f;
+
+                                        //third times the charm
+                                        _randomizer2 = RandomizerNextRandom(_randomizer1);
+                                        m_placementInfo[i].scale = _treeInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (_treeInfo.m_maxScale - _treeInfo.m_minScale) * 0.0001f;
+                                        m_placementInfo[i].brightness = _treeInfo.m_minBrightness + (float)_randomizer2.Int32(10000u) * (_treeInfo.m_maxBrightness - _treeInfo.m_minBrightness) * 0.0001f;
+                                    }
+                                }
+                            } else {
+                                //accurate single item
+                                //see TreeTool.RenderGeometry
+                                if (controlMode == ControlMode.Itemwise && m_itemCount == 1) {
+                                    m_placementInfo[ITEMWISE_INDEX].treeInfo = treeInfo;
+
+                                    uint _seed = Singleton<TreeManager>.instance.m_trees.NextFreeItem(ref _randomizer1);
+                                    Randomizer _randomizer2 = new Randomizer(_seed);
+
+                                    m_placementInfo[ITEMWISE_INDEX].scale = treeInfo.m_minScale + (float)_randomizer2.Int32(10000u) * (treeInfo.m_maxScale - treeInfo.m_minScale) * 0.0001f;
+                                    m_placementInfo[ITEMWISE_INDEX].brightness = treeInfo.m_minBrightness + (float)_randomizer2.Int32(10000u) * (treeInfo.m_maxBrightness - treeInfo.m_minBrightness) * 0.0001f;
+                                } else {
+                                    for (int i = 0; i < m_itemCount; i++) {
+                                        if (IsIndexWithinBounds(i, false)) {
+                                            m_placementInfo[i].treeInfo = treeInfo;
+
+                                            m_placementInfo[i].scale = treeInfo.m_minScale + (float)_randomizer1.Int32(10000u) * (treeInfo.m_maxScale - treeInfo.m_minScale) * 0.0001f;
+                                            m_placementInfo[i].brightness = treeInfo.m_minBrightness + (float)_randomizer1.Int32(10000u) * (treeInfo.m_maxBrightness - treeInfo.m_minBrightness) * 0.0001f;
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            m_itemCount = 0;
+                        }
+                        break;
+                    }
+                    default: {
+                        m_itemCount = 0;
+                        break;
+                    }
                 }
 
             }
-            protected static bool SetItemTreeInfo(int index, TreeInfo treeInfo)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            protected static bool SetItemTreeInfo(int index, TreeInfo treeInfo) {
+                if (IsIndexWithinBounds(index, false)) {
                     m_placementInfo[index].treeInfo = treeInfo;
                     return true;
                 }
                 return false;
             }
-            protected static bool SetItemPropInfo(int index, PropInfo propInfo)
-            {
-                if (IsIndexWithinBounds(index, false))
-                {
+            protected static bool SetItemPropInfo(int index, PropInfo propInfo) {
+                if (IsIndexWithinBounds(index, false)) {
                     m_placementInfo[index].propInfo = propInfo;
                     return true;
                 }
@@ -3510,48 +2901,39 @@ namespace PropLineTool
 
 
         }
-        
+
         private static PlacementCalculator m_placementCalculator = new PlacementCalculator();
-        internal static PlacementCalculator placementCalculator
-        {
-            get
-            {
+        internal static PlacementCalculator placementCalculator {
+            get {
                 return m_placementCalculator;
             }
-            set
-            {
+            set {
                 m_placementCalculator = value;
             }
         }
 
         //Undo Manager
         private static UndoManager m_undoManager = new UndoManager();
-        internal static UndoManager undoManager
-        {
-            get
-            {
+        internal static UndoManager undoManager {
+            get {
                 return m_undoManager;
             }
-            private set
-            {
+            private set {
                 m_undoManager = value;
             }
         }
 
         //User Settings - Control Panel
         private static UserSettingsControlPanel m_userSettingsControlPanel = new UserSettingsControlPanel();
-        internal static UserSettingsControlPanel userSettingsControlPanel
-        {
-            get
-            {
+        internal static UserSettingsControlPanel userSettingsControlPanel {
+            get {
                 return m_userSettingsControlPanel;
             }
-            set
-            {
+            set {
                 m_userSettingsControlPanel = value;
             }
         }
-        
+
         //Overlay Colors!
         public Color m_PLTColor_default = new Color32(39, 130, 204, 128);
         public Color m_PLTColor_defaultSnapZones = new Color32(39, 130, 204, 255);
@@ -3576,7 +2958,7 @@ namespace PropLineTool
         private Ray m_mouseRay;
         private float m_mouseRayLength;
         private bool m_mouseRayValid;
-        
+
         //   NetTool members
         private int m_cachedControlPointCount;
         private PropLineTool.ControlPoint[] m_cachedControlPoints;
@@ -3585,7 +2967,7 @@ namespace PropLineTool
         private int m_controlPointCount;
         private bool m_lengthChanging;
         private float m_lengthTimer;
-        
+
         //   Prop/TreeTool members
         private Vector3 m_cachedPosition;
         private bool m_mouseLeftDown;
@@ -3596,48 +2978,37 @@ namespace PropLineTool
         //   Custom members similar to the Big 3
         private bool m_keyboardCtrlDown;
         private bool m_keyboardAltDown;
-        public bool keyboardAltDown
-        {
-            get
-            {
+        public bool keyboardAltDown {
+            get {
                 return m_keyboardAltDown;
             }
         }
         private bool m_keyboardShiftDown; //this gets stuck for some reason
         private bool m_positionChanging;
         private bool m_pendingPlacementUpdate;
-        private bool IsPositionChanging()
-        {
+        private bool IsPositionChanging() {
             bool result = false;
             Vector3 _oldPos = this.m_cachedPosition;
             Vector3 _newPos = this.m_mousePosition;
-            if (_oldPos == null || _newPos == null)
-            {
+            if (_oldPos == null || _newPos == null) {
                 result = false;
-            }
-            else if (Vector3.SqrMagnitude(_newPos - _oldPos) > 1f)
-            {
+            } else if (Vector3.SqrMagnitude(_newPos - _oldPos) > 1f) {
                 result = true;
             }
             return result;
         }
-        private bool IsVectorPositionChanging(Vector3 oldPosition, Vector3 newPosition, float sqrMagnitudeThreshold)
-        {
+        private bool IsVectorPositionChanging(Vector3 oldPosition, Vector3 newPosition, float sqrMagnitudeThreshold) {
             bool result = false;
             Vector3 _oldPos = oldPosition;
             Vector3 _newPos = newPosition;
-            if (_oldPos == null || _newPos == null)
-            {
+            if (_oldPos == null || _newPos == null) {
                 result = false;
-            }
-            else if (Vector3.SqrMagnitude(_newPos - _oldPos) > sqrMagnitudeThreshold)
-            {
+            } else if (Vector3.SqrMagnitude(_newPos - _oldPos) > sqrMagnitudeThreshold) {
                 result = true;
             }
             return result;
         }
-        private bool IsVectorXZPositionChanging(Vector3 oldPosition, Vector3 newPosition, float tolerance)
-        {
+        private bool IsVectorXZPositionChanging(Vector3 oldPosition, Vector3 newPosition, float tolerance) {
             bool result = false;
             Vector3 _oldPos = oldPosition;
             Vector3 _newPos = newPosition;
@@ -3645,99 +3016,77 @@ namespace PropLineTool
 
             _oldPos.y = 0f;
             _newPos.y = 0f;
-            if (Vector3.SqrMagnitude(_newPos - _oldPos) > _sqrMagnitudeThreshold)
-            {
+            if (Vector3.SqrMagnitude(_newPos - _oldPos) > _sqrMagnitudeThreshold) {
                 result = true;
-            }
-            else
-            {
+            } else {
                 result = false;
             }
 
             return result;
         }
-        private static bool IsCurveLengthLongEnoughXZ()
-        {
+        private static bool IsCurveLengthLongEnoughXZ() {
             bool _result = false;
 
-            if (fenceMode == true)
-            {
-                switch (drawMode)
-                {
-                    case DrawMode.Straight:
-                        {
-                            _result = PlacementCalculator.GetCurveLength(m_mainSegment) >= 0.75f * placementCalculator.spacingSingle;
-                            break;
-                        }
+            if (fenceMode == true) {
+                switch (drawMode) {
+                    case DrawMode.Straight: {
+                        _result = PlacementCalculator.GetCurveLength(m_mainSegment) >= 0.75f * placementCalculator.spacingSingle;
+                        break;
+                    }
                     case DrawMode.Curved:
-                    case DrawMode.Freeform:
-                        {
-                            //_result = PlacementCalculator.GetCurveLength(m_mainBezier) >= placementCalculator.spacingSingle;
-                            _result = (m_mainBezier.d - m_mainBezier.a).magnitude >= placementCalculator.spacingSingle;
-                            break;
-                        }
-                    case DrawMode.Circle:
-                        {
-                            _result = m_mainCircle.diameter >= placementCalculator.spacingSingle;
-                            break;
-                        }
-                    default:
-                        {
-                            break;
-                        }
+                    case DrawMode.Freeform: {
+                        //_result = PlacementCalculator.GetCurveLength(m_mainBezier) >= placementCalculator.spacingSingle;
+                        _result = (m_mainBezier.d - m_mainBezier.a).magnitude >= placementCalculator.spacingSingle;
+                        break;
+                    }
+                    case DrawMode.Circle: {
+                        _result = m_mainCircle.diameter >= placementCalculator.spacingSingle;
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
                 }
-            }
-            else
-            {
-                switch (drawMode)
-                {
-                    case DrawMode.Straight:
-                        {
-                            _result = PlacementCalculator.GetCurveLength(m_mainSegment) >= placementCalculator.spacingSingle;
-                            break; 
-                        }
+            } else {
+                switch (drawMode) {
+                    case DrawMode.Straight: {
+                        _result = PlacementCalculator.GetCurveLength(m_mainSegment) >= placementCalculator.spacingSingle;
+                        break;
+                    }
                     case DrawMode.Curved:
-                    case DrawMode.Freeform:
-                        {
-                            _result = PlacementCalculator.GetCurveLength(m_mainBezier) >= placementCalculator.spacingSingle;
-                            break; 
-                        }
-                    case DrawMode.Circle:
-                        {
-                            _result = m_mainCircle.circumference >= placementCalculator.spacingSingle;
-                            break;
-                        }
-                    default:
-                        {
-                            break; 
-                        }
+                    case DrawMode.Freeform: {
+                        _result = PlacementCalculator.GetCurveLength(m_mainBezier) >= placementCalculator.spacingSingle;
+                        break;
+                    }
+                    case DrawMode.Circle: {
+                        _result = m_mainCircle.circumference >= placementCalculator.spacingSingle;
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
                 }
             }
 
             return _result;
         }
-        
+
         //prefab info
         //see PropTool/TreeTool
         private PropInfo m_propPrefab;
         private TreeInfo m_treePrefab;
-        public PropInfo propPrefab
-        {
-            get
-            {
+        public PropInfo propPrefab {
+            get {
                 return m_propPrefab;
             }
-            set
-            {
+            set {
                 bool _changedPrefab = m_propPrefab != value;
 
                 m_propPrefab = value;
                 placementCalculator.SetupPropPrefab(value);
 
-                if (_changedPrefab)
-                {
-                    if (userSettingsControlPanel.autoDefaultSpacing == true && objectMode == ObjectMode.Props)
-                    {
+                if (_changedPrefab) {
+                    if (userSettingsControlPanel.autoDefaultSpacing == true && objectMode == ObjectMode.Props) {
                         placementCalculator.SetDefaultSpacing();
                     }
 
@@ -3749,23 +3098,18 @@ namespace PropLineTool
                 }
             }
         }
-        public TreeInfo treePrefab
-        {
-            get
-            {
+        public TreeInfo treePrefab {
+            get {
                 return m_treePrefab;
             }
-            set
-            {
+            set {
                 bool _changedPrefab = m_treePrefab != value;
 
                 m_treePrefab = value;
                 placementCalculator.SetupTreePrefab(value);
 
-                if (_changedPrefab)
-                {
-                    if (userSettingsControlPanel.autoDefaultSpacing == true && objectMode == ObjectMode.Trees)
-                    {
+                if (_changedPrefab) {
+                    if (userSettingsControlPanel.autoDefaultSpacing == true && objectMode == ObjectMode.Trees) {
                         placementCalculator.SetDefaultSpacing();
                     }
 
@@ -3777,11 +3121,11 @@ namespace PropLineTool
                 }
             }
         }
-        private PropInfo m_propInfo; 
-        private TreeInfo m_treeInfo; 
+        private PropInfo m_propInfo;
+        private TreeInfo m_treeInfo;
         private PropInfo m_wasPropPrefab;
         private TreeInfo m_wasTreePrefab;
-        
+
         //used to reset active state
         private static bool m_initialized = false;
         //public static bool m_keepActiveState = false;
@@ -3789,15 +3133,13 @@ namespace PropLineTool
 
         //custom method to reset active state
         //called by ToolSwitch
-        public void ResetActiveState()
-        {
+        public void ResetActiveState() {
             ResetPLT();
             return;
         }
-        
+
         //refer to the Big 3 [NetTool, PropTool, TreeTool]
-        protected override void Awake()
-        {
+        protected override void Awake() {
             base.Awake();
 
             Debug.Log("[PLT]: Begin PropLineTool.Awake()");
@@ -3817,8 +3159,7 @@ namespace PropLineTool
             placementCalculator.ResetLastContinueParameters();
 
             //check main menu settings
-            if (UserSettingsMainMenu.anarchyPLTOnByDefault)
-            {
+            if (UserSettingsMainMenu.anarchyPLTOnByDefault) {
                 userSettingsControlPanel.showErrorGuides = false;
                 userSettingsControlPanel.placeBlockedItems = true;
                 userSettingsControlPanel.anarchyPLT = true;
@@ -3826,37 +3167,30 @@ namespace PropLineTool
             }
 
             //event subscriptions
-            userSettingsControlPanel.eventErrorCheckingSettingChanged += delegate()
-            {
+            userSettingsControlPanel.eventErrorCheckingSettingChanged += delegate () {
                 placementCalculator.UpdatePlacementErrors();
             };
-            userSettingsControlPanel.eventParametersTabSettingChanged += delegate ()
-            {
+            userSettingsControlPanel.eventParametersTabSettingChanged += delegate () {
                 placementCalculator.UpdateItemPlacementInfo();
 
-                if (userSettingsControlPanel.autoDefaultSpacing == true)
-                {
+                if (userSettingsControlPanel.autoDefaultSpacing == true) {
                     placementCalculator.SetDefaultSpacing();
                 }
             };
-            userSettingsControlPanel.eventRenderingPositioningSettingChanged += delegate ()
-            {
+            userSettingsControlPanel.eventRenderingPositioningSettingChanged += delegate () {
                 UpdateCurves();
                 placementCalculator.UpdateItemPlacementInfo();
             };
-            eventDrawModeChanged += delegate (PropLineTool.DrawMode mode)
-            {
+            eventDrawModeChanged += delegate (PropLineTool.DrawMode mode) {
                 bool _straightOrCircle = mode == DrawMode.Straight || drawMode == DrawMode.Circle;
 
                 //fix Straight<->Circle switching in Lock mode
-                if (_straightOrCircle)
-                {
+                if (_straightOrCircle) {
                     UpdateCurves();
                 }
-                
 
-                if (_straightOrCircle && fenceMode == true && (activeState == ActiveState.CreatePointSecond || activeState == ActiveState.CreatePointThird))
-                {
+
+                if (_straightOrCircle && fenceMode == true && (activeState == ActiveState.CreatePointSecond || activeState == ActiveState.CreatePointThird)) {
                     //snap first control point to last fence endpoint
                     //when user switched from fencemode[curved/freeform -> straight] and curve is coupled to previous segment
                     Vector3 _lastFenceEndpoint = placementCalculator.GetLastFenceEndpoint();
@@ -3864,8 +3198,7 @@ namespace PropLineTool
 
                     //Debug.Log("[PLT]: PropLineTool.Awake(): Inside 1/2 step of fence snap.");
 
-                    if (_lastFenceEndpoint != Vector3.zero && _lastFenceEndpoint != Vector3.down && _lastFenceEndpoint != _firstControlPoint)
-                    {
+                    if (_lastFenceEndpoint != Vector3.zero && _lastFenceEndpoint != Vector3.down && _lastFenceEndpoint != _firstControlPoint) {
                         //Debug.Log("[PLT]: PropLineTool.Awake(): Inside 2/2 step of fence snap.");
 
                         ModifyControlPoint(_lastFenceEndpoint, 1);
@@ -3874,38 +3207,29 @@ namespace PropLineTool
                 }
             };
             //auto-set active state when controlMode is changed
-            eventControlModeChanged += delegate (PropLineTool.ControlMode mode)
-            {
-                switch (mode)
-                {
-                    case ControlMode.Itemwise:
-                        {
-                            if (activeState == ActiveState.LockIdle)
-                            {
-                                GoToActiveState(ActiveState.ItemwiseLock);
-                            }
-                            break; 
+            eventControlModeChanged += delegate (PropLineTool.ControlMode mode) {
+                switch (mode) {
+                    case ControlMode.Itemwise: {
+                        if (activeState == ActiveState.LockIdle) {
+                            GoToActiveState(ActiveState.ItemwiseLock);
                         }
-                    case ControlMode.Spacing:
-                        {
-                            if (activeState == ActiveState.ItemwiseLock)
-                            {
-                                GoToActiveState(ActiveState.LockIdle);
-                            }
-                            break; 
+                        break;
+                    }
+                    case ControlMode.Spacing: {
+                        if (activeState == ActiveState.ItemwiseLock) {
+                            GoToActiveState(ActiveState.LockIdle);
                         }
-                    default:
-                        {
-                            //do nothing
-                            break; 
-                        }
+                        break;
+                    }
+                    default: {
+                        //do nothing
+                        break;
+                    }
                 }
             };
             //update perfect circle when prefab changed
-            placementCalculator.eventSpacingSingleChanged += delegate (object sender, float spacing)
-            {
-                if (userSettingsControlPanel.perfectCircles)
-                {
+            placementCalculator.eventSpacingSingleChanged += delegate (object sender, float spacing) {
+                if (userSettingsControlPanel.perfectCircles) {
                     UpdateCurves();
                 }
             };
@@ -3914,16 +3238,14 @@ namespace PropLineTool
             Debug.Log("[PLT]: End PropLineTool.Awake()");
         }
 
-        protected override void OnDestroy()
-        {
+        protected override void OnDestroy() {
             PropLineTool.instance = null;
 
             base.OnDestroy();
         }
 
         //called when exiting to main menu, other save, or desktop
-        internal static void OnLevelUnloading()
-        {
+        internal static void OnLevelUnloading() {
             m_initialized = false;
 
             undoManager = new UndoManager();
@@ -3931,95 +3253,81 @@ namespace PropLineTool
 
         //custom method
         //cancels/resets all control points
-        private void ResetAllControlPoints()
-        {
-            for (int i = 0; i < this.m_controlPoints.Length; i++)
-            {
+        private void ResetAllControlPoints() {
+            for (int i = 0; i < this.m_controlPoints.Length; i++) {
                 this.m_controlPoints[i].Clear();
             }
             this.m_controlPointCount = 0;
             this.m_positionChanging = true;
         }
-        
+
         //custom method
         //on-rightclick
         //cancels the latest control point and sets its stuff to zero
-        private bool CancelControlPoint()
-        {
+        private bool CancelControlPoint() {
             bool result = false;
 
             //custom stuff
-            if ((this.m_controlPointCount > 0) && (this.m_controlPointCount <= 3))
-            {
-                switch (m_controlPointCount)
-                {
+            if ((this.m_controlPointCount > 0) && (this.m_controlPointCount <= 3)) {
+                switch (m_controlPointCount) {
                     //placing first CP
-                    case 0:
-                        {
-                            ResetAllControlPoints();
-                            ModifyControlPoint(this.m_cachedPosition, 1);
-                            this.m_positionChanging = true;
-                            result = true;
-                            break;
-                        }
+                    case 0: {
+                        ResetAllControlPoints();
+                        ModifyControlPoint(this.m_cachedPosition, 1);
+                        this.m_positionChanging = true;
+                        result = true;
+                        break;
+                    }
                     //placing second CP
-                    case 1:
-                        {
-                            this.m_controlPoints[0].Clear();
-                            this.m_cachedControlPoints[0].Clear();
-                            this.m_cachedControlPoints[1].Clear();
-                            this.m_cachedControlPoints[2].Clear();
-                            this.m_controlPointCount = 0;
-                            
-                            this.m_positionChanging = true;
-                            result = true;
-                            break;
-                        }
+                    case 1: {
+                        this.m_controlPoints[0].Clear();
+                        this.m_cachedControlPoints[0].Clear();
+                        this.m_cachedControlPoints[1].Clear();
+                        this.m_cachedControlPoints[2].Clear();
+                        this.m_controlPointCount = 0;
+
+                        this.m_positionChanging = true;
+                        result = true;
+                        break;
+                    }
                     //for straight
                     //in locking mode
                     //   or the instant before placement occurs
                     //for curved and freeform
                     //   placing/creating third CP
-                    case 2:
-                        {
-                            Vector3 _oldDir1 = this.m_controlPoints[1].m_direction;
-                            this.m_cachedControlPoints[2].Clear();
-                            this.m_controlPointCount = 1;
-                            if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines))
-                            {
-                                //stub
-                            }
-                            else
-                            {
-                                this.m_controlPoints[0].m_direction = _oldDir1;
-                            }
-
-                            ModifyControlPoint(this.m_mousePosition, 2);
-                            this.m_positionChanging = true;
-                            
-                            result = true;
-                            break;
+                    case 2: {
+                        Vector3 _oldDir1 = this.m_controlPoints[1].m_direction;
+                        this.m_cachedControlPoints[2].Clear();
+                        this.m_controlPointCount = 1;
+                        if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines)) {
+                            //stub
+                        } else {
+                            this.m_controlPoints[0].m_direction = _oldDir1;
                         }
+
+                        ModifyControlPoint(this.m_mousePosition, 2);
+                        this.m_positionChanging = true;
+
+                        result = true;
+                        break;
+                    }
                     //for curved and freeform
                     //in locking mode
                     //   or the instant before placement occurs
-                    case 3:
-                        {
-                            Vector3 _oldPos2 = this.m_controlPoints[2].m_position;
-                            this.m_controlPoints[2].Clear();
-                            this.m_cachedControlPoints[2].Clear();
-                            this.m_controlPointCount = 2;
-                            
-                            this.m_positionChanging = true;
-                            ModifyControlPoint(this.m_mousePosition, 3);
-                            
-                            result = true;
-                            break;
-                        }
+                    case 3: {
+                        Vector3 _oldPos2 = this.m_controlPoints[2].m_position;
+                        this.m_controlPoints[2].Clear();
+                        this.m_cachedControlPoints[2].Clear();
+                        this.m_controlPointCount = 2;
+
+                        this.m_positionChanging = true;
+                        ModifyControlPoint(this.m_mousePosition, 3);
+
+                        result = true;
+                        break;
+                    }
                 }
-            }
-            else
-            {
+            } else {
                 Debug.LogError("[PLT]: CancelControlPoint(): m_controlPointCount is out of bounds! (value = " + this.m_controlPointCount.ToString() + ")");
                 result = false;
             }
@@ -4031,342 +3339,279 @@ namespace PropLineTool
         //custom method
         //finalizes control point placement to move onto the next step
         //on-click
-        private bool AddControlPoint(Vector3 position)
-        {
+        private bool AddControlPoint(Vector3 position) {
             bool result = false;
 
             //custom stuff
-            if ((this.m_controlPointCount >= 0) && (this.m_controlPointCount < 3))
-            {
-                switch (m_controlPointCount)
-                {
-                    case 0:
-                        {
-                            this.m_controlPoints[0].m_position = position;
-                            Vector3 _vector0 = position;
-                            this.m_controlPoints[0].m_position = _vector0;
-                            if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines))
-                            {
-                                //stub
-                            }
-                            else
-                            {
-                                this.m_controlPoints[0].m_direction = Vector3.zero;
-                            }
-                            this.m_controlPointCount = 1;
+            if ((this.m_controlPointCount >= 0) && (this.m_controlPointCount < 3)) {
+                switch (m_controlPointCount) {
+                    case 0: {
+                        this.m_controlPoints[0].m_position = position;
+                        Vector3 _vector0 = position;
+                        this.m_controlPoints[0].m_position = _vector0;
+                        if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines)) {
+                            //stub
+                        } else {
+                            this.m_controlPoints[0].m_direction = Vector3.zero;
+                        }
+                        this.m_controlPointCount = 1;
 
-                            this.m_controlPoints[1].Clear();
-                            this.m_controlPoints[2].Clear();
-                            
-                            this.m_positionChanging = true;
-                            result = true;
-                            break;
+                        this.m_controlPoints[1].Clear();
+                        this.m_controlPoints[2].Clear();
+
+                        this.m_positionChanging = true;
+                        result = true;
+                        break;
+                    }
+                    case 1: {
+                        Vector3 _vector1 = position;
+                        Vector3 _p0 = this.m_controlPoints[0].m_position;
+                        Vector3 _normVector1 = (_vector1 - _p0);
+                        _normVector1.y = 0f;
+                        _normVector1.Normalize();
+                        this.m_controlPoints[1].m_position = _vector1;
+                        if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines)) {
+                            //stub
+                        } else {
+                            this.m_controlPoints[0].m_direction = _normVector1;
                         }
-                    case 1:
-                        {
-                            Vector3 _vector1 = position;
-                            Vector3 _p0 = this.m_controlPoints[0].m_position;
-                            Vector3 _normVector1 = (_vector1 - _p0);
-                            _normVector1.y = 0f;
-                            _normVector1.Normalize();
-                            this.m_controlPoints[1].m_position = _vector1;
-                            if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines))
-                            {
-                                //stub
+                        this.m_controlPoints[1].m_direction = _normVector1;
+                        this.m_controlPointCount = 2;
+
+                        this.m_positionChanging = true;
+                        result = true;
+                        break;
+                    }
+                    case 2: {
+                        if (PropLineTool.drawMode == DrawMode.Freeform) {
+                            this.m_controlPoints[2].m_position = position;
+                            CalculateFreeformMiddlePoint(ref this.m_controlPoints);
+                        } else //must be curved
+                          {
+                            Vector3 _vector2 = position;
+                            Vector3 _p1 = this.m_controlPoints[1].m_position;
+                            if ((_p1 == null) || (_p1 == Vector3.zero)) {
+                                Debug.LogError("[PLT]: AddControlPoint(): Middle control point not found!");
+                                result = false;
+                                break;
                             }
-                            else
-                            {
-                                this.m_controlPoints[0].m_direction = _normVector1;
-                            }
-                            this.m_controlPoints[1].m_direction = _normVector1;
-                            this.m_controlPointCount = 2;
-                            
-                            this.m_positionChanging = true;
-                            result = true;
-                            break;
+                            Vector3 _normVector2 = (_vector2 - _p1);
+                            _normVector2.y = 0f;
+                            _normVector2.Normalize();
+                            this.m_controlPoints[2].m_position = _vector2;
+                            this.m_controlPoints[2].m_direction = _normVector2;
                         }
-                    case 2:
-                        {
-                            if (PropLineTool.drawMode == DrawMode.Freeform)
-                            {
-                                this.m_controlPoints[2].m_position = position;
-                                CalculateFreeformMiddlePoint(ref this.m_controlPoints);
-                            }
-                            else //must be curved
-                            {
-                                Vector3 _vector2 = position;
-                                Vector3 _p1 = this.m_controlPoints[1].m_position;
-                                if ((_p1 == null) || (_p1 == Vector3.zero))
-                                {
-                                    Debug.LogError("[PLT]: AddControlPoint(): Middle control point not found!");
-                                    result = false;
-                                    break;
-                                }
-                                Vector3 _normVector2 = (_vector2 - _p1);
-                                _normVector2.y = 0f;
-                                _normVector2.Normalize();
-                                this.m_controlPoints[2].m_position = _vector2;
-                                this.m_controlPoints[2].m_direction = _normVector2;
-                            }
-                            
-                            this.m_controlPointCount = 3;
-                            this.m_positionChanging = true;
-                            result = true;
-                            break;
-                        }
-                    default:
-                        {
-                            break;
-                        }
+
+                        this.m_controlPointCount = 3;
+                        this.m_positionChanging = true;
+                        result = true;
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
                 }
-            }
-            else
-            {
+            } else {
                 Debug.LogError("[PLT]: AddControlPoint(): m_controlPointCount is out of bounds!");
                 result = false;
             }
             return result;
         }
-        
+
         //custom method
         //updates active control point
         //   so that curve continuously changes (renders) with mouse movement
         //index does not have to match control point count (:
         //   actually pointNumber must be less than or equal to control point count
         //   used for changing (moving) control points in lock mode
-        private bool ModifyControlPoint(Vector3 position, int pointNumber)
-        {
+        private bool ModifyControlPoint(Vector3 position, int pointNumber) {
             bool result = false;
 
             int _index = pointNumber - 1;
-            
+
             int _pointCount = this.m_controlPointCount;
             bool flag = pointNumber <= (_pointCount + 1);
             bool flag2 = ((_pointCount >= 0) && (_pointCount <= 3));
 
-            if (flag && flag2)
-            {
-                switch (_index)
-                {
+            if (flag && flag2) {
+                switch (_index) {
                     //first point
-                    case 0:
-                        {
-                            bool _isPlacement = (((_pointCount == 0) || (_pointCount == 1)) && (PropLineTool.activeState == PropLineTool.ActiveState.CreatePointFirst));
-                            bool _isMovement = (((_pointCount == 2) || (_pointCount == 3)) && (PropLineTool.activeState == PropLineTool.ActiveState.MovePointFirst));
-                            //bool _isSnapFirstControlPoint = ((_pointCount == 1) && (activeState == ActiveState.CreatePointSecond || activeState == ActiveState.CreatePointThird) && (drawMode == DrawMode.Straight));
-                            bool _isSnapFirstControlPoint = ((_pointCount == 1 && activeState == ActiveState.CreatePointSecond) || (_pointCount == 2 && activeState == ActiveState.CreatePointThird)) && (drawMode == DrawMode.Straight || drawMode == DrawMode.Circle);
+                    case 0: {
+                        bool _isPlacement = (((_pointCount == 0) || (_pointCount == 1)) && (PropLineTool.activeState == PropLineTool.ActiveState.CreatePointFirst));
+                        bool _isMovement = (((_pointCount == 2) || (_pointCount == 3)) && (PropLineTool.activeState == PropLineTool.ActiveState.MovePointFirst));
+                        //bool _isSnapFirstControlPoint = ((_pointCount == 1) && (activeState == ActiveState.CreatePointSecond || activeState == ActiveState.CreatePointThird) && (drawMode == DrawMode.Straight));
+                        bool _isSnapFirstControlPoint = ((_pointCount == 1 && activeState == ActiveState.CreatePointSecond) || (_pointCount == 2 && activeState == ActiveState.CreatePointThird)) && (drawMode == DrawMode.Straight || drawMode == DrawMode.Circle);
 
-                            //placement
-                            if (_isPlacement)
-                            {
-                                Vector3 _vector0 = position;
-                                this.m_controlPoints[0].m_position = _vector0;
-                                if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines))
-                                {
-                                    //stub
-                                }
-                                else
-                                {
-                                    this.m_controlPoints[0].m_direction = Vector3.zero;
-                                }
+                        //placement
+                        if (_isPlacement) {
+                            Vector3 _vector0 = position;
+                            this.m_controlPoints[0].m_position = _vector0;
+                            if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines)) {
+                                //stub
+                            } else {
+                                this.m_controlPoints[0].m_direction = Vector3.zero;
+                            }
+
+                        }
+                        //when pointcount = 2, should be adjusting line startpoint
+                        //when pointcount = 3, should be adjusting curve startpoint
+                        //movement
+                        else if (_isMovement) {
+                            Vector3 _vector0 = position;
+                            Vector3 _p1 = this.m_controlPoints[1].m_position;
+                            Vector3 _normVector0 = (_p1 - _vector0);
+                            _normVector0.y = 0f;
+                            _normVector0.Normalize();
+                            this.m_controlPoints[0].m_position = _vector0;
+                            this.m_controlPoints[0].m_direction = _normVector0;
+                            this.m_controlPoints[1].m_direction = _normVector0;
+
+                            bool _isFreeform = (PropLineTool.drawMode == PropLineTool.DrawMode.Freeform);
+                            if (_isFreeform) {
+                                //do the freeform algorithm stuff
+
+                                ReverseControlPoints3();
+                                CalculateFreeformMiddlePoint(ref this.m_controlPoints);
+                                ReverseControlPoints3();
+
+                            } else {
 
                             }
-                            //when pointcount = 2, should be adjusting line startpoint
-                            //when pointcount = 3, should be adjusting curve startpoint
-                            //movement
-                            else if (_isMovement)
-                            {
-                                Vector3 _vector0 = position;
-                                Vector3 _p1 = this.m_controlPoints[1].m_position;
-                                Vector3 _normVector0 = (_p1 - _vector0);
-                                _normVector0.y = 0f;
-                                _normVector0.Normalize();
-                                this.m_controlPoints[0].m_position = _vector0;
-                                this.m_controlPoints[0].m_direction = _normVector0;
-                                this.m_controlPoints[1].m_direction = _normVector0;
+                        } else if (_isSnapFirstControlPoint) {
+                            Vector3 _vector0 = position;
+                            Vector3 _p1 = this.m_controlPoints[1].m_position;
+                            this.m_controlPoints[0].m_position = _vector0;
+                            Vector3 _normVector1 = (_p1 - _vector0);
+                            _normVector1.y = 0f;
+                            _normVector1.Normalize();
+                            this.m_controlPoints[0].m_direction = _normVector1;
+                            this.m_controlPoints[1].m_direction = _normVector1;
 
-                                bool _isFreeform = (PropLineTool.drawMode == PropLineTool.DrawMode.Freeform);
-                                if (_isFreeform)
-                                {
-                                    //do the freeform algorithm stuff
+                            UpdateCachedControlPoints();
+                            UpdateCurves();
 
-                                    ReverseControlPoints3();
-                                    CalculateFreeformMiddlePoint(ref this.m_controlPoints);
-                                    ReverseControlPoints3();
-
-                                }
-                                else
-                                {
-                                    
-                                }
-                            }
-                            else if (_isSnapFirstControlPoint)
-                            {
-                                Vector3 _vector0 = position;
-                                Vector3 _p1 = this.m_controlPoints[1].m_position;
-                                this.m_controlPoints[0].m_position = _vector0;
-                                Vector3 _normVector1 = (_p1 - _vector0);
-                                _normVector1.y = 0f;
-                                _normVector1.Normalize();
-                                this.m_controlPoints[0].m_direction = _normVector1;
-                                this.m_controlPoints[1].m_direction = _normVector1;
-
-                                UpdateCachedControlPoints();
-                                UpdateCurves();
-
-                            }
-                            else
-                            {
-                                result = false;
-                                break;
-                            }
-                            
-                            result = true;
+                        } else {
+                            result = false;
                             break;
                         }
+
+                        result = true;
+                        break;
+                    }
                     //second point (end for Straight mode)
-                    case 1:
-                        {
-                            bool _isPlacement = ((_pointCount == 1) && (PropLineTool.activeState == PropLineTool.ActiveState.CreatePointSecond));
-                            bool _isMovement = (((_pointCount == 2) || (_pointCount == 3)) && (PropLineTool.activeState == PropLineTool.ActiveState.MovePointSecond));
-                            bool _isFreeform = (PropLineTool.drawMode == PropLineTool.DrawMode.Freeform);
+                    case 1: {
+                        bool _isPlacement = ((_pointCount == 1) && (PropLineTool.activeState == PropLineTool.ActiveState.CreatePointSecond));
+                        bool _isMovement = (((_pointCount == 2) || (_pointCount == 3)) && (PropLineTool.activeState == PropLineTool.ActiveState.MovePointSecond));
+                        bool _isFreeform = (PropLineTool.drawMode == PropLineTool.DrawMode.Freeform);
 
-                            //for lines, this means either placement or movement
-                            //for curves, this means either placement or movement
-                            //placement
-                            if (_isPlacement)
-                            {
-                                Vector3 _vector1 = position;
-                                Vector3 _p0 = this.m_controlPoints[0].m_position;
-                                Vector3 _normVector1 = (_vector1 - _p0);
-                                _normVector1.y = 0f;
-                                _normVector1.Normalize();
-                                this.m_controlPoints[1].m_position = _vector1;
-                                if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines))
-                                {
-                                    //stub
-                                }
-                                else
-                                {
-                                    this.m_controlPoints[0].m_direction = _normVector1;
-                                }
-                                this.m_controlPoints[1].m_direction = _normVector1;
+                        //for lines, this means either placement or movement
+                        //for curves, this means either placement or movement
+                        //placement
+                        if (_isPlacement) {
+                            Vector3 _vector1 = position;
+                            Vector3 _p0 = this.m_controlPoints[0].m_position;
+                            Vector3 _normVector1 = (_vector1 - _p0);
+                            _normVector1.y = 0f;
+                            _normVector1.Normalize();
+                            this.m_controlPoints[1].m_position = _vector1;
+                            if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines)) {
+                                //stub
+                            } else {
+                                this.m_controlPoints[0].m_direction = _normVector1;
                             }
-                            //movement
-                            else if (_isMovement)
-                            {
-                                Vector3 _vector1 = position;
-                                Vector3 _p0 = this.m_controlPoints[0].m_position;
-                                Vector3 _normVector1 = (_vector1 - _p0);
-                                _normVector1.y = 0f;
-                                _normVector1.Normalize();
-                                this.m_controlPoints[1].m_position = _vector1;
+                            this.m_controlPoints[1].m_direction = _normVector1;
+                        }
+                        //movement
+                        else if (_isMovement) {
+                            Vector3 _vector1 = position;
+                            Vector3 _p0 = this.m_controlPoints[0].m_position;
+                            Vector3 _normVector1 = (_vector1 - _p0);
+                            _normVector1.y = 0f;
+                            _normVector1.Normalize();
+                            this.m_controlPoints[1].m_position = _vector1;
 
 
-                                Vector3 _vector2 = this.m_controlPoints[2].m_position;
-                                Vector3 _p1 = position;
+                            Vector3 _vector2 = this.m_controlPoints[2].m_position;
+                            Vector3 _p1 = position;
+                            Vector3 _normVector2 = (_vector2 - _p1);
+                            _normVector2.y = 0f;
+                            _normVector2.Normalize();
+                            this.m_controlPoints[2].m_direction = _normVector2;
+
+                            if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines)) {
+                                //stub
+                            } else {
+                                this.m_controlPoints[0].m_direction = _normVector1;
+                            }
+                            this.m_controlPoints[1].m_direction = _normVector1;
+
+                            if (_isFreeform) {
+                                CalculateFreeformMiddlePoint(ref this.m_controlPoints);
+                            } else {
+
+                            }
+                        } else {
+                            result = false;
+                            break;
+                        }
+
+                        result = true;
+                        break;
+                    }
+                    //third point (end for Curved and Freeform modes)
+                    case 2: {
+
+                        bool _isPlacement = ((_pointCount == 2) && (PropLineTool.activeState == PropLineTool.ActiveState.CreatePointThird));
+                        bool _isMovement = (((_pointCount == 2) || (_pointCount == 3)) && (PropLineTool.activeState == PropLineTool.ActiveState.MovePointThird));
+                        bool _isFreeform = (PropLineTool.drawMode == PropLineTool.DrawMode.Freeform);
+
+                        //placement
+                        if (_isPlacement) {
+                            if (_isFreeform) {
+                                this.m_controlPoints[2].m_position = position;
+                                //normal Freeform algorithm from NetTool.SimulationStep
+                                CalculateFreeformMiddlePoint(ref this.m_controlPoints);
+                            } else {
+                                Vector3 _vector2 = position;
+                                Vector3 _p1 = this.m_controlPoints[1].m_position;
                                 Vector3 _normVector2 = (_vector2 - _p1);
                                 _normVector2.y = 0f;
                                 _normVector2.Normalize();
+                                this.m_controlPoints[2].m_position = _vector2;
                                 this.m_controlPoints[2].m_direction = _normVector2;
-
-                                if ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines))
-                                {
-                                    //stub
-                                }
-                                else
-                                {
-                                    this.m_controlPoints[0].m_direction = _normVector1;
-                                }
-                                this.m_controlPoints[1].m_direction = _normVector1;
-
-                                if (_isFreeform)
-                                {
-                                    CalculateFreeformMiddlePoint(ref this.m_controlPoints);
-                                }
-                                else
-                                {
-                                    
-                                }
                             }
-                            else
-                            {
-                                result = false;
-                                break;
+                        }
+                        //movement
+                        else if (_isMovement) {
+                            if (_isFreeform) {
+                                this.m_controlPoints[2].m_position = position;
+                                //normal Freeform algorithm from NetTool.SimulationStep
+                                CalculateFreeformMiddlePoint(ref this.m_controlPoints);
+                            } else {
+                                Vector3 _vector2 = position;
+                                Vector3 _p1 = this.m_controlPoints[1].m_position;
+                                Vector3 _normVector2 = (_vector2 - _p1);
+                                _normVector2.y = 0f;
+                                _normVector2.Normalize();
+                                this.m_controlPoints[2].m_position = _vector2;
+                                this.m_controlPoints[2].m_direction = _normVector2;
                             }
-                            
-                            result = true;
+                        } else {
+                            result = false;
                             break;
                         }
-                    //third point (end for Curved and Freeform modes)
-                    case 2:
-                        {
 
-                            bool _isPlacement = ((_pointCount == 2) && (PropLineTool.activeState == PropLineTool.ActiveState.CreatePointThird));
-                            bool _isMovement = (((_pointCount == 2) || (_pointCount == 3)) && (PropLineTool.activeState == PropLineTool.ActiveState.MovePointThird));
-                            bool _isFreeform = (PropLineTool.drawMode == PropLineTool.DrawMode.Freeform);
-
-                            //placement
-                            if (_isPlacement)
-                            {
-                                if (_isFreeform)
-                                {
-                                    this.m_controlPoints[2].m_position = position;
-                                    //normal Freeform algorithm from NetTool.SimulationStep
-                                    CalculateFreeformMiddlePoint(ref this.m_controlPoints);
-                                }
-                                else
-                                {
-                                    Vector3 _vector2 = position;
-                                    Vector3 _p1 = this.m_controlPoints[1].m_position;
-                                    Vector3 _normVector2 = (_vector2 - _p1);
-                                    _normVector2.y = 0f;
-                                    _normVector2.Normalize();
-                                    this.m_controlPoints[2].m_position = _vector2;
-                                    this.m_controlPoints[2].m_direction = _normVector2;
-                                }
-                            }
-                            //movement
-                            else if (_isMovement)
-                            {
-                                if (_isFreeform)
-                                {
-                                    this.m_controlPoints[2].m_position = position;
-                                    //normal Freeform algorithm from NetTool.SimulationStep
-                                    CalculateFreeformMiddlePoint(ref this.m_controlPoints);
-                                }
-                                else
-                                {
-                                    Vector3 _vector2 = position;
-                                    Vector3 _p1 = this.m_controlPoints[1].m_position;
-                                    Vector3 _normVector2 = (_vector2 - _p1);
-                                    _normVector2.y = 0f;
-                                    _normVector2.Normalize();
-                                    this.m_controlPoints[2].m_position = _vector2;
-                                    this.m_controlPoints[2].m_direction = _normVector2;
-                                }
-                            }
-                            else
-                            {
-                                result = false;
-                                break;
-                            }
-                            
-                            result = true;
-                            break;
-                        }
+                        result = true;
+                        break;
+                    }
                 }
-            }
-            else
-            {
-                if (!flag2)
-                {
+            } else {
+                if (!flag2) {
                     Debug.LogError("[PLT]: ModifyControlPoint(): m_controlPointCount is out of bounds! (value = " + this.m_controlPointCount.ToString() + ")");
                 }
                 result = false;
             }
-            if (result == true)
-            {
+            if (result == true) {
                 UpdateCachedControlPoints();
             }
             return result;
@@ -4377,93 +3622,77 @@ namespace PropLineTool
         //   and clearing the old segments
         //      by calling ResetAllControlPoints();
         //should only be called immediately after placing the end point
-        private bool ContinueDrawing()
-        {
+        private bool ContinueDrawing() {
             bool result = false;
             bool _snapping = ((PropLineTool.m_snapMode == SnapMode.Objects) || (PropLineTool.m_snapMode == SnapMode.ZoneLines));
             bool _fenceMode = PropLineTool.fenceMode == true;
-            
+
             ControlPoint _p0 = this.m_controlPoints[0];
             ControlPoint _p1 = this.m_controlPoints[1];
             ControlPoint _p2 = this.m_controlPoints[2];
 
             ResetAllControlPoints();
 
-            switch (PropLineTool.drawMode)
-            {
-                case DrawMode.Straight:
-                    {
-                        if (_fenceMode)
-                        {
-                            Vector3 _lastFenceEndpoint = placementCalculator.GetLastFenceEndpoint();
+            switch (PropLineTool.drawMode) {
+                case DrawMode.Straight: {
+                    if (_fenceMode) {
+                        Vector3 _lastFenceEndpoint = placementCalculator.GetLastFenceEndpoint();
 
-                            if (_lastFenceEndpoint == Vector3.down)
-                            {
-                                return false;
-                            }
-
-                            _p1.m_position = _lastFenceEndpoint;
+                        if (_lastFenceEndpoint == Vector3.down) {
+                            return false;
                         }
 
-                        if (_snapping)
-                        {
-                            this.m_controlPoints[0] = _p1;
-                        }
-                        else
-                        {
-                            this.m_controlPoints[0].m_position = _p1.m_position;
-                        }
-
-                        this.m_controlPointCount = 1;
-                        result = true;
-                        break;
+                        _p1.m_position = _lastFenceEndpoint;
                     }
-                case DrawMode.Curved:
-                    {
-                        if (_snapping)
-                        {
-                            this.m_controlPoints[0] = _p2;
-                            //stub
-                        }
-                        else
-                        {
-                            this.m_controlPoints[0] = _p2;
-                        }
 
-                        this.m_controlPointCount = 1;
-                        result = true;
-                        break;
+                    if (_snapping) {
+                        this.m_controlPoints[0] = _p1;
+                    } else {
+                        this.m_controlPoints[0].m_position = _p1.m_position;
                     }
-                case DrawMode.Freeform:
-                    {
-                        //as NetTool does, snapping doesn't matter for Freeform
 
-                        //Freeform skips to CreatePointThird
+                    this.m_controlPointCount = 1;
+                    result = true;
+                    break;
+                }
+                case DrawMode.Curved: {
+                    if (_snapping) {
                         this.m_controlPoints[0] = _p2;
-                        this.m_controlPoints[1] = _p2;
-                        this.m_controlPoints[1].m_position = _p2.m_position + _p2.m_direction;
+                        //stub
+                    } else {
+                        this.m_controlPoints[0] = _p2;
+                    }
 
-                        this.m_controlPointCount = 2;
-                        result = true;
-                        break;
-                    }
-                case DrawMode.Circle:
-                    {
-                        this.m_controlPoints[0] = _p0;
-                        this.m_controlPoints[1] = _p1;
+                    this.m_controlPointCount = 1;
+                    result = true;
+                    break;
+                }
+                case DrawMode.Freeform: {
+                    //as NetTool does, snapping doesn't matter for Freeform
 
-                        this.m_controlPointCount = 1;
-                        result = true;
-                        break;
-                    }
-                default:
-                    {
-                        result = false;
-                        break;
-                    }
+                    //Freeform skips to CreatePointThird
+                    this.m_controlPoints[0] = _p2;
+                    this.m_controlPoints[1] = _p2;
+                    this.m_controlPoints[1].m_position = _p2.m_position + _p2.m_direction;
+
+                    this.m_controlPointCount = 2;
+                    result = true;
+                    break;
+                }
+                case DrawMode.Circle: {
+                    this.m_controlPoints[0] = _p0;
+                    this.m_controlPoints[1] = _p1;
+
+                    this.m_controlPointCount = 1;
+                    result = true;
+                    break;
+                }
+                default: {
+                    result = false;
+                    break;
+                }
             }
-            if (result == true)
-            {
+            if (result == true) {
                 //set placementCalculator bool m_isContinueDrawing to true
                 placementCalculator.SetContinueDrawing(true);
 
@@ -4472,140 +3701,114 @@ namespace PropLineTool
             }
             return result;
         }
-        
-        private bool PostCheckAndContinue()
-        {
+
+        private bool PostCheckAndContinue() {
             bool _continueCPResult = false;
 
-            switch (drawMode)
-            {
+            switch (drawMode) {
                 case DrawMode.Straight:
-                case DrawMode.Circle:
-                    {
-                        if (PropLineTool.m_lockingMode == LockingMode.Off)
-                        {
-                            //enter or remain in MaxFillContinue
-                            if (placementCalculator.segmentState.isReadyForMaxContinue)
-                            {
-                                placementCalculator.UpdateItemPlacementInfo(true, false);
+                case DrawMode.Circle: {
+                    if (PropLineTool.m_lockingMode == LockingMode.Off) {
+                        //enter or remain in MaxFillContinue
+                        if (placementCalculator.segmentState.isReadyForMaxContinue) {
+                            placementCalculator.UpdateItemPlacementInfo(true, false);
 
-                                GoToActiveState(ActiveState.MaxFillContinue);
+                            GoToActiveState(ActiveState.MaxFillContinue);
+                        }
+                        //exit MaxFillContinue if needed, then ContinueDrawing
+                        else {
+                            _continueCPResult = ContinueDrawing();
+                            if (_continueCPResult) {
+                                //PropLineTool.m_activeState = PropLineTool.ActiveState.CreatePointSecond;
+                                GoToActiveState(ActiveState.CreatePointSecond);
+
+                                ModifyControlPoint(this.m_mousePosition, 2);
+
+                                if (fenceMode == true && placementCalculator.segmentState.isContinueDrawing == true && drawMode == DrawMode.Straight) {
+                                    ModifyControlPoint(placementCalculator.GetLastFenceEndpoint(), 1);
+
+                                }
+
+                                UpdateCachedControlPoints();
+                                UpdateCurves();
+
+                                placementCalculator.UpdateItemPlacementInfo(true, false);
+                            } else {
+                                this.ResetAllControlPoints();
+
+                                GoToActiveState(ActiveState.CreatePointFirst);
                             }
-                            //exit MaxFillContinue if needed, then ContinueDrawing
-                            else
-                            {
-                                _continueCPResult = ContinueDrawing();
-                                if (_continueCPResult)
-                                {
-                                    //PropLineTool.m_activeState = PropLineTool.ActiveState.CreatePointSecond;
+                        }
+                    } else if (PropLineTool.m_lockingMode == LockingMode.Lock) //Locking is enabled
+                      {
+                        PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
+                        GoToActiveState(ActiveState.LockIdle);
+                    }
+
+                    return true;
+                }
+                case DrawMode.Curved:
+                case DrawMode.Freeform: {
+                    if (PropLineTool.m_lockingMode == LockingMode.Off) {
+                        //enter or remain in MaxFillContinue
+                        if (placementCalculator.segmentState.isReadyForMaxContinue) {
+                            placementCalculator.UpdateItemPlacementInfo(true, false);
+
+                            GoToActiveState(ActiveState.MaxFillContinue);
+                        }
+                        //exit MaxFillContinue if needed, then ContinueDrawing
+                        else {
+                            _continueCPResult = ContinueDrawing();
+                            if (_continueCPResult) {
+                                if (PropLineTool.drawMode == DrawMode.Curved) {
                                     GoToActiveState(ActiveState.CreatePointSecond);
 
-                                    ModifyControlPoint(this.m_mousePosition, 2);
-
-                                    if (fenceMode == true && placementCalculator.segmentState.isContinueDrawing == true && drawMode == DrawMode.Straight)
-                                    {
-                                        ModifyControlPoint(placementCalculator.GetLastFenceEndpoint(), 1);
-
-                                    }
+                                    Vector3 _temp1 = this.m_controlPoints[0].m_position + 0.001f * this.m_controlPoints[0].m_direction;
+                                    ModifyControlPoint(_temp1, 2);
 
                                     UpdateCachedControlPoints();
                                     UpdateCurves();
 
                                     placementCalculator.UpdateItemPlacementInfo(true, false);
-                                }
-                                else
-                                {
+                                } else if (PropLineTool.drawMode == DrawMode.Freeform) {
+                                    GoToActiveState(ActiveState.CreatePointThird);
+
+                                    Vector3 _temp2 = this.m_controlPoints[0].m_position + 0.01f * this.m_controlPoints[0].m_direction;
+                                    ModifyControlPoint(_temp2, 3);
+
+                                    UpdateCachedControlPoints();
+                                    UpdateCurves();
+
+                                    placementCalculator.UpdateItemPlacementInfo(true, false);
+                                } else {
                                     this.ResetAllControlPoints();
 
                                     GoToActiveState(ActiveState.CreatePointFirst);
                                 }
+                            } else {
+                                this.ResetAllControlPoints();
+
+                                GoToActiveState(ActiveState.CreatePointFirst);
                             }
                         }
-                        else if (PropLineTool.m_lockingMode == LockingMode.Lock) //Locking is enabled
-                        {
-                            PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
-                            GoToActiveState(ActiveState.LockIdle);
-                        }
+                    } else if (PropLineTool.m_lockingMode == LockingMode.Lock) //Locking is enabled
+                      {
 
-                        return true;
+                        PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
+                        GoToActiveState(ActiveState.LockIdle);
                     }
-                case DrawMode.Curved:
-                case DrawMode.Freeform:
-                    {
-                        if (PropLineTool.m_lockingMode == LockingMode.Off)
-                        {
-                            //enter or remain in MaxFillContinue
-                            if (placementCalculator.segmentState.isReadyForMaxContinue)
-                            {
-                                placementCalculator.UpdateItemPlacementInfo(true, false);
 
-                                GoToActiveState(ActiveState.MaxFillContinue);
-                            }
-                            //exit MaxFillContinue if needed, then ContinueDrawing
-                            else
-                            {
-                                _continueCPResult = ContinueDrawing();
-                                if (_continueCPResult)
-                                {
-                                    if (PropLineTool.drawMode == DrawMode.Curved)
-                                    {
-                                        GoToActiveState(ActiveState.CreatePointSecond);
-
-                                        Vector3 _temp1 = this.m_controlPoints[0].m_position + 0.001f * this.m_controlPoints[0].m_direction;
-                                        ModifyControlPoint(_temp1, 2);
-
-                                        UpdateCachedControlPoints();
-                                        UpdateCurves();
-
-                                        placementCalculator.UpdateItemPlacementInfo(true, false);
-                                    }
-                                    else if (PropLineTool.drawMode == DrawMode.Freeform)
-                                    {
-                                        GoToActiveState(ActiveState.CreatePointThird);
-
-                                        Vector3 _temp2 = this.m_controlPoints[0].m_position + 0.01f * this.m_controlPoints[0].m_direction;
-                                        ModifyControlPoint(_temp2, 3);
-
-                                        UpdateCachedControlPoints();
-                                        UpdateCurves();
-
-                                        placementCalculator.UpdateItemPlacementInfo(true, false);
-                                    }
-                                    else
-                                    {
-                                        this.ResetAllControlPoints();
-
-                                        GoToActiveState(ActiveState.CreatePointFirst);
-                                    }
-                                }
-                                else
-                                {
-                                    this.ResetAllControlPoints();
-
-                                    GoToActiveState(ActiveState.CreatePointFirst);
-                                }
-                            }
-                        }
-                        else if (PropLineTool.m_lockingMode == LockingMode.Lock) //Locking is enabled
-                        {
-
-                            PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
-                            GoToActiveState(ActiveState.LockIdle);
-                        }
-
-                        return true;
-                    }
-                default:
-                    {
-                        return false;
-                    }
+                    return true;
+                }
+                default: {
+                    return false;
+                }
             }
         }
 
         //from NetTool
         //only calculates the (middle point position) and (end point direction)!
-        public void CalculateFreeformMiddlePoint(ref PropLineTool.ControlPoint[] array)
-        {
+        public void CalculateFreeformMiddlePoint(ref PropLineTool.ControlPoint[] array) {
             //PropLineTool.ControlPoint result = new ControlPoint();
             Vector3 _p2_p0 = array[2].m_position - array[0].m_position;
             Vector3 _dir_p1 = array[1].m_direction;
@@ -4622,48 +3825,37 @@ namespace PropLineTool
             array[2].m_direction = _dir_p2;
 
             //sometimes things don't work corrently
-            if (float.IsNaN(array[1].m_position.x) || float.IsNaN(array[1].m_position.y) || float.IsNaN(array[1].m_position.z) || array[1].m_position == null)
-            {
+            if (float.IsNaN(array[1].m_position.x) || float.IsNaN(array[1].m_position.y) || float.IsNaN(array[1].m_position.z) || array[1].m_position == null) {
                 array[1].m_position = array[0].m_position + 0.01f * array[0].m_direction;
                 array[1].m_direction = array[0].m_direction;
             }
         }
-        
-        protected override void OnEnable()
-        {
+
+        protected override void OnEnable() {
             base.OnEnable();
-            
+
             //custom precalls
-            if (m_keepActiveState == false)
-            {
+            if (m_keepActiveState == false) {
                 ResetPLT();
-            }
-            else if (m_initialized == false)
-            {
+            } else if (m_initialized == false) {
                 m_initialized = true;
 
                 ResetPLT();
-            }
-            else if (m_keepActiveState == true)
-            {
+            } else if (m_keepActiveState == true) {
                 //do nothing extra
             }
-            
+
             m_keepActiveState = true;
         }
-        
-        protected override void OnDisable()
-        {
+
+        protected override void OnDisable() {
             base.OnDisable();
             base.ToolCursor = null;
-            
+
             //custom postcalls
-            if (m_keepActiveState == false)
-            {
+            if (m_keepActiveState == false) {
                 ResetPLT();
-            }
-            else if (m_keepActiveState == true)
-            {
+            } else if (m_keepActiveState == true) {
 
             }
 
@@ -4671,8 +3863,7 @@ namespace PropLineTool
             this.m_mouseRayValid = false;
         }
 
-        protected void ResetPLT()
-        {
+        protected void ResetPLT() {
             //NetTool base methods
             this.m_controlPointCount = 0;
             this.m_cachedControlPointCount = 0;
@@ -4682,7 +3873,7 @@ namespace PropLineTool
             PropLineTool.objectMode = PropLineTool.ObjectMode.Undefined;
             //reset control points
             this.ResetAllControlPoints();
-            
+
             //reset curves
             m_mainArm1 = new Segment3();
             m_mainArm2 = new Segment3();
@@ -4690,185 +3881,155 @@ namespace PropLineTool
             m_mainBezier = new Bezier3();
             m_mainCircle = new Circle3XZ();
             m_rawCircle = new Circle3XZ();
-            
+
             //reset placement calculator
             placementCalculator.Reset();
-            
+
             Singleton<TerrainManager>.instance.RenderZones = false;
-            
+
             //update undo previews
             undoManager.CheckItemsStillExist();
         }
-        
-        private void GoToActiveState(ActiveState state)
-        {
+
+        private void GoToActiveState(ActiveState state) {
             ActiveState _oldState = activeState;
             activeState = state;
 
-            if (state == _oldState)
-            {
+            if (state == _oldState) {
                 return;
             }
 
             //takes care of any overhead that needs to be done
             //when switching states
-            switch (state)
-            {
-                case ActiveState.Undefined:
-                    {
-                        break; 
-                    }
-                case ActiveState.CreatePointFirst:
-                    {
-                        placementCalculator.SetContinueDrawing(false);
-                        placementCalculator.FinalizeForPlacement(false);
+            switch (state) {
+                case ActiveState.Undefined: {
+                    break;
+                }
+                case ActiveState.CreatePointFirst: {
+                    placementCalculator.SetContinueDrawing(false);
+                    placementCalculator.FinalizeForPlacement(false);
 
-                        //PropLineToolMod.optionPanel.AllDrawModeButtonsEnabler(true);
-                        break; 
-                    }
-                case ActiveState.CreatePointSecond:
-                    {
-                        //PropLineToolMod.optionPanel.AllDrawModeButtonsEnabler(true);
-                        break; 
-                    }
-                case ActiveState.CreatePointThird:
-                    {
-                        //PropLineToolMod.optionPanel.AllDrawModeButtonsEnabler(true);
-                        break; 
-                    }
-                case ActiveState.LockIdle:
-                    {
-                        UpdateCachedControlPoints();
-                        UpdateCurves();
+                    //PropLineToolMod.optionPanel.AllDrawModeButtonsEnabler(true);
+                    break;
+                }
+                case ActiveState.CreatePointSecond: {
+                    //PropLineToolMod.optionPanel.AllDrawModeButtonsEnabler(true);
+                    break;
+                }
+                case ActiveState.CreatePointThird: {
+                    //PropLineToolMod.optionPanel.AllDrawModeButtonsEnabler(true);
+                    break;
+                }
+                case ActiveState.LockIdle: {
+                    UpdateCachedControlPoints();
+                    UpdateCurves();
 
-                        if (state == _oldState)
-                        {
-                            placementCalculator.UpdateItemPlacementInfo(true, true);
-                        }
-                        else
-                        {
-                            switch (_oldState)
-                            {
-                                case ActiveState.CreatePointFirst:
-                                case ActiveState.CreatePointSecond:
-                                case ActiveState.CreatePointThird:
-                                    {
-                                        placementCalculator.UpdateItemPlacementInfo();
-                                        break;
-                                    }
-                                case ActiveState.MovePointFirst:
-                                case ActiveState.MovePointSecond:
-                                case ActiveState.MovePointThird:
-                                case ActiveState.MoveSegment:
-                                case ActiveState.ChangeAngle:
-                                    {
-                                        placementCalculator.UpdateItemPlacementInfo();
-                                        break;
-                                    }
-                                case ActiveState.ChangeSpacing:
-                                    {
-                                        placementCalculator.UpdateItemPlacementInfo(true, false);
-                                        break;
-                                    }
-                                case ActiveState.MaxFillContinue:
-                                    {
-                                        //placementCalculator.UpdateItemPlacementInfo(true, true);
+                    if (state == _oldState) {
+                        placementCalculator.UpdateItemPlacementInfo(true, true);
+                    } else {
+                        switch (_oldState) {
+                            case ActiveState.CreatePointFirst:
+                            case ActiveState.CreatePointSecond:
+                            case ActiveState.CreatePointThird: {
+                                placementCalculator.UpdateItemPlacementInfo();
+                                break;
+                            }
+                            case ActiveState.MovePointFirst:
+                            case ActiveState.MovePointSecond:
+                            case ActiveState.MovePointThird:
+                            case ActiveState.MoveSegment:
+                            case ActiveState.ChangeAngle: {
+                                placementCalculator.UpdateItemPlacementInfo();
+                                break;
+                            }
+                            case ActiveState.ChangeSpacing: {
+                                placementCalculator.UpdateItemPlacementInfo(true, false);
+                                break;
+                            }
+                            case ActiveState.MaxFillContinue: {
+                                //placementCalculator.UpdateItemPlacementInfo(true, true);
 
-                                        //Keep This One
-                                        placementCalculator.UpdateItemPlacementInfo(true, false);
-                                        break;
-                                    }
-                                default:
-                                    {
-                                        placementCalculator.UpdateItemPlacementInfo();
-                                        break;
-                                    }
+                                //Keep This One
+                                placementCalculator.UpdateItemPlacementInfo(true, false);
+                                break;
+                            }
+                            default: {
+                                placementCalculator.UpdateItemPlacementInfo();
+                                break;
                             }
                         }
-                        
-                        int _offset = fenceMode == true ? 0 : (controlMode == ControlMode.Itemwise ? 0 : 1);
-                        if (placementCalculator.GetItemCountActual() >= (1 + _offset))
-                        {
-                            //hoverAngle = m_placementInfo[1].angle - placementCalculator.modelAngleOffset + Mathf.PI;
-                            hoverAngle = m_placementInfo[hoverItemAngleCenterIndex].angle - placementCalculator.totalPropertyAngleOffset + Mathf.PI;
-                        }
-                        break; 
                     }
-                case ActiveState.MovePointFirst:
-                    {
-                        lockBackupControlPoints[0] = m_cachedControlPoints[0];
-                        break; 
-                    }
-                case ActiveState.MovePointSecond:
-                    {
-                        lockBackupControlPoints[1] = m_cachedControlPoints[1];
-                        break; 
-                    }
-                case ActiveState.MovePointThird:
-                    {
-                        lockBackupControlPoints[2] = m_cachedControlPoints[2];
-                        break; 
-                    }
-                case ActiveState.MoveSegment:
-                    {
-                        for (int i = 0; i < m_controlPoints.Length; i++)
-                        {
-                            lockBackupControlPoints[i].m_position = m_controlPoints[i].m_position;
-                        }
-                        lockBackupCachedPosition = m_cachedPosition;
-                        break; 
-                    }
-                case ActiveState.ChangeSpacing:
-                    {
-                        lockBackupSpacing = placementCalculator.spacingSingle;
-                        break; 
-                    }
-                case ActiveState.ChangeAngle:
-                    {
-                        lockBackupAngleSingle = placementCalculator.angleSingle;
-                        lockBackupAngleOffset = placementCalculator.angleOffset;
-                        lockBackupItemSecondAngle = m_placementInfo[hoverItemAngleCenterIndex].angle;
-                        lockBackupItemDirection = m_placementInfo[hoverItemAngleCenterIndex].itemDirection;
-                        break; 
-                    }
-                case ActiveState.ItemwiseLock:
-                    {
-                        //nothing here...
-                        break;
-                    }
-                case ActiveState.MoveItemwiseItem:
-                    {
-                        lockBackupItemwiseT = hoverItemwiseT;
-                        break;
-                    }
-                case ActiveState.MaxFillContinue:
-                    {
-                        //if (_oldState == ActiveState.LockIdle)
-                        //{
-                        //    placementCalculator.UpdateItemPlacementInfo(true, true);
-                        //}
-                        //else
-                        //{
-                        //    placementCalculator.UpdateItemPlacementInfo();
-                        //}
 
-                        placementCalculator.UpdateItemPlacementInfo();
+                    int _offset = fenceMode == true ? 0 : (controlMode == ControlMode.Itemwise ? 0 : 1);
+                    if (placementCalculator.GetItemCountActual() >= (1 + _offset)) {
+                        //hoverAngle = m_placementInfo[1].angle - placementCalculator.modelAngleOffset + Mathf.PI;
+                        hoverAngle = m_placementInfo[hoverItemAngleCenterIndex].angle - placementCalculator.totalPropertyAngleOffset + Mathf.PI;
+                    }
+                    break;
+                }
+                case ActiveState.MovePointFirst: {
+                    lockBackupControlPoints[0] = m_cachedControlPoints[0];
+                    break;
+                }
+                case ActiveState.MovePointSecond: {
+                    lockBackupControlPoints[1] = m_cachedControlPoints[1];
+                    break;
+                }
+                case ActiveState.MovePointThird: {
+                    lockBackupControlPoints[2] = m_cachedControlPoints[2];
+                    break;
+                }
+                case ActiveState.MoveSegment: {
+                    for (int i = 0; i < m_controlPoints.Length; i++) {
+                        lockBackupControlPoints[i].m_position = m_controlPoints[i].m_position;
+                    }
+                    lockBackupCachedPosition = m_cachedPosition;
+                    break;
+                }
+                case ActiveState.ChangeSpacing: {
+                    lockBackupSpacing = placementCalculator.spacingSingle;
+                    break;
+                }
+                case ActiveState.ChangeAngle: {
+                    lockBackupAngleSingle = placementCalculator.angleSingle;
+                    lockBackupAngleOffset = placementCalculator.angleOffset;
+                    lockBackupItemSecondAngle = m_placementInfo[hoverItemAngleCenterIndex].angle;
+                    lockBackupItemDirection = m_placementInfo[hoverItemAngleCenterIndex].itemDirection;
+                    break;
+                }
+                case ActiveState.ItemwiseLock: {
+                    //nothing here...
+                    break;
+                }
+                case ActiveState.MoveItemwiseItem: {
+                    lockBackupItemwiseT = hoverItemwiseT;
+                    break;
+                }
+                case ActiveState.MaxFillContinue: {
+                    //if (_oldState == ActiveState.LockIdle)
+                    //{
+                    //    placementCalculator.UpdateItemPlacementInfo(true, true);
+                    //}
+                    //else
+                    //{
+                    //    placementCalculator.UpdateItemPlacementInfo();
+                    //}
 
-                        break;
-                    }
-                default:
-                    {
-                        activeState = ActiveState.Undefined;
-                        break; 
-                    }
+                    placementCalculator.UpdateItemPlacementInfo();
+
+                    break;
+                }
+                default: {
+                    activeState = ActiveState.Undefined;
+                    break;
+                }
             }
-            
+
         }
 
         //called implicitly in OnToolGUI
         //updates cached control points just outside of the switch block
-        private void ProcessKeyInputImpl(KeyPressEvent key)
-        {
+        private void ProcessKeyInputImpl(KeyPressEvent key) {
             //UI
             bool _isInsideUI = this.m_toolController.IsInsideUI;
             bool _isMouseRayValid = this.m_mouseRayValid;
@@ -4877,38 +4038,30 @@ namespace PropLineTool
             //control points
             bool _addCPResult = false;
             bool _cancelCPResult = false;
-            bool _continueCPResult = false;
+            //bool _continueCPResult = false;
 
             //error checking
             bool _successfulRayCast = false;
             ToolBase.ToolErrors _toolErrors = new ToolBase.ToolErrors();
-            
-            if (key._mouseDown)
-            {
-                if (key._leftClick)
-                {
+
+            if (key._mouseDown) {
+                if (key._leftClick) {
                     this.m_mouseLeftDown = true;
                 }
-                if (key._rightClick)
-                {
+                if (key._rightClick) {
                     this.m_mouseRightDown = true;
                 }
-            }
-            else if (key._mouseUp)
-            {
-                if (key._leftClickRelease)
-                {
+            } else if (key._mouseUp) {
+                if (key._leftClickRelease) {
                     this.m_mouseLeftDown = false;
                 }
-                if (key._rightClickRelease)
-                {
+                if (key._rightClickRelease) {
                     this.m_mouseRightDown = false;
                 }
             }
-            
+
             //update undo previews on Ctrl-key down
-            if (!this.m_keyboardCtrlDown && key._ctrl && key._keyDown)
-            {
+            if (!this.m_keyboardCtrlDown && key._ctrl && key._keyDown) {
                 undoManager.CheckItemsStillExist();
             }
 
@@ -4918,70 +4071,57 @@ namespace PropLineTool
             this.m_keyboardShiftDown = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift));
 
             //test for Esc and reset if pressed
-            if (key._esc)
-            {
+            if (key._esc) {
                 ResetPLT();
 
                 return;
             }
 
             //test for undo before alt-clicks
-            if (!_isInsideUI && key._ctrlZ)
-            {
+            if (!_isInsideUI && key._ctrlZ) {
                 SegmentInfo _segmentInfo = SegmentInfo.defaultValue;
                 bool _resultUndo = undoManager.UndoLatestEntry(out _segmentInfo);
 
                 //push back MFC offset
                 bool _undoMaxFillContinue = _segmentInfo.m_isMaxFillContinue || _segmentInfo.isReadyForMaxContinue;
-                if (_resultUndo && _undoMaxFillContinue)
-                {
+                if (_resultUndo && _undoMaxFillContinue) {
                     placementCalculator.RevertLastContinueParameters(_segmentInfo.m_lastFinalOffset, _segmentInfo.m_lastFenceEndpoint);
                 }
 
                 placementCalculator.UpdateItemPlacementInfo();
             }
 
-            if (m_keyboardAltDown)
-            {
+            if (m_keyboardAltDown) {
                 isCopyPlacing = true;
-            }
-            else
-            {
+            } else {
                 isCopyPlacing = false;
             }
 
             //test for alt-clicks before clicks or ctrl-clicks
             //test for ctrl-clicks before clicks
-            
-            if (!_isInsideUI && key._altOnlyLeftClick)
-            {
+
+            if (!_isInsideUI && key._altOnlyLeftClick) {
                 isCopyPlacing = true;
 
-                switch (activeState)
-                {
+                switch (activeState) {
                     case ActiveState.Undefined:
-                    case ActiveState.CreatePointFirst:
-                        {
-                            break;
+                    case ActiveState.CreatePointFirst: {
+                        break;
+                    }
+                    case ActiveState.CreatePointSecond: {
+                        if (drawMode == DrawMode.Straight || drawMode == DrawMode.Circle) {
+                            FinalizePlacement(true, true);
+                            return;
                         }
-                    case ActiveState.CreatePointSecond:
-                        {
-                            if (drawMode == DrawMode.Straight || drawMode == DrawMode.Circle)
-                            {
-                                FinalizePlacement(true, true);
-                                return;
-                            }
-                            break;
+                        break;
+                    }
+                    case ActiveState.CreatePointThird: {
+                        if (drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform) {
+                            FinalizePlacement(true, true);
+                            return;
                         }
-                    case ActiveState.CreatePointThird:
-                        {
-                            if (drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform)
-                            {
-                                FinalizePlacement(true, true);
-                                return;
-                            }
-                            break;
-                        }
+                        break;
+                    }
                     case ActiveState.LockIdle:
                     case ActiveState.MovePointFirst:
                     case ActiveState.MovePointSecond:
@@ -4991,671 +4131,524 @@ namespace PropLineTool
                     case ActiveState.ChangeAngle:
                     case ActiveState.ItemwiseLock:
                     case ActiveState.MoveItemwiseItem:
-                    case ActiveState.MaxFillContinue:
-                        {
-                            FinalizePlacement(true, true);
-                            return;
-                        }
-                    default:
-                        {
-                            break;
-                        }
-                }
-            }
-            switch (activeState)
-            {
-                //state set to undefined
-                case ActiveState.Undefined:
-                    {
-                        Debug.LogError("[PLT]: ProcessKeyInputImpl(): Active state is set to undefined!");
+                    case ActiveState.MaxFillContinue: {
+                        FinalizePlacement(true, true);
+                        return;
+                    }
+                    default: {
                         break;
                     }
+                }
+            }
+            switch (activeState) {
+                //state set to undefined
+                case ActiveState.Undefined: {
+                    Debug.LogError("[PLT]: ProcessKeyInputImpl(): Active state is set to undefined!");
+                    break;
+                }
 
                 //creating first control point
-                case ActiveState.CreatePointFirst:
-                    {
-                        if (!_isInsideUI && key._leftClick)
-                        {
-                            placementCalculator.FinalizeForPlacement(false);
+                case ActiveState.CreatePointFirst: {
+                    if (!_isInsideUI && key._leftClick) {
+                        placementCalculator.FinalizeForPlacement(false);
+
+                        _addCPResult = AddControlPoint(this.m_cachedPosition);
+                        if (this.m_mouseRayValid && _addCPResult) {
+                            GoToActiveState(ActiveState.CreatePointSecond);
+                            ModifyControlPoint(this.m_mousePosition, 2); //update second point to mouse position
+                            UpdateCachedControlPoints();
+                            UpdateCurves();
+
+                            placementCalculator.UpdateItemPlacementInfo(false, false);
+                        }
+                    }
+
+
+                    break;
+                }
+
+                //creating second control point
+                case ActiveState.CreatePointSecond: {
+                    if (!_isInsideUI) {
+                        bool _proceedToItemwiseLock = false;
+                        bool _twoPointedDrawMode = drawMode == DrawMode.Straight || drawMode == DrawMode.Circle;
+                        _proceedToItemwiseLock = controlMode == ControlMode.Itemwise && key._leftClick && _twoPointedDrawMode;
+
+                        if (key._ctrlOnlyLeftClick && _twoPointedDrawMode) {
+                            //check if curve is too short
+                            if (IsCurveLengthLongEnoughXZ() == false) {
+                                return;
+                            }
 
                             _addCPResult = AddControlPoint(this.m_cachedPosition);
-                            if (this.m_mouseRayValid && _addCPResult)
-                            {
-                                GoToActiveState(ActiveState.CreatePointSecond);
-                                ModifyControlPoint(this.m_mousePosition, 2); //update second point to mouse position
+                            if (this.m_mouseRayValid && _addCPResult) {
+                                PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
+
+                                GoToActiveState(ActiveState.LockIdle);
+                            }
+                            break;
+                        } else if (_proceedToItemwiseLock) {
+                            //check if curve is too short
+                            if (IsCurveLengthLongEnoughXZ() == false) {
+                                return;
+                            }
+
+                            _addCPResult = AddControlPoint(this.m_cachedPosition);
+                            if (this.m_mouseRayValid && _addCPResult) {
+                                PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
+
+                                GoToActiveState(ActiveState.ItemwiseLock);
+                            }
+                            break;
+                        } else if (key._leftClick) {
+                            if (_twoPointedDrawMode) {
+                                //check if curve is too short
+                                if (IsCurveLengthLongEnoughXZ() == false) {
+                                    return;
+                                }
+
+                                if (!IsAtLeastOneItemValidPlacement()) {
+                                    return;
+                                }
+
+                                _addCPResult = AddControlPoint(this.m_cachedPosition);
+                                if (this.m_mouseRayValid && _addCPResult) {
+                                    //finalize placement
+                                    FinalizePlacement(true, false);
+
+                                    //post-process
+                                    if (!PostCheckAndContinue()) {
+                                        ResetAllControlPoints();
+
+                                        GoToActiveState(ActiveState.CreatePointFirst);
+                                    }
+
+                                }
+                            } else   //Curved drawmode
+                              {
+                                _addCPResult = AddControlPoint(this.m_cachedPosition);
+                                if (this.m_mouseRayValid && _addCPResult) {
+                                    GoToActiveState(ActiveState.CreatePointThird);
+                                    ModifyControlPoint(this.m_mousePosition, 3); //update third point to mouse position
+                                    UpdateCachedControlPoints();
+                                    UpdateCurves();
+
+                                    placementCalculator.UpdateItemPlacementInfo(true, false);
+                                }
+                            }
+                        } else if (key._rightClick) {
+                            _cancelCPResult = CancelControlPoint();
+                            if (this.m_mouseRayValid && _cancelCPResult) {
+                                GoToActiveState(ActiveState.CreatePointFirst);
+                                ModifyControlPoint(this.m_mousePosition, 1); //update position of first point
                                 UpdateCachedControlPoints();
                                 UpdateCurves();
-                                
+
                                 placementCalculator.UpdateItemPlacementInfo(false, false);
                             }
                         }
 
 
-                        break;
                     }
 
-                //creating second control point
-                case ActiveState.CreatePointSecond:
-                    {
-                        if (!_isInsideUI)
-                        {
-                            bool _proceedToItemwiseLock = false;
-                            bool _twoPointedDrawMode = drawMode == DrawMode.Straight || drawMode == DrawMode.Circle;
-                            _proceedToItemwiseLock = controlMode == ControlMode.Itemwise && key._leftClick && _twoPointedDrawMode;
-
-                            if (key._ctrlOnlyLeftClick && _twoPointedDrawMode)
-                            {
-                                //check if curve is too short
-                                if (IsCurveLengthLongEnoughXZ() == false)
-                                {
-                                    return;
-                                }
-
-                                _addCPResult = AddControlPoint(this.m_cachedPosition);
-                                if (this.m_mouseRayValid && _addCPResult)
-                                {
-                                    PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
-
-                                    GoToActiveState(ActiveState.LockIdle);
-                                }
-                                break;
-                            }
-                            else if (_proceedToItemwiseLock)
-                            {
-                                //check if curve is too short
-                                if (IsCurveLengthLongEnoughXZ() == false)
-                                {
-                                    return;
-                                }
-
-                                _addCPResult = AddControlPoint(this.m_cachedPosition);
-                                if (this.m_mouseRayValid && _addCPResult)
-                                {
-                                    PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
-
-                                    GoToActiveState(ActiveState.ItemwiseLock);
-                                }
-                                break;
-                            }
-                            else if (key._leftClick)
-                            {
-                                if (_twoPointedDrawMode)
-                                {
-                                    //check if curve is too short
-                                    if (IsCurveLengthLongEnoughXZ() == false)
-                                    {
-                                        return;
-                                    }
-
-                                    if (!IsAtLeastOneItemValidPlacement())
-                                    {
-                                        return;
-                                    }
-
-                                    _addCPResult = AddControlPoint(this.m_cachedPosition);
-                                    if (this.m_mouseRayValid && _addCPResult)
-                                    {
-                                        //finalize placement
-                                        FinalizePlacement(true, false);
-
-                                        //post-process
-                                        if (!PostCheckAndContinue())
-                                        {
-                                            ResetAllControlPoints();
-
-                                            GoToActiveState(ActiveState.CreatePointFirst);
-                                        }
-
-                                    }
-                                }
-                                else   //Curved drawmode
-                                {
-                                    _addCPResult = AddControlPoint(this.m_cachedPosition);
-                                    if (this.m_mouseRayValid && _addCPResult)
-                                    {
-                                        GoToActiveState(ActiveState.CreatePointThird);
-                                        ModifyControlPoint(this.m_mousePosition, 3); //update third point to mouse position
-                                        UpdateCachedControlPoints();
-                                        UpdateCurves();
-
-                                        placementCalculator.UpdateItemPlacementInfo(true, false);
-                                    }
-                                }
-                            }
-                            else if (key._rightClick)
-                            {
-                                _cancelCPResult = CancelControlPoint();
-                                if (this.m_mouseRayValid && _cancelCPResult)
-                                {
-                                    GoToActiveState(ActiveState.CreatePointFirst);
-                                    ModifyControlPoint(this.m_mousePosition, 1); //update position of first point
-                                    UpdateCachedControlPoints();
-                                    UpdateCurves();
-
-                                    placementCalculator.UpdateItemPlacementInfo(false, false);
-                                }
-                            }
-
-
-                        }
-
-                        break;
-                    }
+                    break;
+                }
 
                 //creating third control point
-                case ActiveState.CreatePointThird:
-                    {
-                        if (!_isInsideUI)
-                        {
-                            bool _proceedToItemwiseLock = false;
-                            _proceedToItemwiseLock = controlMode == ControlMode.Itemwise && key._leftClick;
+                case ActiveState.CreatePointThird: {
+                    if (!_isInsideUI) {
+                        bool _proceedToItemwiseLock = false;
+                        _proceedToItemwiseLock = controlMode == ControlMode.Itemwise && key._leftClick;
 
-                            if (key._ctrlOnlyLeftClick)
-                            {
-                                //check if curve is too short
-                                if (IsCurveLengthLongEnoughXZ() == false)
-                                {
-                                    return;
-                                }
-
-                                _addCPResult = AddControlPoint(this.m_cachedPosition);
-                                if (this.m_mouseRayValid && _addCPResult)
-                                {
-                                    PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
-                                    
-                                    GoToActiveState(ActiveState.LockIdle);
-                                }
-                                break;
-                            }
-                            else if (_proceedToItemwiseLock)
-                            {
-                                //check if curve is too short
-                                if (IsCurveLengthLongEnoughXZ() == false)
-                                {
-                                    return;
-                                }
-
-                                _addCPResult = AddControlPoint(this.m_cachedPosition);
-                                if (this.m_mouseRayValid && _addCPResult)
-                                {
-                                    PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
-
-                                    GoToActiveState(ActiveState.ItemwiseLock);
-                                }
-                                break;
-                            }
-                            else if (key._leftClick)
-                            {
-                                //check if curve is too short
-                                if (IsCurveLengthLongEnoughXZ() == false)
-                                {
-                                    return;
-                                }
-
-                                if (!IsAtLeastOneItemValidPlacement())
-                                {
-                                    return;
-                                }
-
-                                _addCPResult = AddControlPoint(this.m_cachedPosition);
-                                if (this.m_mouseRayValid && _addCPResult)
-                                {
-                                    //finalize placement
-                                    FinalizePlacement(true, false);
-
-                                    //post-process
-                                    if (!PostCheckAndContinue())
-                                    {
-                                        ResetAllControlPoints();
-
-                                        GoToActiveState(ActiveState.CreatePointFirst);
-                                    }
-                                }
-                            }
-                            else if (key._rightClick)
-                            {
-                                _cancelCPResult = CancelControlPoint();
-                                if (this.m_mouseRayValid && _cancelCPResult)
-                                {
-                                    GoToActiveState(ActiveState.CreatePointSecond);
-                                    ModifyControlPoint(this.m_mousePosition, 2); //update position of second point
-                                    UpdateCachedControlPoints();
-                                    UpdateCurves();
-
-                                    placementCalculator.UpdateItemPlacementInfo(false, false);
-                                }
+                        if (key._ctrlOnlyLeftClick) {
+                            //check if curve is too short
+                            if (IsCurveLengthLongEnoughXZ() == false) {
+                                return;
                             }
 
+                            _addCPResult = AddControlPoint(this.m_cachedPosition);
+                            if (this.m_mouseRayValid && _addCPResult) {
+                                PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
 
-                        }
+                                GoToActiveState(ActiveState.LockIdle);
+                            }
+                            break;
+                        } else if (_proceedToItemwiseLock) {
+                            //check if curve is too short
+                            if (IsCurveLengthLongEnoughXZ() == false) {
+                                return;
+                            }
 
-                        break;
-                    }
-                    
-                //in lock mode, awaiting user input
-                case ActiveState.LockIdle:
-                    {
-                        if (!_isInsideUI)
-                        {
-                            if (controlMode == ControlMode.Itemwise && key._ctrlOnlyLeftClick)
-                            {
+                            _addCPResult = AddControlPoint(this.m_cachedPosition);
+                            if (this.m_mouseRayValid && _addCPResult) {
+                                PropLineTool.m_wasLockingMode = PropLineTool.m_lockingMode;
+
                                 GoToActiveState(ActiveState.ItemwiseLock);
-                                break;
                             }
-                            if (key._ctrlEnter || key._ctrlOnlyLeftClick)
-                            {
-                                ContinueDrawingFromLockMode(_isMouseRayValid, true);
+                            break;
+                        } else if (key._leftClick) {
+                            //check if curve is too short
+                            if (IsCurveLengthLongEnoughXZ() == false) {
+                                return;
                             }
-                            else if (key._rightClick)
-                            {
-                                RevertDrawingFromLockMode();
+
+                            if (!IsAtLeastOneItemValidPlacement()) {
+                                return;
                             }
-                            else if (key._leftClick && hoverState != HoverState.Unbound)
-                            {
-                                switch (hoverState)
-                                {
-                                    case HoverState.SpacingLocus:
-                                        {
-                                            GoToActiveState(ActiveState.ChangeSpacing);
-                                            break;
-                                        }
-                                    case HoverState.AngleLocus:
-                                        {
-                                            GoToActiveState(ActiveState.ChangeAngle);
-                                            break;
-                                        }
-                                    case HoverState.ControlPointFirst:
-                                        {
-                                            GoToActiveState(ActiveState.MovePointFirst);
 
-                                            ModifyControlPoint(this.m_mousePosition, 1); //update first point to mouse position
-                                            UpdateCachedControlPoints();
-                                            UpdateCurves();
-                                            placementCalculator.UpdateItemPlacementInfo();
+                            _addCPResult = AddControlPoint(this.m_cachedPosition);
+                            if (this.m_mouseRayValid && _addCPResult) {
+                                //finalize placement
+                                FinalizePlacement(true, false);
 
-                                            break;
-                                        }
-                                    case HoverState.ControlPointSecond:
-                                        {
-                                            GoToActiveState(ActiveState.MovePointSecond);
+                                //post-process
+                                if (!PostCheckAndContinue()) {
+                                    ResetAllControlPoints();
 
-                                            ModifyControlPoint(this.m_mousePosition, 2); //update second point to mouse position
-                                            UpdateCachedControlPoints();
-                                            UpdateCurves();
-                                            placementCalculator.UpdateItemPlacementInfo();
-
-                                            break;
-                                        }
-                                    case HoverState.ControlPointThird:
-                                        {
-                                            GoToActiveState(ActiveState.MovePointThird);
-
-                                            ModifyControlPoint(this.m_mousePosition, 3); //update third point to mouse position
-                                            UpdateCachedControlPoints();
-                                            UpdateCurves();
-                                            placementCalculator.UpdateItemPlacementInfo();
-
-                                            break;
-                                        }
-                                    case HoverState.Curve:
-                                        {
-                                            GoToActiveState(ActiveState.MoveSegment);
-                                            break;
-                                        }
-                                    case HoverState.ItemwiseItem:
-                                        {
-                                            if (controlMode == ControlMode.Itemwise)
-                                            {
-                                                GoToActiveState(ActiveState.MoveItemwiseItem);
-                                            }
-                                            break;
-                                        }
-                                    default:
-                                        {
-
-                                            break; 
-                                        }
+                                    GoToActiveState(ActiveState.CreatePointFirst);
                                 }
-
-
                             }
-
-
-                        }
-                        //inside UI and changing userParameters or switching prefabs
-                        else if (key._leftClick)
-                        {
-                            UpdatePrefabs();    //should be called after placementCalculator.GetPrefabData
-                            placementCalculator.UpdateItemPlacementInfo();
-                        }
-
-
-                        break;
-                    }
-
-                //in lock mode, moving first control point
-                case ActiveState.MovePointFirst:
-                    {
-                        if (!_isInsideUI)
-                        {
-                            if (key._rightClick)
-                            {
-                                //reset first CP to original position
-                                ModifyControlPoint(lockBackupControlPoints[0].m_position, 1);
-                            }
-                            else if (key._leftClick)
-                            {
-                                //check if curve is now too short
-                                if (IsCurveLengthLongEnoughXZ() == false)
-                                {
-                                    return;
-                                }
-                                
-                                //set first CP to new position
-                                
-                                //(don't need to do anything extra)
-                            }
-                            if (key._leftClick || key._rightClick)
-                            {
-                                GoToActiveState(ActiveState.LockIdle);
-                            }
-                        }
-                        break;
-                    }
-
-                //in lock mode, moving second control point
-                case ActiveState.MovePointSecond:
-                    {
-                        if (!_isInsideUI)
-                        {
-                            if (key._rightClick)
-                            {
-                                //reset second CP to original position
-                                ModifyControlPoint(lockBackupControlPoints[1].m_position, 2);
-                            }
-                            else if (key._leftClick)
-                            {
-                                //check if curve is now too short
-                                if (IsCurveLengthLongEnoughXZ() == false)
-                                {
-                                    return;
-                                }
-
-                                //set second CP to new position
-
-                                //(don't need to do anything extra)
-                            }
-                            if (key._leftClick || key._rightClick)
-                            {
-                                GoToActiveState(ActiveState.LockIdle);
-                            }
-                        }
-                        break;
-                    }
-
-                //in lock mode, moving third control point
-                case ActiveState.MovePointThird:
-                    {
-                        if (!_isInsideUI)
-                        {
-                            if (key._rightClick)
-                            {
-                                //reset third CP to original position
-                                ModifyControlPoint(lockBackupControlPoints[2].m_position, 3);
-                            }
-                            else if (key._leftClick)
-                            {
-                                //check if curve is now too short
-                                if (IsCurveLengthLongEnoughXZ() == false)
-                                {
-                                    return;
-                                }
-
-                                //set third CP to new position
-
-                                //(don't need to do anything extra)
-                            }
-                            if (key._leftClick || key._rightClick)
-                            {
-                                GoToActiveState(ActiveState.LockIdle);
-                            }
-                        }
-                        break;
-                    }
-
-                //in lock mode, moving full line or curve
-                case ActiveState.MoveSegment:
-                    {
-                        if (!_isInsideUI)
-                        {
-                            if (key._rightClick)
-                            {
-                                GoToActiveState(ActiveState.LockIdle);
-                                
-                                for (int i = 0; i < m_controlPoints.Length; i++)
-                                {
-                                    m_controlPoints[i].m_position = lockBackupControlPoints[i].m_position;
-                                }
-
+                        } else if (key._rightClick) {
+                            _cancelCPResult = CancelControlPoint();
+                            if (this.m_mouseRayValid && _cancelCPResult) {
+                                GoToActiveState(ActiveState.CreatePointSecond);
+                                ModifyControlPoint(this.m_mousePosition, 2); //update position of second point
                                 UpdateCachedControlPoints();
                                 UpdateCurves();
 
-                                placementCalculator.UpdateItemPlacementInfo();
-                            }
-                            else if (key._leftClick)
-                            {
-                                //set curve to new position
-
-                                //(don't need to do anything extra)
-                            }
-                            if (key._leftClick || key._rightClick)
-                            {
-                                GoToActiveState(ActiveState.LockIdle);
+                                placementCalculator.UpdateItemPlacementInfo(false, false);
                             }
                         }
-                        break;
+
+
                     }
 
-                //in lock mode, changing item-to-item spacing along the line or curve
-                case ActiveState.ChangeSpacing:
-                    {
-                        if (!_isInsideUI)
-                        {
-                            if (key._rightClick)
-                            {
-                                //reset spacing to original value
-                                placementCalculator.spacingSingle = lockBackupSpacing;
-                            }
-                            else if (key._leftClick)
-                            {
-                                //set spacing to new value
+                    break;
+                }
 
-                                //(don't need to do anything extra)
-                            }
-                            if (key._leftClick || key._rightClick)
-                            {
-                                GoToActiveState(ActiveState.LockIdle);
-                            }
-                        }
-                        break;
-                    }
-
-                //in lock mode, changing initial item (first item's) angle
-                case ActiveState.ChangeAngle:
-                    {
-                        if (!_isInsideUI)
-                        {
-                            if (key._rightClick)
-                            {
-                                //reset angle to original value
-                                placementCalculator.angleOffset = lockBackupAngleOffset;
-                                placementCalculator.angleSingle = lockBackupAngleSingle;
-                            }
-                            else if (key._leftClick)
-                            {
-                                //set angle to new value
-
-                                //(don't need to do anything extra)
-                            }
-                            if (key._leftClick || key._rightClick)
-                            {
-                                GoToActiveState(ActiveState.LockIdle);
-                            }
-                        }
-                        break;
-                    }
-                case ActiveState.ItemwiseLock:
-                    {
-                        if (!_isInsideUI)
-                        {
-                            if (key._ctrlOnlyLeftClick)
-                            {
-                                GoToActiveState(ActiveState.LockIdle);
-                            }
-                            else if (key._ctrlEnter)
-                            {
-                                ContinueDrawingFromLockMode(_isMouseRayValid, false);
-                            }
-                            else if (key._rightClick)
-                            {
-                                RevertDrawingFromLockMode();
-                            }
-                            else if (key._leftClick && hoverState != HoverState.Unbound)
-                            {
-                                switch (hoverState)
-                                {
-                                    case HoverState.ItemwiseItem:
-                                        {
-                                            FinalizePlacement(true, true);
-                                            break;
-                                        }
-                                    default:
-                                        {
-                                            //do nothing
-                                            break;
-                                        }
-                                }
-                            }
-                        }
-                        //inside UI and changing userParameters or switching prefabs
-                        else if (key._leftClick)
-                        {
-                            UpdatePrefabs();    //should be called after placementCalculator.GetPrefabData
-                            placementCalculator.UpdateItemPlacementInfo();
-                        }
-                        break;
-                    }
-                case ActiveState.MoveItemwiseItem:
-                    {
-                        if (!_isInsideUI)
-                        {
-                            if (key._rightClick)
-                            {
-                                //reset item back to original position
-                                hoverItemwiseT = lockBackupItemwiseT;
-                            }
-                            else if (key._leftClick)
-                            {
-                                //set itemT in DiscoverHoverState
-
-                                //(don't need to do anything extra)
-                            }
-                            if (key._leftClick || key._rightClick)
-                            {
-                                GoToActiveState(ActiveState.LockIdle);
-                            }
-                        }
-                        break;
-                    }
-                case ActiveState.MaxFillContinue:
-                    {
-                        if (controlMode == ControlMode.Itemwise)
-                        {
+                //in lock mode, awaiting user input
+                case ActiveState.LockIdle: {
+                    if (!_isInsideUI) {
+                        if (controlMode == ControlMode.Itemwise && key._ctrlOnlyLeftClick) {
                             GoToActiveState(ActiveState.ItemwiseLock);
+                            break;
                         }
-                        else if (!_isInsideUI)
-                        {
-                            if (key._ctrlOnlyLeftClick || key._rightClick)
-                            {
-                                if (this.m_mouseRayValid)
-                                {
-                                    GoToActiveState(ActiveState.LockIdle);
+                        if (key._ctrlEnter || key._ctrlOnlyLeftClick) {
+                            ContinueDrawingFromLockMode(_isMouseRayValid, true);
+                        } else if (key._rightClick) {
+                            RevertDrawingFromLockMode();
+                        } else if (key._leftClick && hoverState != HoverState.Unbound) {
+                            switch (hoverState) {
+                                case HoverState.SpacingLocus: {
+                                    GoToActiveState(ActiveState.ChangeSpacing);
+                                    break;
                                 }
-                            }
-                            else if (key._leftClick)
-                            {
-                                //check if curve is too short
-                                if (IsCurveLengthLongEnoughXZ() == false)
-                                {
-                                    return;
+                                case HoverState.AngleLocus: {
+                                    GoToActiveState(ActiveState.ChangeAngle);
+                                    break;
                                 }
-                                if (!IsAtLeastOneItemValidPlacement())
-                                {
-                                    return;
+                                case HoverState.ControlPointFirst: {
+                                    GoToActiveState(ActiveState.MovePointFirst);
+
+                                    ModifyControlPoint(this.m_mousePosition, 1); //update first point to mouse position
+                                    UpdateCachedControlPoints();
+                                    UpdateCurves();
+                                    placementCalculator.UpdateItemPlacementInfo();
+
+                                    break;
                                 }
+                                case HoverState.ControlPointSecond: {
+                                    GoToActiveState(ActiveState.MovePointSecond);
 
-                                if (this.m_mouseRayValid)
-                                {
-                                    //finalize placement
-                                    FinalizePlacement(true, false);
+                                    ModifyControlPoint(this.m_mousePosition, 2); //update second point to mouse position
+                                    UpdateCachedControlPoints();
+                                    UpdateCurves();
+                                    placementCalculator.UpdateItemPlacementInfo();
 
-                                    //post-process
-                                    if (!PostCheckAndContinue())
-                                    {
-                                        ResetAllControlPoints();
+                                    break;
+                                }
+                                case HoverState.ControlPointThird: {
+                                    GoToActiveState(ActiveState.MovePointThird);
 
-                                        GoToActiveState(ActiveState.CreatePointFirst);
+                                    ModifyControlPoint(this.m_mousePosition, 3); //update third point to mouse position
+                                    UpdateCachedControlPoints();
+                                    UpdateCurves();
+                                    placementCalculator.UpdateItemPlacementInfo();
+
+                                    break;
+                                }
+                                case HoverState.Curve: {
+                                    GoToActiveState(ActiveState.MoveSegment);
+                                    break;
+                                }
+                                case HoverState.ItemwiseItem: {
+                                    if (controlMode == ControlMode.Itemwise) {
+                                        GoToActiveState(ActiveState.MoveItemwiseItem);
                                     }
+                                    break;
+                                }
+                                default: {
+
+                                    break;
                                 }
                             }
-                            else
-                            {
+
+
+                        }
+
+
+                    }
+                    //inside UI and changing userParameters or switching prefabs
+                    else if (key._leftClick) {
+                        UpdatePrefabs();    //should be called after placementCalculator.GetPrefabData
+                        placementCalculator.UpdateItemPlacementInfo();
+                    }
+
+
+                    break;
+                }
+
+                //in lock mode, moving first control point
+                case ActiveState.MovePointFirst: {
+                    if (!_isInsideUI) {
+                        if (key._rightClick) {
+                            //reset first CP to original position
+                            ModifyControlPoint(lockBackupControlPoints[0].m_position, 1);
+                        } else if (key._leftClick) {
+                            //check if curve is now too short
+                            if (IsCurveLengthLongEnoughXZ() == false) {
                                 return;
                             }
-                        }
-                        
 
-                        break;
+                            //set first CP to new position
+
+                            //(don't need to do anything extra)
+                        }
+                        if (key._leftClick || key._rightClick) {
+                            GoToActiveState(ActiveState.LockIdle);
+                        }
                     }
+                    break;
+                }
+
+                //in lock mode, moving second control point
+                case ActiveState.MovePointSecond: {
+                    if (!_isInsideUI) {
+                        if (key._rightClick) {
+                            //reset second CP to original position
+                            ModifyControlPoint(lockBackupControlPoints[1].m_position, 2);
+                        } else if (key._leftClick) {
+                            //check if curve is now too short
+                            if (IsCurveLengthLongEnoughXZ() == false) {
+                                return;
+                            }
+
+                            //set second CP to new position
+
+                            //(don't need to do anything extra)
+                        }
+                        if (key._leftClick || key._rightClick) {
+                            GoToActiveState(ActiveState.LockIdle);
+                        }
+                    }
+                    break;
+                }
+
+                //in lock mode, moving third control point
+                case ActiveState.MovePointThird: {
+                    if (!_isInsideUI) {
+                        if (key._rightClick) {
+                            //reset third CP to original position
+                            ModifyControlPoint(lockBackupControlPoints[2].m_position, 3);
+                        } else if (key._leftClick) {
+                            //check if curve is now too short
+                            if (IsCurveLengthLongEnoughXZ() == false) {
+                                return;
+                            }
+
+                            //set third CP to new position
+
+                            //(don't need to do anything extra)
+                        }
+                        if (key._leftClick || key._rightClick) {
+                            GoToActiveState(ActiveState.LockIdle);
+                        }
+                    }
+                    break;
+                }
+
+                //in lock mode, moving full line or curve
+                case ActiveState.MoveSegment: {
+                    if (!_isInsideUI) {
+                        if (key._rightClick) {
+                            GoToActiveState(ActiveState.LockIdle);
+
+                            for (int i = 0; i < m_controlPoints.Length; i++) {
+                                m_controlPoints[i].m_position = lockBackupControlPoints[i].m_position;
+                            }
+
+                            UpdateCachedControlPoints();
+                            UpdateCurves();
+
+                            placementCalculator.UpdateItemPlacementInfo();
+                        } else if (key._leftClick) {
+                            //set curve to new position
+
+                            //(don't need to do anything extra)
+                        }
+                        if (key._leftClick || key._rightClick) {
+                            GoToActiveState(ActiveState.LockIdle);
+                        }
+                    }
+                    break;
+                }
+
+                //in lock mode, changing item-to-item spacing along the line or curve
+                case ActiveState.ChangeSpacing: {
+                    if (!_isInsideUI) {
+                        if (key._rightClick) {
+                            //reset spacing to original value
+                            placementCalculator.spacingSingle = lockBackupSpacing;
+                        } else if (key._leftClick) {
+                            //set spacing to new value
+
+                            //(don't need to do anything extra)
+                        }
+                        if (key._leftClick || key._rightClick) {
+                            GoToActiveState(ActiveState.LockIdle);
+                        }
+                    }
+                    break;
+                }
+
+                //in lock mode, changing initial item (first item's) angle
+                case ActiveState.ChangeAngle: {
+                    if (!_isInsideUI) {
+                        if (key._rightClick) {
+                            //reset angle to original value
+                            placementCalculator.angleOffset = lockBackupAngleOffset;
+                            placementCalculator.angleSingle = lockBackupAngleSingle;
+                        } else if (key._leftClick) {
+                            //set angle to new value
+
+                            //(don't need to do anything extra)
+                        }
+                        if (key._leftClick || key._rightClick) {
+                            GoToActiveState(ActiveState.LockIdle);
+                        }
+                    }
+                    break;
+                }
+                case ActiveState.ItemwiseLock: {
+                    if (!_isInsideUI) {
+                        if (key._ctrlOnlyLeftClick) {
+                            GoToActiveState(ActiveState.LockIdle);
+                        } else if (key._ctrlEnter) {
+                            ContinueDrawingFromLockMode(_isMouseRayValid, false);
+                        } else if (key._rightClick) {
+                            RevertDrawingFromLockMode();
+                        } else if (key._leftClick && hoverState != HoverState.Unbound) {
+                            switch (hoverState) {
+                                case HoverState.ItemwiseItem: {
+                                    FinalizePlacement(true, true);
+                                    break;
+                                }
+                                default: {
+                                    //do nothing
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    //inside UI and changing userParameters or switching prefabs
+                    else if (key._leftClick) {
+                        UpdatePrefabs();    //should be called after placementCalculator.GetPrefabData
+                        placementCalculator.UpdateItemPlacementInfo();
+                    }
+                    break;
+                }
+                case ActiveState.MoveItemwiseItem: {
+                    if (!_isInsideUI) {
+                        if (key._rightClick) {
+                            //reset item back to original position
+                            hoverItemwiseT = lockBackupItemwiseT;
+                        } else if (key._leftClick) {
+                            //set itemT in DiscoverHoverState
+
+                            //(don't need to do anything extra)
+                        }
+                        if (key._leftClick || key._rightClick) {
+                            GoToActiveState(ActiveState.LockIdle);
+                        }
+                    }
+                    break;
+                }
+                case ActiveState.MaxFillContinue: {
+                    if (controlMode == ControlMode.Itemwise) {
+                        GoToActiveState(ActiveState.ItemwiseLock);
+                    } else if (!_isInsideUI) {
+                        if (key._ctrlOnlyLeftClick || key._rightClick) {
+                            if (this.m_mouseRayValid) {
+                                GoToActiveState(ActiveState.LockIdle);
+                            }
+                        } else if (key._leftClick) {
+                            //check if curve is too short
+                            if (IsCurveLengthLongEnoughXZ() == false) {
+                                return;
+                            }
+                            if (!IsAtLeastOneItemValidPlacement()) {
+                                return;
+                            }
+
+                            if (this.m_mouseRayValid) {
+                                //finalize placement
+                                FinalizePlacement(true, false);
+
+                                //post-process
+                                if (!PostCheckAndContinue()) {
+                                    ResetAllControlPoints();
+
+                                    GoToActiveState(ActiveState.CreatePointFirst);
+                                }
+                            }
+                        } else {
+                            return;
+                        }
+                    }
+
+
+                    break;
+                }
                 //out of bounds
-                default:
-                    {
-                        Debug.LogError("[PLT]: ProcessKeyInputImpl(): Active state does not match a case!");
-                        break;
-                    }
+                default: {
+                    Debug.LogError("[PLT]: ProcessKeyInputImpl(): Active state does not match a case!");
+                    break;
+                }
             }
-            
-            if (_successfulRayCast == false)
-            {
+
+            if (_successfulRayCast == false) {
                 _toolErrors |= ToolBase.ToolErrors.RaycastFailed;
             }
         }
-        private IEnumerator ProcessKeyInput(KeyPressEvent _key_)
-        {
+        private IEnumerator ProcessKeyInput(KeyPressEvent _key_) {
             return new TProcessKeyEventTc_Iterator32G { _keyPressEvent = _key_, TTf__this = this };
         }
 
-        private void ContinueDrawingFromLockMode(bool isMouseRayValid, bool finalizePlacement)
-        {
+        private void ContinueDrawingFromLockMode(bool isMouseRayValid, bool finalizePlacement) {
             //check if in fence mode and line is too short
-            if (PropLineTool.fenceMode == true && placementCalculator.GetItemCountActual() <= 0)
-            {
+            if (PropLineTool.fenceMode == true && placementCalculator.GetItemCountActual() <= 0) {
                 return;
             }
-            
-            if (isMouseRayValid)
-            {
-                if (finalizePlacement)
-                {
+
+            if (isMouseRayValid) {
+                if (finalizePlacement) {
                     //finalize placement
-                    if (!FinalizePlacement(true, false))
-                    {
+                    if (!FinalizePlacement(true, false)) {
                         return;
                     }
 
                     //post-process
-                    if (!PostCheckAndContinue())
-                    {
+                    if (!PostCheckAndContinue()) {
                         ResetAllControlPoints();
 
                         GoToActiveState(ActiveState.CreatePointFirst);
@@ -5752,33 +4745,26 @@ namespace PropLineTool
             //}
         }
 
-        private void RevertDrawingFromLockMode()
-        {
+        private void RevertDrawingFromLockMode() {
             bool _cancelCPResult = CancelControlPoint();
-            if (this.m_mouseRayValid && _cancelCPResult)
-            {
+            if (this.m_mouseRayValid && _cancelCPResult) {
                 bool _twoPointedDrawMode = drawMode == DrawMode.Straight || drawMode == DrawMode.Circle;
 
-                if (_twoPointedDrawMode)
-                {
+                if (_twoPointedDrawMode) {
                     GoToActiveState(ActiveState.CreatePointSecond);
                     ModifyControlPoint(this.m_mousePosition, 2); //update position of first point
                     UpdateCachedControlPoints();
                     UpdateCurves();
 
                     placementCalculator.UpdateItemPlacementInfo(false, false);
-                }
-                else if (PropLineTool.drawMode == PropLineTool.DrawMode.Curved)
-                {
+                } else if (PropLineTool.drawMode == PropLineTool.DrawMode.Curved) {
                     GoToActiveState(ActiveState.CreatePointThird);
                     ModifyControlPoint(this.m_mousePosition, 3); //update position of second point
                     UpdateCachedControlPoints();
                     UpdateCurves();
 
                     placementCalculator.UpdateItemPlacementInfo(false, false);
-                }
-                else if (PropLineTool.drawMode == DrawMode.Freeform)
-                {
+                } else if (PropLineTool.drawMode == DrawMode.Freeform) {
                     GoToActiveState(ActiveState.CreatePointThird);
                     ModifyControlPoint(this.m_mousePosition, 3); //update third point to mouse position
                     UpdateCachedControlPoints();
@@ -5788,64 +4774,55 @@ namespace PropLineTool
                 }
             }
         }
-        
-        protected override void OnToolGUI(Event e)
-        {
-            
+
+        protected override void OnToolGUI(Event e) {
+
             bool _isMouseEvent = (e.isMouse);
             bool _isKeyEvent = (e.isKey);
 
-            if (!_isMouseEvent && !_isKeyEvent)
-            {
+            if (!_isMouseEvent && !_isKeyEvent) {
                 return;
             }
-            
+
             PropLineTool.m_keyPressEvent.Set3(e);
-            
+
             Singleton<SimulationManager>.instance.AddAction(this.ProcessKeyInput(m_keyPressEvent));
 
         }
 
-        protected override void OnToolLateUpdate()
-        {
+        protected override void OnToolLateUpdate() {
             //_DEBUG_OnToolLateUpdate.FrameStart();
             OnToolLateUpdateImpl();
             //_DEBUG_OnToolLateUpdate.FrameEnd(true);
         }
 
         //OnToolLateUpdate
-        protected void OnToolLateUpdateImpl()
-        {
+        protected void OnToolLateUpdateImpl() {
             //All 3 stuff
             Vector3 _mousePosition = Input.mousePosition;
             this.m_mouseRay = Camera.main.ScreenPointToRay(_mousePosition);
             this.m_mouseRayLength = Camera.main.farClipPlane;
             this.m_mouseRayValid = (!this.m_toolController.IsInsideUI && Cursor.visible);
-            
+
             //Prop/Tree stuff
             UpdateCachedPosition(false); //also updates m_positionChanging
 
             //Net stuff
-            if (this.m_lengthTimer > 0f)
-            {
+            if (this.m_lengthTimer > 0f) {
                 this.m_lengthTimer = Mathf.Max(0f, this.m_lengthTimer - Time.deltaTime);
             }
 
             //check if user switched from Curved/Freeform(in CreatePointThird) -> Straight/Circle
-            if ((drawMode == DrawMode.Straight || drawMode == DrawMode.Circle) && activeState == ActiveState.CreatePointThird)
-            {
+            if ((drawMode == DrawMode.Straight || drawMode == DrawMode.Circle) && activeState == ActiveState.CreatePointThird) {
                 bool _cancelCPResult = CancelControlPoint();
-                if (_cancelCPResult)
-                {
+                if (_cancelCPResult) {
                     GoToActiveState(ActiveState.CreatePointSecond);
                     ModifyControlPoint(this.m_mousePosition, 2); //update second point to mouse position
                     UpdateCachedControlPoints();
                     UpdateCurves();
-                }
-                else
-                {
+                } else {
                     this.ResetAllControlPoints();
-                    
+
                     GoToActiveState(ActiveState.CreatePointFirst);
                     ModifyControlPoint(this.m_mousePosition, 1);
                     UpdateCachedControlPoints();
@@ -5853,32 +4830,28 @@ namespace PropLineTool
                 }
                 return;
             }
-            
+
             //consider moving to event subscription in Awake() or OnDrawModeChanged()
             //check if user switched from Straight/Circle(in CreatePointSecond and continueDrawing fenceMode) -> Curved/Freeform
-            if ((drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform) && activeState == ActiveState.CreatePointSecond && placementCalculator.segmentState.IsPositionEqualToLastFenceEndpoint(m_cachedControlPoints[0].m_position))
-            {
+            if ((drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform) && activeState == ActiveState.CreatePointSecond && placementCalculator.segmentState.IsPositionEqualToLastFenceEndpoint(m_cachedControlPoints[0].m_position)) {
                 placementCalculator.ResetLastContinueParameters();
             }
-            if (activeState == ActiveState.CreatePointFirst && placementCalculator.segmentState.IsPositionEqualToLastFenceEndpoint(m_cachedControlPoints[0].m_position))
-            {
+            if (activeState == ActiveState.CreatePointFirst && placementCalculator.segmentState.IsPositionEqualToLastFenceEndpoint(m_cachedControlPoints[0].m_position)) {
                 placementCalculator.ResetLastContinueParameters();
             }
             //check if control point count is > 0 in CreatePointFirst
-            if (activeState == ActiveState.CreatePointFirst && m_controlPointCount > 0)
-            {
+            if (activeState == ActiveState.CreatePointFirst && m_controlPointCount > 0) {
                 m_controlPointCount = 0;
             }
-            
+
             //SUPER IMPORTANT
             //continuously update control points to follow mouse when applicable
-            if (this.m_positionChanging)
-            {
+            if (this.m_positionChanging) {
                 UpdateControlPoints();
                 DiscoverHoverState(m_cachedPosition);
                 UpdateMiscHoverParameters();
             }
-            
+
             //Prop/Tree stuff
             UpdateCachedPosition(false);
 
@@ -5889,106 +4862,84 @@ namespace PropLineTool
             //    placementCalculator.UpdateItemPlacementInfo();
             //}
 
-            if (PropLineTool.m_snapMode == PropLineTool.SnapMode.ZoneLines)
-            {
+            if (PropLineTool.m_snapMode == PropLineTool.SnapMode.ZoneLines) {
                 Singleton<TerrainManager>.instance.RenderZones = true;
-            }
-            else
-            {
+            } else {
                 Singleton<TerrainManager>.instance.RenderZones = false;
             }
         }
 
-        protected override void OnToolUpdate()
-        {
+        protected override void OnToolUpdate() {
             //_DEBUG_OnToolUpdate.FrameStart();
             OnToolUpdateImpl();
             //_DEBUG_OnToolUpdate.FrameEnd(true);
         }
 
-        protected void OnToolUpdateImpl()
-        {
+        protected void OnToolUpdateImpl() {
 
             UpdateCachedControlPoints();
-            
+
             Vector3 _hitPos = new Vector3();
-            if (TryRaycast(out _hitPos))
-            {
-                if (m_mousePosition != _hitPos)
-                {
+            if (TryRaycast(out _hitPos)) {
+                if (m_mousePosition != _hitPos) {
                     m_mousePosition = _hitPos;
                 }
             }
 
             //trying more stuff to have curves perfectly follow mouse
-            if (DoesPositionNeedUpdating(out _hitPos))
-            {
+            if (DoesPositionNeedUpdating(out _hitPos)) {
                 this.m_cachedPosition = _hitPos;
                 UpdateControlPoints();
             }
 
             //don't like how this looks afterall
             //ShowToolInfo();
-            
+
         }
 
-        public int GetConstructionCostTotal()
-        {
+        public int GetConstructionCostTotal() {
             int _totalCost = 0;
 
             int _itemCount = placementCalculator.GetItemCountActual();
 
-            switch (objectMode)
-            {
-                case ObjectMode.Props:
-                    {
-                        for (int i = 0; i < _itemCount; i++)
-                        {
-                            if (PlacementCalculator.IsIndexWithinBounds(i, false))
-                            {
-                                if (m_placementInfo[i].isValidPlacement)
-                                {
-                                    _totalCost += m_placementInfo[i].propInfo.GetConstructionCost();
-                                }
+            switch (objectMode) {
+                case ObjectMode.Props: {
+                    for (int i = 0; i < _itemCount; i++) {
+                        if (PlacementCalculator.IsIndexWithinBounds(i, false)) {
+                            if (m_placementInfo[i].isValidPlacement) {
+                                _totalCost += m_placementInfo[i].propInfo.GetConstructionCost();
                             }
                         }
-                        break; 
                     }
-                case ObjectMode.Trees:
-                    {
-                        for (int i = 0; i < _itemCount; i++)
-                        {
-                            if (PlacementCalculator.IsIndexWithinBounds(i, false))
-                            {
-                                if (m_placementInfo[i].isValidPlacement)
-                                {
-                                    _totalCost += m_placementInfo[i].treeInfo.GetConstructionCost();
-                                }
+                    break;
+                }
+                case ObjectMode.Trees: {
+                    for (int i = 0; i < _itemCount; i++) {
+                        if (PlacementCalculator.IsIndexWithinBounds(i, false)) {
+                            if (m_placementInfo[i].isValidPlacement) {
+                                _totalCost += m_placementInfo[i].treeInfo.GetConstructionCost();
                             }
                         }
-                        break; 
                     }
-                default:
-                    {
-                        _totalCost = 0;
-                        break; 
-                    }
+                    break;
+                }
+                default: {
+                    _totalCost = 0;
+                    break;
+                }
             }
 
             return _totalCost;
         }
 
-        public bool ShowConstructionCostToolInfo()
-        {
-            if (placementCalculator.GetItemCountActual() <= 0)
-            {
+        public bool ShowConstructionCostToolInfo() {
+            if (placementCalculator.GetItemCountActual() <= 0) {
                 return false;
             }
-            
+
             int _constructionCost = GetConstructionCostTotal();
 
-            if (_constructionCost <= 0)
-            {
+            if (_constructionCost <= 0) {
                 return false;
             }
 
@@ -5996,55 +4947,45 @@ namespace PropLineTool
             bool _preCheck = !this.m_toolController.IsInsideUI && Cursor.visible && _modeHasGameFlag;
             bool _showCostInfo = false;
 
-            switch (activeState)
-            {
-                case ActiveState.CreatePointSecond:
-                    {
-                        if (drawMode == DrawMode.Straight || drawMode == DrawMode.Circle)
-                        {
-                            _showCostInfo = true;
-                        }
-                        break;
-                    }
-                case ActiveState.CreatePointThird:
-                    {
-                        if (drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform)
-                        {
-                            _showCostInfo = true;
-                        }
-                        break; 
-                    }
-                case ActiveState.LockIdle:
-                    {
-                        if (hoverState == HoverState.Unbound)
-                        {
-                            _showCostInfo = true;
-                        }
-                        break;
-                    }
-                case ActiveState.MaxFillContinue:
-                    {
+            switch (activeState) {
+                case ActiveState.CreatePointSecond: {
+                    if (drawMode == DrawMode.Straight || drawMode == DrawMode.Circle) {
                         _showCostInfo = true;
-                        break;
                     }
+                    break;
+                }
+                case ActiveState.CreatePointThird: {
+                    if (drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform) {
+                        _showCostInfo = true;
+                    }
+                    break;
+                }
+                case ActiveState.LockIdle: {
+                    if (hoverState == HoverState.Unbound) {
+                        _showCostInfo = true;
+                    }
+                    break;
+                }
+                case ActiveState.MaxFillContinue: {
+                    _showCostInfo = true;
+                    break;
+                }
                 case ActiveState.MovePointFirst:
                 case ActiveState.MovePointSecond:
                 case ActiveState.MovePointThird:
                 case ActiveState.ChangeAngle:
                 case ActiveState.MoveSegment:
-                case ActiveState.ChangeSpacing:
-                    {
-                        _showCostInfo = false;
-                        break; 
-                    }
+                case ActiveState.ChangeSpacing: {
+                    _showCostInfo = false;
+                    break;
+                }
                 default:
                     break;
             }
 
-            if (_preCheck && _showCostInfo)
-            {
+            if (_preCheck && _showCostInfo) {
                 string _costText = string.Format(Locale.Get("TOOL_CONSTRUCTION_COST"), _constructionCost / 100);
-                
+
                 base.ShowToolInfo(true, _costText, this.m_cachedPosition);
                 return true;
             }
@@ -6052,8 +4993,7 @@ namespace PropLineTool
             return false;
         }
 
-        public bool ShowHoverToolInfo()
-        {
+        public bool ShowHoverToolInfo() {
             bool _modeHasGameFlag = (this.m_toolController.m_mode & ItemClass.Availability.Game) != ItemClass.Availability.None;
             bool _preCheck = !this.m_toolController.IsInsideUI && Cursor.visible && _modeHasGameFlag;
             bool _showHoverInfo = false;
@@ -6062,176 +5002,136 @@ namespace PropLineTool
 
             Vector3 _position = this.m_cachedPosition;
 
-            switch (activeState)
-            {
+            switch (activeState) {
                 case ActiveState.CreatePointFirst:
                 case ActiveState.CreatePointSecond:
-                case ActiveState.CreatePointThird:
-                    {
-                        _showHoverInfo = false;
-                        break;
-                    }
-                case ActiveState.LockIdle:
-                    {
-                        if (hoverState != HoverState.Unbound)
-                        {
-                            _showHoverInfo = true;
+                case ActiveState.CreatePointThird: {
+                    _showHoverInfo = false;
+                    break;
+                }
+                case ActiveState.LockIdle: {
+                    if (hoverState != HoverState.Unbound) {
+                        _showHoverInfo = true;
 
-                            switch (hoverState)
-                            {
-                                case HoverState.SpacingLocus:
-                                    {
-                                        _hoverText = "Change Spacing";
-                                        break; 
-                                    }
-                                case HoverState.AngleLocus:
-                                    {
-                                        _hoverText = "Change Angle";
-                                        break;
-                                    }
-                                case HoverState.ControlPointFirst:
-                                    {
-                                        _hoverText = "Move First Point";
-                                        break;
-                                    }
-                                case HoverState.ControlPointSecond:
-                                    {
-                                        _hoverText = "Move Second Point";
-                                        break;
-                                    }
-                                case HoverState.ControlPointThird:
-                                    {
-                                        _hoverText = "Move Third Point";
-                                        break;
-                                    }
-                                case HoverState.Curve:
-                                    {
-                                        _hoverText = "Translate Curve";
-                                        break;
-                                    }
+                        switch (hoverState) {
+                            case HoverState.SpacingLocus: {
+                                _hoverText = "Change Spacing";
+                                break;
+                            }
+                            case HoverState.AngleLocus: {
+                                _hoverText = "Change Angle";
+                                break;
+                            }
+                            case HoverState.ControlPointFirst: {
+                                _hoverText = "Move First Point";
+                                break;
+                            }
+                            case HoverState.ControlPointSecond: {
+                                _hoverText = "Move Second Point";
+                                break;
+                            }
+                            case HoverState.ControlPointThird: {
+                                _hoverText = "Move Third Point";
+                                break;
+                            }
+                            case HoverState.Curve: {
+                                _hoverText = "Translate Curve";
+                                break;
                             }
                         }
-                        break;
                     }
-                case ActiveState.MovePointFirst:
-                    {
-                        //_showHoverInfo = true;
-                        break;
-                    }
-                case ActiveState.MovePointSecond:
-                    {
-                        //_showHoverInfo = true;
-                        break;
-                    }
-                case ActiveState.MovePointThird:
-                    {
-                        //_showHoverInfo = true;
-                        break;
-                    }
-                case ActiveState.MoveSegment:
-                    {
-                        //_showHoverInfo = true;
-                        //_hoverText = "Click to lock curve position";
-                        break;
-                    }
-                case ActiveState.ChangeAngle:
-                    {
-                        //_showHoverInfo = true;
-                        break;
-                    }
-                case ActiveState.ChangeSpacing:
-                    {
-                        //_showHoverInfo = true;
-                        break;
-                    }
+                    break;
+                }
+                case ActiveState.MovePointFirst: {
+                    //_showHoverInfo = true;
+                    break;
+                }
+                case ActiveState.MovePointSecond: {
+                    //_showHoverInfo = true;
+                    break;
+                }
+                case ActiveState.MovePointThird: {
+                    //_showHoverInfo = true;
+                    break;
+                }
+                case ActiveState.MoveSegment: {
+                    //_showHoverInfo = true;
+                    //_hoverText = "Click to lock curve position";
+                    break;
+                }
+                case ActiveState.ChangeAngle: {
+                    //_showHoverInfo = true;
+                    break;
+                }
+                case ActiveState.ChangeSpacing: {
+                    //_showHoverInfo = true;
+                    break;
+                }
 
-                default:
-                    {
-                        _showHoverInfo = false;
-                        break; 
-                    }
+                default: {
+                    _showHoverInfo = false;
+                    break;
+                }
             }
 
-            if (_preCheck && _showHoverInfo)
-            {
+            if (_preCheck && _showHoverInfo) {
                 base.ShowToolInfo(true, _hoverText, _position);
 
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
 
-        public void ShowToolInfo()
-        {
+        public void ShowToolInfo() {
             Vector3 _position = this.m_cachedPosition;
-            
-            if (ShowHoverToolInfo())
-            {
+
+            if (ShowHoverToolInfo()) {
                 return;
-            }
-            else if (ShowConstructionCostToolInfo())
-            {
+            } else if (ShowConstructionCostToolInfo()) {
                 return;
-            }
-            else
-            {
+            } else {
                 base.ShowToolInfo(false, null, _position);
             }
-            
+
         }
 
         //from PropTool
-        public static void DispatchPlacementEffect(Vector3 position, bool isBulldozeEffect)
-        {
+        public static void DispatchPlacementEffect(Vector3 position, bool isBulldozeEffect) {
             EffectInfo _effectInfo;
-            if (isBulldozeEffect)
-            {
+            if (isBulldozeEffect) {
                 _effectInfo = Singleton<PropManager>.instance.m_properties.m_bulldozeEffect;
-            }
-            else
-            {
+            } else {
                 _effectInfo = Singleton<PropManager>.instance.m_properties.m_placementEffect;
             }
-            if (_effectInfo != null)
-            {
+            if (_effectInfo != null) {
                 InstanceID instance = default(InstanceID);
                 EffectInfo.SpawnArea spawnArea = new EffectInfo.SpawnArea(position, Vector3.up, 1f);
                 Singleton<EffectManager>.instance.DispatchEffect(_effectInfo, instance, spawnArea, Vector3.zero, 0f, 1f, Singleton<AudioManager>.instance.DefaultGroup);
             }
         }
 
-        public bool IsAtLeastOneItemValidPlacement()
-        {
+        public bool IsAtLeastOneItemValidPlacement() {
             bool _atLeastOneValid = false;
             bool _itemValid = false;
-            for (int i = 0; i < placementCalculator.GetItemCountActual(); i++)
-            {
-                if (!PlacementCalculator.GetItemValidPlacement(i, out _itemValid))
-                {
+            for (int i = 0; i < placementCalculator.GetItemCountActual(); i++) {
+                if (!PlacementCalculator.GetItemValidPlacement(i, out _itemValid)) {
                     _atLeastOneValid = false;
                     break;
                 }
-                if (_itemValid)
-                {
+                if (_itemValid) {
                     _atLeastOneValid = true;
                     break;
                 }
             }
-            if (!_atLeastOneValid)
-            {
+            if (!_atLeastOneValid) {
                 return false;
-            }
-            else
-            {
+            } else {
                 return true;
             }
         }
-        
-        public bool FinalizePlacement(bool continueDrawing, bool isCopyPlacing)
-        {
+
+        public bool FinalizePlacement(bool continueDrawing, bool isCopyPlacing) {
 
             //Vector3 _position = Vector3.zero;
             Vector3 _meshPosition = Vector3.zero;
@@ -6239,15 +5139,13 @@ namespace PropLineTool
 
             int _itemCount = placementCalculator.GetItemCountActual();
 
-            if (_itemCount < 1)
-            {
+            if (_itemCount < 1) {
                 return false;
             }
-            
+
             //verify at least one item is valid
             //so we don't waste spots in the undo 'stack'
-            if(!IsAtLeastOneItemValidPlacement())
-            {
+            if (!IsAtLeastOneItemValidPlacement()) {
                 return false;
             }
 
@@ -6256,219 +5154,184 @@ namespace PropLineTool
             //new as of 170623
             placementCalculator.UpdateItemPlacementInfo();
 
-            switch (objectMode)
-            {
-                case ObjectMode.Props:
-                    {
-                        PropInfo _propInfo = propPrefab;
-                        if (_propInfo == null)
-                        {
-                            return false;
-                        }
-                        ushort _propID;
-                        
-                        for (int i = 0; i < _itemCount; i++)
-                        {
-                            //if (!PlacementCalculator.GetItemPosition(i, out _position) || !placementCalculator.GetAngle(i, out _angle))
-                            if (!PlacementCalculator.GetItemMeshPosition(i, out _meshPosition) || !placementCalculator.GetAngle(i, out _angle))
-                            {
-                                //return;
-                                break;
-                            }
-                            //new as of 161102 for Prop Precision
-                            if (userSettingsControlPanel.renderAndPlacePosResVanilla)
-                            {
-                                _meshPosition = _meshPosition.QuantizeToGameShortGridXYZ();
-                            }
-                            //for correct variation of itemwise placement
-                            if (controlMode == ControlMode.Itemwise && i == PlacementCalculator.ITEMWISE_INDEX)
-                            {
-                                //_propInfo = m_placementInfo[PlacementCalculator.ITEMWISE_INDEX].propInfo;
-                                //_propInfo.GetVariation(ref _randomizer);
-
-                                placementCalculator.propInfo.GetVariation(ref _randomizer);
-                            }
-                            if (m_placementInfo[i].isValidPlacement)
-                            {
-                                _propInfo = m_placementInfo[i].propInfo;
-                                if (Singleton<PropManager>.instance.CreateProp(out _propID, ref _randomizer, _propInfo, _meshPosition, _angle, true))
-                                {
-                                    PlacementCalculator.SetPropID(i, _propID);
-
-                                    DispatchPlacementEffect(_meshPosition, false);
-                                }
-                            }
-                        }
-
-                        //undoManager.AddEntry(_itemCount, m_placementInfo, ObjectMode.Props);
-                        undoManager.AddEntry(_itemCount, m_placementInfo, ObjectMode.Props, fenceMode, placementCalculator.segmentState);
-
-                        break;
+            switch (objectMode) {
+                case ObjectMode.Props: {
+                    PropInfo _propInfo = propPrefab;
+                    if (_propInfo == null) {
+                        return false;
                     }
-                case ObjectMode.Trees:
-                    {
-                        TreeInfo _treeInfo = treePrefab;
-                        if (_treeInfo == null)
-                        {
-                            return false;
+                    ushort _propID;
+
+                    for (int i = 0; i < _itemCount; i++) {
+                        //if (!PlacementCalculator.GetItemPosition(i, out _position) || !placementCalculator.GetAngle(i, out _angle))
+                        if (!PlacementCalculator.GetItemMeshPosition(i, out _meshPosition) || !placementCalculator.GetAngle(i, out _angle)) {
+                            //return;
+                            break;
                         }
-                        uint _treeID;
-                        
-                        for (int i = 0; i < _itemCount; i++)
-                        {
-                            //if (!PlacementCalculator.GetItemPosition(i, out _position))
-                            if (!PlacementCalculator.GetItemMeshPosition(i, out _meshPosition))
-                            {
-                                //return;
-                                break;
-                            }
-                            //for correct variation of itemwise placement
-                            if (controlMode == ControlMode.Itemwise && i == PlacementCalculator.ITEMWISE_INDEX)
-                            {
-                                //_treeInfo = m_placementInfo[PlacementCalculator.ITEMWISE_INDEX].treeInfo;
-                                //_treeInfo.GetVariation(ref _randomizer);
+                        //new as of 161102 for Prop Precision
+                        if (userSettingsControlPanel.renderAndPlacePosResVanilla) {
+                            _meshPosition = _meshPosition.QuantizeToGameShortGridXYZ();
+                        }
+                        //for correct variation of itemwise placement
+                        if (controlMode == ControlMode.Itemwise && i == PlacementCalculator.ITEMWISE_INDEX) {
+                            //_propInfo = m_placementInfo[PlacementCalculator.ITEMWISE_INDEX].propInfo;
+                            //_propInfo.GetVariation(ref _randomizer);
 
-                                placementCalculator.treeInfo.GetVariation(ref _randomizer);
-                            }
-                            if (m_placementInfo[i].isValidPlacement)
-                            {
-                                _treeInfo = m_placementInfo[i].treeInfo;
-                                if (Singleton<TreeManager>.instance.CreateTree(out _treeID, ref _randomizer, _treeInfo, _meshPosition, true))
-                                {
-                                    PlacementCalculator.SetTreeID(i, _treeID);
+                            placementCalculator.propInfo.GetVariation(ref _randomizer);
+                        }
+                        if (m_placementInfo[i].isValidPlacement) {
+                            _propInfo = m_placementInfo[i].propInfo;
+                            if (Singleton<PropManager>.instance.CreateProp(out _propID, ref _randomizer, _propInfo, _meshPosition, _angle, true)) {
+                                PlacementCalculator.SetPropID(i, _propID);
 
-                                    DispatchPlacementEffect(_meshPosition, false);
-                                }
+                                DispatchPlacementEffect(_meshPosition, false);
                             }
                         }
-
-                        //undoManager.AddEntry(_itemCount, m_placementInfo, ObjectMode.Trees);
-                        undoManager.AddEntry(_itemCount, m_placementInfo, ObjectMode.Trees, fenceMode, placementCalculator.segmentState);
-
-                        break;
                     }
-                default:
-                    {
-                        
-                        break;
+
+                    //undoManager.AddEntry(_itemCount, m_placementInfo, ObjectMode.Props);
+                    undoManager.AddEntry(_itemCount, m_placementInfo, ObjectMode.Props, fenceMode, placementCalculator.segmentState);
+
+                    break;
+                }
+                case ObjectMode.Trees: {
+                    TreeInfo _treeInfo = treePrefab;
+                    if (_treeInfo == null) {
+                        return false;
                     }
+                    uint _treeID;
+
+                    for (int i = 0; i < _itemCount; i++) {
+                        //if (!PlacementCalculator.GetItemPosition(i, out _position))
+                        if (!PlacementCalculator.GetItemMeshPosition(i, out _meshPosition)) {
+                            //return;
+                            break;
+                        }
+                        //for correct variation of itemwise placement
+                        if (controlMode == ControlMode.Itemwise && i == PlacementCalculator.ITEMWISE_INDEX) {
+                            //_treeInfo = m_placementInfo[PlacementCalculator.ITEMWISE_INDEX].treeInfo;
+                            //_treeInfo.GetVariation(ref _randomizer);
+
+                            placementCalculator.treeInfo.GetVariation(ref _randomizer);
+                        }
+                        if (m_placementInfo[i].isValidPlacement) {
+                            _treeInfo = m_placementInfo[i].treeInfo;
+                            if (Singleton<TreeManager>.instance.CreateTree(out _treeID, ref _randomizer, _treeInfo, _meshPosition, true)) {
+                                PlacementCalculator.SetTreeID(i, _treeID);
+
+                                DispatchPlacementEffect(_meshPosition, false);
+                            }
+                        }
+                    }
+
+                    //undoManager.AddEntry(_itemCount, m_placementInfo, ObjectMode.Trees);
+                    undoManager.AddEntry(_itemCount, m_placementInfo, ObjectMode.Trees, fenceMode, placementCalculator.segmentState);
+
+                    break;
+                }
+                default: {
+
+                    break;
+                }
             }
-            
-            if (isCopyPlacing == false)
-            {
+
+            if (isCopyPlacing == false) {
                 placementCalculator.FinalizeForPlacement(continueDrawing);
             }
 
             return true;
         }
 
-        public override void RenderGeometry(RenderManager.CameraInfo cameraInfo)
-        {
-            
-            switch (activeState)
-            {
+        public override void RenderGeometry(RenderManager.CameraInfo cameraInfo) {
+
+            switch (activeState) {
                 //state set to undefined
-                case ActiveState.Undefined:
-                    {
-                        //Debug.LogError("[PLT]: RenderGeometry(): Active state is set to undefined!");
-                        break;
-                    }
+                case ActiveState.Undefined: {
+                    //Debug.LogError("[PLT]: RenderGeometry(): Active state is set to undefined!");
+                    break;
+                }
 
                 //creating first control point
-                case ActiveState.CreatePointFirst:
-                    {
+                case ActiveState.CreatePointFirst: {
 
-                        break;
-                    }
+                    break;
+                }
 
                 //creating second control point
-                case ActiveState.CreatePointSecond:
-                    {
-                        if (drawMode == DrawMode.Straight || drawMode == DrawMode.Circle)
-                        {
-                            RenderItems(cameraInfo);
-                        }
-                        break;
+                case ActiveState.CreatePointSecond: {
+                    if (drawMode == DrawMode.Straight || drawMode == DrawMode.Circle) {
+                        RenderItems(cameraInfo);
                     }
+                    break;
+                }
 
                 //creating third control point
-                case ActiveState.CreatePointThird:
-                    {
-                        RenderItems(cameraInfo);
-                        break;
-                    }
+                case ActiveState.CreatePointThird: {
+                    RenderItems(cameraInfo);
+                    break;
+                }
 
                 //in lock mode, awaiting user input
-                case ActiveState.LockIdle:
-                    {
-                        RenderItems(cameraInfo);
-                        break;
-                    }
+                case ActiveState.LockIdle: {
+                    RenderItems(cameraInfo);
+                    break;
+                }
 
                 //in lock mode, moving first control point
-                case ActiveState.MovePointFirst:
-                    {
+                case ActiveState.MovePointFirst: {
 
-                        RenderItems(cameraInfo);
-                        break;
-                    }
+                    RenderItems(cameraInfo);
+                    break;
+                }
 
                 //in lock mode, moving second control point
-                case ActiveState.MovePointSecond:
-                    {
+                case ActiveState.MovePointSecond: {
 
-                        RenderItems(cameraInfo);
-                        break;
-                    }
+                    RenderItems(cameraInfo);
+                    break;
+                }
 
                 //in lock mode, moving third control point
-                case ActiveState.MovePointThird:
-                    {
+                case ActiveState.MovePointThird: {
 
-                        RenderItems(cameraInfo);
-                        break;
-                    }
+                    RenderItems(cameraInfo);
+                    break;
+                }
 
                 //in lock mode, moving full line or curve
-                case ActiveState.MoveSegment:
-                    {
+                case ActiveState.MoveSegment: {
 
-                        RenderItems(cameraInfo);
-                        break;
-                    }
+                    RenderItems(cameraInfo);
+                    break;
+                }
 
                 //in lock mode, changing item-to-item spacing along the line or curve
-                case ActiveState.ChangeSpacing:
-                    {
+                case ActiveState.ChangeSpacing: {
 
-                        RenderItems(cameraInfo);
-                        break;
-                    }
+                    RenderItems(cameraInfo);
+                    break;
+                }
 
                 //in lock mode, changing initial item (first item's) angle
-                case ActiveState.ChangeAngle:
-                    {
+                case ActiveState.ChangeAngle: {
 
-                        RenderItems(cameraInfo);
-                        break;
-                    }
+                    RenderItems(cameraInfo);
+                    break;
+                }
                 case ActiveState.ItemwiseLock:
-                case ActiveState.MoveItemwiseItem:
-                    {
-                        RenderItems(cameraInfo);
-                        break;
-                    }
+                case ActiveState.MoveItemwiseItem: {
+                    RenderItems(cameraInfo);
+                    break;
+                }
                 //out of bounds
-                case ActiveState.MaxFillContinue:
-                    {
-                        RenderItems(cameraInfo);
-                        break;
-                    }
-                default:
-                    {
-                        //Debug.LogError("[PLT]: RenderGeometry(): Active state does not match a case!");
-                        break;
-                    }
+                case ActiveState.MaxFillContinue: {
+                    RenderItems(cameraInfo);
+                    break;
+                }
+                default: {
+                    //Debug.LogError("[PLT]: RenderGeometry(): Active state does not match a case!");
+                    break;
+                }
             }
 
 
@@ -6478,25 +5341,20 @@ namespace PropLineTool
             base.RenderGeometry(cameraInfo);
         }
 
-        private void RenderItems(RenderManager.CameraInfo cameraInfo)
-        {
-            switch (objectMode)
-            {
-                case ObjectMode.Props:
-                    {
-                        RenderProps(cameraInfo);
-                        break; 
-                    }
-                case ObjectMode.Trees:
-                    {
-                        RenderTrees(cameraInfo);
-                        break; 
-                    }
+        private void RenderItems(RenderManager.CameraInfo cameraInfo) {
+            switch (objectMode) {
+                case ObjectMode.Props: {
+                    RenderProps(cameraInfo);
+                    break;
+                }
+                case ObjectMode.Trees: {
+                    RenderTrees(cameraInfo);
+                    break;
+                }
             }
         }
-        
-        private void RenderProps(RenderManager.CameraInfo cameraInfo)
-        {
+
+        private void RenderProps(RenderManager.CameraInfo cameraInfo) {
             PropInfo _propInfo = m_propPrefab;
             //Vector3 _position = Vector3.zero;
             Vector3 _meshPosition = Vector3.zero;
@@ -6511,48 +5369,38 @@ namespace PropLineTool
 
             bool _itemValid = false;
 
-            for (int i = 0; i < placementCalculator.GetItemCountActual(); i++)
-            {
+            for (int i = 0; i < placementCalculator.GetItemCountActual(); i++) {
                 //if (!PlacementCalculator.GetItemPosition(i, out _position) || !placementCalculator.GetAngle(i, out _angle))
-                if (!PlacementCalculator.GetItemMeshPosition(i, out _meshPosition) || !placementCalculator.GetAngle(i, out _angle))
-                {
+                if (!PlacementCalculator.GetItemMeshPosition(i, out _meshPosition) || !placementCalculator.GetAngle(i, out _angle)) {
                     //Debug.Log("Break triggered on prop render i = " + i.ToString());
 
                     //return;
                     break;
-                }
-                else if (PlacementCalculator.GetItemValidPlacement(i, out _itemValid))
-                {
-                    if (_itemValid == true)
-                    {
+                } else if (PlacementCalculator.GetItemValidPlacement(i, out _itemValid)) {
+                    if (_itemValid == true) {
                         _propInfo = m_placementInfo[i].propInfo;
                         _scale = m_placementInfo[i].scale;
                         _color = m_placementInfo[i].color;
 
-                        if (userSettingsControlPanel.renderAndPlacePosResVanilla == true)
-                        {
+                        if (userSettingsControlPanel.renderAndPlacePosResVanilla == true) {
                             _meshPosition = _meshPosition.QuantizeToGameShortGridXYZ();
                         }
 
                         InstanceID _id = default(InstanceID);
-                        if (_requireHeightMap)
-                        {
+                        if (_requireHeightMap) {
                             Singleton<TerrainManager>.instance.GetHeightMapping(_meshPosition, out _heightMap, out _heightMapping, out _surfaceMapping);
                             PropInstance.RenderInstance(cameraInfo, _propInfo, _id, _meshPosition, _scale, _angle, _color, RenderManager.DefaultColorLocation, true, _heightMap, _heightMapping, _surfaceMapping);
-                        }
-                        else
-                        {
+                        } else {
                             PropInstance.RenderInstance(cameraInfo, _propInfo, _id, _meshPosition, _scale, _angle, _color, RenderManager.DefaultColorLocation, true);
                         }
                     }
                 }
             }
-            
+
             //end of RenderProps
         }
-        
-        private void RenderTrees(RenderManager.CameraInfo cameraInfo)
-        {
+
+        private void RenderTrees(RenderManager.CameraInfo cameraInfo) {
             TreeInfo _treeInfo = m_treePrefab;
             //Vector3 _position = Vector3.zero;
             Vector3 _meshPosition = Vector3.zero;
@@ -6560,9 +5408,8 @@ namespace PropLineTool
             float _brightness = 1f;
 
             bool _itemValid = false;
-            
-            for (int i = 0; i < placementCalculator.GetItemCountActual(); i++)
-            {
+
+            for (int i = 0; i < placementCalculator.GetItemCountActual(); i++) {
                 if (!PlacementCalculator.GetItemMeshPosition(i, out _meshPosition))
                 //if (!PlacementCalculator.GetItemPosition(i, out _position))
                 {
@@ -6570,13 +5417,9 @@ namespace PropLineTool
 
                     //return;
                     break;
-                }
-                else if (PlacementCalculator.GetItemValidPlacement(i, out _itemValid))
-                {
-                    if (_itemValid == true)
-                    {
-                        if (userSettingsControlPanel.renderAndPlacePosResVanilla == true)
-                        {
+                } else if (PlacementCalculator.GetItemValidPlacement(i, out _itemValid)) {
+                    if (_itemValid == true) {
+                        if (userSettingsControlPanel.renderAndPlacePosResVanilla == true) {
                             //_position.QuantizeToGameShortGridXYZ();
                             _meshPosition = _meshPosition.QuantizeToGameShortGridXYZ();
                         }
@@ -6592,9 +5435,8 @@ namespace PropLineTool
 
             //end of RenderTrees
         }
-        
-        public void DiscoverHoverState(Vector3 position)
-        {
+
+        public void DiscoverHoverState(Vector3 position) {
             bool _curvedOrFreeform = drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform;
             bool _straight = drawMode == DrawMode.Straight;
             bool _circle = drawMode == DrawMode.Circle;
@@ -6602,44 +5444,33 @@ namespace PropLineTool
             bool _itemwiseState = activeState == ActiveState.ItemwiseLock || activeState == ActiveState.MoveItemwiseItem;
 
             //check for itemwise first before classic lock mode
-            if (controlMode == ControlMode.Itemwise && _itemwiseState)
-            {
+            if (controlMode == ControlMode.Itemwise && _itemwiseState) {
                 float _hoverItemT = 1f;
-                
+
                 //update only hoverItemwiseT
-                if (_curvedOrFreeform && MathPLT.IsCloseToCurveXZ(m_mainBezier, hoverItemwiseCurveDistanceThreshold, position, out _hoverItemT))
-                {
+                if (_curvedOrFreeform && MathPLT.IsCloseToCurveXZ(m_mainBezier, hoverItemwiseCurveDistanceThreshold, position, out _hoverItemT)) {
                     hoverItemwiseT = _hoverItemT;
                     hoverState = HoverState.ItemwiseItem;
-                }
-                else if (_straight && MathPLT.IsCloseToSegmentXZ(m_mainSegment, hoverItemwiseCurveDistanceThreshold, position, out _hoverItemT))
-                {
+                } else if (_straight && MathPLT.IsCloseToSegmentXZ(m_mainSegment, hoverItemwiseCurveDistanceThreshold, position, out _hoverItemT)) {
                     hoverItemwiseT = _hoverItemT;
                     hoverState = HoverState.ItemwiseItem;
-                }
-                else if (_circle && MathPLT.IsCloseToCircle3XZ(m_mainCircle, hoverItemwiseCurveDistanceThreshold, position, out _hoverItemT))
-                {
+                } else if (_circle && MathPLT.IsCloseToCircle3XZ(m_mainCircle, hoverItemwiseCurveDistanceThreshold, position, out _hoverItemT)) {
                     hoverItemwiseT = _hoverItemT;
                     hoverState = HoverState.ItemwiseItem;
-                }
-                else
-                {
+                } else {
                     hoverState = HoverState.Unbound;
                 }
                 //return;
             }
 
             //check for classic lock mode
-            if (activeState != ActiveState.LockIdle)
-            {
+            if (activeState != ActiveState.LockIdle) {
                 return;
             }
 
             int _offset = fenceMode == true ? 0 : 1;
-            if (placementCalculator.GetItemCountActual() < (1 + _offset))
-            {
-                if (controlMode != ControlMode.Itemwise)
-                {
+            if (placementCalculator.GetItemCountActual() < (1 + _offset)) {
+                if (controlMode != ControlMode.Itemwise) {
                     hoverState = HoverState.Unbound;
                     return;
                 }
@@ -6656,90 +5487,64 @@ namespace PropLineTool
             //bool _straight = drawMode == DrawMode.Straight;
 
             bool _angleObjectMode = objectMode == ObjectMode.Props;
-            
+
             Vector3 _angleCenter = m_placementInfo[hoverItemAngleCenterIndex].position;
             float _angle = hoverAngle;
             Vector3 _anglePos = Circle2.Position3FromAngleXZ(_angleCenter, _angleLocusRadius, _angle);
-            
+
             Vector3 _spacingPos = fenceMode == true ? m_fenceEndPoints[hoverItemPositionIndex] : m_placementInfo[hoverItemPositionIndex].position;
 
-            if (MathPLT.IsInsideCircleXZ(_spacingPos, _pointRadius, position))
-            {
-                switch (controlMode)
-                {
-                    case ControlMode.Itemwise:
-                        {
-                            hoverState = HoverState.ItemwiseItem;
-                            break; 
-                        }
-                    default:
-                        {
-                            hoverState = HoverState.SpacingLocus;
-                            break;
-                        }
+            if (MathPLT.IsInsideCircleXZ(_spacingPos, _pointRadius, position)) {
+                switch (controlMode) {
+                    case ControlMode.Itemwise: {
+                        hoverState = HoverState.ItemwiseItem;
+                        break;
+                    }
+                    default: {
+                        hoverState = HoverState.SpacingLocus;
+                        break;
+                    }
                 }
-            }
-            else if (_angleObjectMode && MathPLT.IsInsideCircleXZ(_anglePos, _anglePointRadius, position))
-            {
+            } else if (_angleObjectMode && MathPLT.IsInsideCircleXZ(_anglePos, _anglePointRadius, position)) {
                 hoverState = HoverState.AngleLocus;
-            }
-            else if (_angleObjectMode && MathPLT.IsNearCircleOutlineXZ(_angleCenter, hoverAngleLocusDiameter, position, _angleLocusDistanceThreshold))
-            {
+            } else if (_angleObjectMode && MathPLT.IsNearCircleOutlineXZ(_angleCenter, hoverAngleLocusDiameter, position, _angleLocusDistanceThreshold)) {
                 hoverState = HoverState.AngleLocus;
-            }
-            else if (MathPLT.IsInsideCircleXZ(m_cachedControlPoints[0].m_position, _pointRadius, position))
-            {
+            } else if (MathPLT.IsInsideCircleXZ(m_cachedControlPoints[0].m_position, _pointRadius, position)) {
                 hoverState = HoverState.ControlPointFirst;
-            }
-            else if (MathPLT.IsInsideCircleXZ(m_cachedControlPoints[1].m_position, _pointRadius, position))
-            {
+            } else if (MathPLT.IsInsideCircleXZ(m_cachedControlPoints[1].m_position, _pointRadius, position)) {
                 hoverState = HoverState.ControlPointSecond;
-            }
-            else if (_curvedOrFreeform && MathPLT.IsInsideCircleXZ(m_cachedControlPoints[2].m_position, _pointRadius, position))
-            {
+            } else if (_curvedOrFreeform && MathPLT.IsInsideCircleXZ(m_cachedControlPoints[2].m_position, _pointRadius, position)) {
                 hoverState = HoverState.ControlPointThird;
-            }
-            else if (_curvedOrFreeform && MathPLT.IsCloseToCurveXZ(m_mainBezier, hoverCurveDistanceThreshold, position, out hoverCurveT))
-            {
+            } else if (_curvedOrFreeform && MathPLT.IsCloseToCurveXZ(m_mainBezier, hoverCurveDistanceThreshold, position, out hoverCurveT)) {
                 hoverState = HoverState.Curve;
-            }
-            else if (_straight && MathPLT.IsCloseToSegmentXZ(m_mainSegment, hoverCurveDistanceThreshold, position, out hoverCurveT))
-            {
+            } else if (_straight && MathPLT.IsCloseToSegmentXZ(m_mainSegment, hoverCurveDistanceThreshold, position, out hoverCurveT)) {
                 hoverState = HoverState.Curve;
-            }
-            else if (_circle && MathPLT.IsCloseToCircle3XZ(m_mainCircle, hoverCurveDistanceThreshold, position, out hoverCurveT))
-            {
+            } else if (_circle && MathPLT.IsCloseToCircle3XZ(m_mainCircle, hoverCurveDistanceThreshold, position, out hoverCurveT)) {
                 hoverState = HoverState.Curve;
-            }
-            else
-            {
+            } else {
                 hoverState = HoverState.Unbound;
             }
         }
-        
 
-        public void RenderPlacementErrorOverlays(RenderManager.CameraInfo cameraInfo)
-        {
+
+        public void RenderPlacementErrorOverlays(RenderManager.CameraInfo cameraInfo) {
             bool _override = userSettingsControlPanel.anarchyPLT || (!userSettingsControlPanel.anarchyPLT && userSettingsControlPanel.placeBlockedItems);
-            
-            if (placementCalculator.segmentState.allItemsValid == true && !_override)
-            {
+
+            if (placementCalculator.segmentState.allItemsValid == true && !_override) {
                 return;
             }
-            
-            if (placementCalculator.GetItemCountActual() <= 0)
-            {
+
+            if (placementCalculator.GetItemCountActual() <= 0) {
                 return;
             }
-            
-            if (IsActiveStateAnItemRenderState() == false)
-            {
+
+            if (IsActiveStateAnItemRenderState() == false) {
                 return;
             }
-            
+
 
             Color32 _blockedColor = _override == true ? new Color32(219, 192, 82, 80) : new Color32(219, 192, 82, 200);
-            Color32 _invalidPlacementColor = userSettingsControlPanel.anarchyPLT == true? new Color32(193, 78, 72, 50) : new Color32(193, 78, 72, 200);
+            Color32 _invalidPlacementColor = userSettingsControlPanel.anarchyPLT == true ? new Color32(193, 78, 72, 50) : new Color32(193, 78, 72, 200);
 
             Color32 _blockedColorTransparent = new Color32(_blockedColor.r, _blockedColor.g, _blockedColor.b, 0);
             Color32 _invalidPlacementColorTransparent = new Color32(_invalidPlacementColor.r, _invalidPlacementColor.g, _invalidPlacementColor.b, 0);
@@ -6747,46 +5552,35 @@ namespace PropLineTool
             float _radius = 8f;
             float _scale = 1f;
 
-            switch (objectMode)
-            {
-                case ObjectMode.Props:
-                    {
-                        _scale = Mathf.Max(propPrefab.m_maxScale, propPrefab.m_minScale);
-                        _radius = Mathf.Max(propPrefab.m_generatedInfo.m_size.x, propPrefab.m_generatedInfo.m_size.z) * _scale;
-                        break;
-                    }
-                case ObjectMode.Trees:
-                    {
-                        _scale = Mathf.Max(treePrefab.m_maxScale, treePrefab.m_minScale);
-                        _radius = Mathf.Max(treePrefab.m_generatedInfo.m_size.x, treePrefab.m_generatedInfo.m_size.z) * _scale;
-                        break;
-                    }
-                default:
-                    {
-                        return;
-                    }
+            switch (objectMode) {
+                case ObjectMode.Props: {
+                    _scale = Mathf.Max(propPrefab.m_maxScale, propPrefab.m_minScale);
+                    _radius = Mathf.Max(propPrefab.m_generatedInfo.m_size.x, propPrefab.m_generatedInfo.m_size.z) * _scale;
+                    break;
+                }
+                case ObjectMode.Trees: {
+                    _scale = Mathf.Max(treePrefab.m_maxScale, treePrefab.m_minScale);
+                    _radius = Mathf.Max(treePrefab.m_generatedInfo.m_size.x, treePrefab.m_generatedInfo.m_size.z) * _scale;
+                    break;
+                }
+                default: {
+                    return;
+                }
             }
 
             bool _itemValid = true;
             ItemCollisionType _itemCollisionFlags = ItemCollisionType.None;
             Vector3 _itemPosition = Vector3.zero;
-            
-            for (int i = 0; i < placementCalculator.GetItemCountActual(); i++)
-            {
-                if (PlacementCalculator.GetItemValidPlacement(i, out _itemValid) && PlacementCalculator.GetItemPosition(i, out _itemPosition))
-                {
-                    if (_itemValid == false || _override)
-                    {
-                        if (PlacementCalculator.GetItemCollisionFlags(i, out _itemCollisionFlags))
-                        {
-                            if (_itemCollisionFlags == ItemCollisionType.Blocked)
-                            {
+
+            for (int i = 0; i < placementCalculator.GetItemCountActual(); i++) {
+                if (PlacementCalculator.GetItemValidPlacement(i, out _itemValid) && PlacementCalculator.GetItemPosition(i, out _itemPosition)) {
+                    if (_itemValid == false || _override) {
+                        if (PlacementCalculator.GetItemCollisionFlags(i, out _itemCollisionFlags)) {
+                            if (_itemCollisionFlags == ItemCollisionType.Blocked) {
                                 RenderCircle(cameraInfo, _itemPosition, 0.10f, _blockedColor, false, false);
                                 RenderCircle(cameraInfo, _itemPosition, 2f, _blockedColor, false, false);
                                 RenderCircle(cameraInfo, _itemPosition, _radius, _blockedColor, false, true);
-                            }
-                            else if (_itemCollisionFlags != ItemCollisionType.None)
-                            {
+                            } else if (_itemCollisionFlags != ItemCollisionType.None) {
                                 RenderCircle(cameraInfo, _itemPosition, 0.10f, _invalidPlacementColor, false, false);
                                 RenderCircle(cameraInfo, _itemPosition, 2f, _invalidPlacementColor, false, false);
                                 RenderCircle(cameraInfo, _itemPosition, _radius, _invalidPlacementColor, false, true);
@@ -6800,144 +5594,73 @@ namespace PropLineTool
 
 
         //called in RenderOverlay
-        public void RenderHoverObjectOverlays(RenderManager.CameraInfo cameraInfo)
-        {
+        public void RenderHoverObjectOverlays(RenderManager.CameraInfo cameraInfo) {
             int _offset = fenceMode == true ? 0 : 1;
-            if (placementCalculator.GetItemCountActual() < (1 + _offset))
-            {
-                if (controlMode != ControlMode.Itemwise)
-                {
+            if (placementCalculator.GetItemCountActual() < (1 + _offset)) {
+                if (controlMode != ControlMode.Itemwise) {
                     return;
                 }
             }
 
-            switch (activeState)
-            {
+            switch (activeState) {
                 case ActiveState.Undefined:
                 case ActiveState.CreatePointFirst:
                 case ActiveState.CreatePointSecond:
                 case ActiveState.CreatePointThird:
-                case ActiveState.MaxFillContinue:
-                    {
-                        return;
-                    }
-                default:
-                    {
-                        break; 
-                    }
+                case ActiveState.MaxFillContinue: {
+                    return;
+                }
+                default: {
+                    break;
+                }
             }
 
             //setup highlight colors
             Color32 _baseColor = m_PLTColor_hoverBase;
             Color32 _lockIdleColor = m_PLTColor_locked;
             Color32 _highlightColor = m_PLTColor_lockedHighlight;
-            if (m_keyboardAltDown == true)
-            {
+            if (m_keyboardAltDown == true) {
                 _baseColor = m_PLTColor_hoverCopyPlace;
                 _highlightColor = m_PLTColor_copyPlaceHighlight;
             }
 
             bool _angleObjectMode = objectMode == ObjectMode.Props;
 
-            switch (activeState)
-            {
-                case ActiveState.LockIdle:
-                    {
-                        //cp0
-                        Color32 _cp0Color = hoverState == HoverState.ControlPointFirst ? _highlightColor : _baseColor;
-                        RenderCircle(cameraInfo, m_cachedControlPoints[0].m_position, hoverPointDiameter, _cp0Color, false, false);
-                        //cp1
-                        Color32 _cp1Color = hoverState == HoverState.ControlPointSecond ? _highlightColor : _baseColor;
-                        RenderCircle(cameraInfo, m_cachedControlPoints[1].m_position, hoverPointDiameter, _cp1Color, false, false);
-                        //cp2
-                        if (drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform)
-                        {
-                            Color32 _cp2Color = hoverState == HoverState.ControlPointThird ? _highlightColor : _baseColor;
-                            RenderCircle(cameraInfo, m_cachedControlPoints[2].m_position, hoverPointDiameter, _cp2Color, false, false);
-                        }
-                        //curve
-                        //this is done in RenderOverlay()
+            switch (activeState) {
+                case ActiveState.LockIdle: {
+                    //cp0
+                    Color32 _cp0Color = hoverState == HoverState.ControlPointFirst ? _highlightColor : _baseColor;
+                    RenderCircle(cameraInfo, m_cachedControlPoints[0].m_position, hoverPointDiameter, _cp0Color, false, false);
+                    //cp1
+                    Color32 _cp1Color = hoverState == HoverState.ControlPointSecond ? _highlightColor : _baseColor;
+                    RenderCircle(cameraInfo, m_cachedControlPoints[1].m_position, hoverPointDiameter, _cp1Color, false, false);
+                    //cp2
+                    if (drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform) {
+                        Color32 _cp2Color = hoverState == HoverState.ControlPointThird ? _highlightColor : _baseColor;
+                        RenderCircle(cameraInfo, m_cachedControlPoints[2].m_position, hoverPointDiameter, _cp2Color, false, false);
+                    }
+                    //curve
+                    //this is done in RenderOverlay()
 
-                        //spacing control point
-                        Color32 _item1Color = hoverState == HoverState.SpacingLocus || hoverState == HoverState.ItemwiseItem ? _highlightColor : _baseColor;
-                        Vector3 _spacingPos = fenceMode == true ? m_fenceEndPoints[hoverItemPositionIndex] : m_placementInfo[hoverItemPositionIndex].position;
-                        RenderCircle(cameraInfo, _spacingPos, hoverPointDiameter, _item1Color, false, false);
+                    //spacing control point
+                    Color32 _item1Color = hoverState == HoverState.SpacingLocus || hoverState == HoverState.ItemwiseItem ? _highlightColor : _baseColor;
+                    Vector3 _spacingPos = fenceMode == true ? m_fenceEndPoints[hoverItemPositionIndex] : m_placementInfo[hoverItemPositionIndex].position;
+                    RenderCircle(cameraInfo, _spacingPos, hoverPointDiameter, _item1Color, false, false);
 
-                        //spacing fill indicator
-                        if (hoverState == HoverState.SpacingLocus)
-                        {
-                            Color32 _fillColor = Color.Lerp(_highlightColor, _lockIdleColor, 0.50f);
+                    //spacing fill indicator
+                    if (hoverState == HoverState.SpacingLocus) {
+                        Color32 _fillColor = Color.Lerp(_highlightColor, _lockIdleColor, 0.50f);
 
-                            RenderProgressiveSpacingFill(cameraInfo, placementCalculator.spacingSingle, 1.00f, 0.20f, _fillColor, false, true);
-                        }
+                        RenderProgressiveSpacingFill(cameraInfo, placementCalculator.spacingSingle, 1.00f, 0.20f, _fillColor, false, true);
+                    }
 
-                        //ANGLE
-                        if (_angleObjectMode)
-                        {
-                            //angle indicator
-                            Vector3 _angleCenter = m_placementInfo[hoverItemAngleCenterIndex].position;
-                            float _angle = hoverAngle;
-                            Vector3 _anglePos = Circle2.Position3FromAngleXZ(_angleCenter, hoverAngleLocusDiameter, _angle);
-                            Color32 _angleColor = hoverState == HoverState.AngleLocus ? _highlightColor : _baseColor;
-                            RenderCircle(cameraInfo, _anglePos, hoverPointDiameter, _angleColor, false, false);
-                            //angle locus
-                            Color32 _blendColor = Color.Lerp(_baseColor, _angleColor, 0.50f);
-                            _blendColor.a = 88;
-                            RenderCircle(cameraInfo, _angleCenter, hoverAngleLocusDiameter * 2f, _blendColor, false, true);
-                            //angle indicator line
-                            Segment3 _angleLine = new Segment3(_angleCenter, _anglePos);
-                            RenderLine(cameraInfo, _angleLine, 0.05f, 0.50f, _blendColor, false, true);
-                        }
-                        
-
-                        break; 
-                    }
-                case ActiveState.MovePointFirst:
-                    {
-                        RenderCircle(cameraInfo, m_cachedControlPoints[0].m_position, hoverPointDiameter, _highlightColor, false, false);
-                        break;
-                    }
-                case ActiveState.MovePointSecond:
-                    {
-                        RenderCircle(cameraInfo, m_cachedControlPoints[1].m_position, hoverPointDiameter, _highlightColor, false, false);
-                        break;
-                    }
-                case ActiveState.MovePointThird:
-                    {
-                        if (drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform)
-                        {
-                            RenderCircle(cameraInfo, m_cachedControlPoints[2].m_position, hoverPointDiameter, _highlightColor, false, false);
-                        }
-                        break;
-                    }
-                case ActiveState.MoveSegment:
-                    {
-                        //this is done in RenderOverlay()
-                        break;
-                    }
-                case ActiveState.ChangeSpacing:
-                    {
-                        //item second
-                        Vector3 _spacingPos = fenceMode == true ? m_fenceEndPoints[hoverItemPositionIndex] : m_placementInfo[hoverItemPositionIndex].position;
-                        RenderCircle(cameraInfo, _spacingPos, hoverPointDiameter, _highlightColor, false, false);
-                        if (fenceMode == true)
-                        {
-                            Color32 _blendColor = Color.Lerp(_baseColor, _highlightColor, 0.50f);
-                            RenderLine(cameraInfo, new Segment3(m_fenceEndPoints[0], m_fenceEndPoints[1]), 0.05f, 0.50f, _blendColor, false, true);
-                        }
-                        else
-                        {
-                            RenderProgressiveSpacingFill(cameraInfo, placementCalculator.spacingSingle, 1.00f, 0.20f, _highlightColor, false, true);
-                        }
-                        break;
-                    }
-                case ActiveState.ChangeAngle:
-                    {
-                        //ANGLE
+                    //ANGLE
+                    if (_angleObjectMode) {
+                        //angle indicator
                         Vector3 _angleCenter = m_placementInfo[hoverItemAngleCenterIndex].position;
                         float _angle = hoverAngle;
                         Vector3 _anglePos = Circle2.Position3FromAngleXZ(_angleCenter, hoverAngleLocusDiameter, _angle);
-                        Color32 _angleColor = _highlightColor;
+                        Color32 _angleColor = hoverState == HoverState.AngleLocus ? _highlightColor : _baseColor;
                         RenderCircle(cameraInfo, _anglePos, hoverPointDiameter, _angleColor, false, false);
                         //angle locus
                         Color32 _blendColor = Color.Lerp(_baseColor, _angleColor, 0.50f);
@@ -6946,24 +5669,70 @@ namespace PropLineTool
                         //angle indicator line
                         Segment3 _angleLine = new Segment3(_angleCenter, _anglePos);
                         RenderLine(cameraInfo, _angleLine, 0.05f, 0.50f, _blendColor, false, true);
+                    }
 
-                        break;
+
+                    break;
+                }
+                case ActiveState.MovePointFirst: {
+                    RenderCircle(cameraInfo, m_cachedControlPoints[0].m_position, hoverPointDiameter, _highlightColor, false, false);
+                    break;
+                }
+                case ActiveState.MovePointSecond: {
+                    RenderCircle(cameraInfo, m_cachedControlPoints[1].m_position, hoverPointDiameter, _highlightColor, false, false);
+                    break;
+                }
+                case ActiveState.MovePointThird: {
+                    if (drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform) {
+                        RenderCircle(cameraInfo, m_cachedControlPoints[2].m_position, hoverPointDiameter, _highlightColor, false, false);
                     }
-                case ActiveState.MoveItemwiseItem:
-                    {
-                        Vector3 _spacingPos = fenceMode == true ? m_fenceEndPoints[hoverItemPositionIndex] : m_placementInfo[hoverItemPositionIndex].position;
-                        RenderCircle(cameraInfo, _spacingPos, hoverPointDiameter, _highlightColor, false, false);
-                        break;
+                    break;
+                }
+                case ActiveState.MoveSegment: {
+                    //this is done in RenderOverlay()
+                    break;
+                }
+                case ActiveState.ChangeSpacing: {
+                    //item second
+                    Vector3 _spacingPos = fenceMode == true ? m_fenceEndPoints[hoverItemPositionIndex] : m_placementInfo[hoverItemPositionIndex].position;
+                    RenderCircle(cameraInfo, _spacingPos, hoverPointDiameter, _highlightColor, false, false);
+                    if (fenceMode == true) {
+                        Color32 _blendColor = Color.Lerp(_baseColor, _highlightColor, 0.50f);
+                        RenderLine(cameraInfo, new Segment3(m_fenceEndPoints[0], m_fenceEndPoints[1]), 0.05f, 0.50f, _blendColor, false, true);
+                    } else {
+                        RenderProgressiveSpacingFill(cameraInfo, placementCalculator.spacingSingle, 1.00f, 0.20f, _highlightColor, false, true);
                     }
+                    break;
+                }
+                case ActiveState.ChangeAngle: {
+                    //ANGLE
+                    Vector3 _angleCenter = m_placementInfo[hoverItemAngleCenterIndex].position;
+                    float _angle = hoverAngle;
+                    Vector3 _anglePos = Circle2.Position3FromAngleXZ(_angleCenter, hoverAngleLocusDiameter, _angle);
+                    Color32 _angleColor = _highlightColor;
+                    RenderCircle(cameraInfo, _anglePos, hoverPointDiameter, _angleColor, false, false);
+                    //angle locus
+                    Color32 _blendColor = Color.Lerp(_baseColor, _angleColor, 0.50f);
+                    _blendColor.a = 88;
+                    RenderCircle(cameraInfo, _angleCenter, hoverAngleLocusDiameter * 2f, _blendColor, false, true);
+                    //angle indicator line
+                    Segment3 _angleLine = new Segment3(_angleCenter, _anglePos);
+                    RenderLine(cameraInfo, _angleLine, 0.05f, 0.50f, _blendColor, false, true);
+
+                    break;
+                }
+                case ActiveState.MoveItemwiseItem: {
+                    Vector3 _spacingPos = fenceMode == true ? m_fenceEndPoints[hoverItemPositionIndex] : m_placementInfo[hoverItemPositionIndex].position;
+                    RenderCircle(cameraInfo, _spacingPos, hoverPointDiameter, _highlightColor, false, false);
+                    break;
+                }
                 default:
                     break;
             }
         }
-        
-        public void RenderMaxFillContinueMarkers(RenderManager.CameraInfo cameraInfo)
-        {
-            if (controlMode == ControlMode.Itemwise)
-            {
+
+        public void RenderMaxFillContinueMarkers(RenderManager.CameraInfo cameraInfo) {
+            if (controlMode == ControlMode.Itemwise) {
                 return;
             }
 
@@ -6979,7 +5748,7 @@ namespace PropLineTool
             //RenderCircle(cameraInfo, _initialItemPosition, 0.5f, _maxFillContinueColor, false, true);
             //RenderCircle(cameraInfo, _initialItemPosition, _radius, _maxFillContinueColor, false, true);
             RenderSegment(cameraInfo, _thresholdMarkerInitial, 0.25f, 0f, _maxFillContinueColor, false, true);
-            
+
             //================
 
             //final item
@@ -6987,7 +5756,7 @@ namespace PropLineTool
             ItemPlacementInfo _finalItem = placementCalculator.finalItem;
 
             Segment3 _thresholdMarkerFinal = new Segment3(_finalItemPosition - (_finalItem.offsetDirection * _radius), _finalItemPosition + (_finalItem.offsetDirection * _radius));
-            
+
             RenderCircle(cameraInfo, _finalItemPosition, 0.5f, _maxFillContinueColor, false, true);
             RenderCircle(cameraInfo, _finalItemPosition, _radius, _maxFillContinueColor, false, true);
             RenderSegment(cameraInfo, _thresholdMarkerFinal, 0.25f, 0f, _maxFillContinueColor, false, true);
@@ -7004,8 +5773,7 @@ namespace PropLineTool
         }
 
         //RenderOverlay (all-encompassing)
-        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo)
-        {
+        public override void RenderOverlay(RenderManager.CameraInfo cameraInfo) {
             base.RenderOverlay(cameraInfo);
 
             bool _twoPointedDrawMode = drawMode == DrawMode.Straight || drawMode == DrawMode.Circle;
@@ -7024,177 +5792,142 @@ namespace PropLineTool
 
             _createPointColor = controlMode == ControlMode.Itemwise ? _itemwiseLockColor : _createPointColor;
 
-            if (m_keyboardCtrlDown && userSettingsControlPanel.showUndoPreviews == true)
-            {
+            if (m_keyboardCtrlDown && userSettingsControlPanel.showUndoPreviews == true) {
                 undoManager.RenderLatestEntryCircles(cameraInfo, m_PLTColor_undoItemOverlay);
             }
-            
-            if (IsActiveStateAnItemRenderState() && placementCalculator.segmentState.isReadyForMaxContinue)
-            {
+
+            if (IsActiveStateAnItemRenderState() && placementCalculator.segmentState.isReadyForMaxContinue) {
                 _copyPlaceColor = _maxFillContinueColor;
             }
 
-            switch (activeState)
-            {
+            switch (activeState) {
                 //state set to undefined
-                case ActiveState.Undefined:
-                    {
-                        Debug.LogError("[PLT]: RenderOverlay(): Active state is set to undefined!");
-                        break;
-                    }
+                case ActiveState.Undefined: {
+                    Debug.LogError("[PLT]: RenderOverlay(): Active state is set to undefined!");
+                    break;
+                }
 
                 //creating first control point
-                case ActiveState.CreatePointFirst:
-                    {
-                        if (!this.m_toolController.IsInsideUI && Cursor.visible)
-                        {
-                            //medium circle
-                            RenderCircle(cameraInfo, this.m_cachedPosition, 1.00f, _createPointColor, false, false);
-                            //small pinpoint circle
-                            RenderCircle(cameraInfo, this.m_cachedPosition, 0.10f, _createPointColor, false, true);
-                        }
-
-
-                        break;
+                case ActiveState.CreatePointFirst: {
+                    if (!this.m_toolController.IsInsideUI && Cursor.visible) {
+                        //medium circle
+                        RenderCircle(cameraInfo, this.m_cachedPosition, 1.00f, _createPointColor, false, false);
+                        //small pinpoint circle
+                        RenderCircle(cameraInfo, this.m_cachedPosition, 0.10f, _createPointColor, false, true);
                     }
+
+
+                    break;
+                }
 
                 //creating second control point
-                case ActiveState.CreatePointSecond:
-                    {
-                        if (true || this.m_cachedControlPoints[1].m_direction != Vector3.zero)
-                        {
-                            bool _gotoCreatePointFirst = false;
+                case ActiveState.CreatePointSecond: {
+                    if (true || this.m_cachedControlPoints[1].m_direction != Vector3.zero) {
+                        bool _gotoCreatePointFirst = false;
 
-                            switch (drawMode)
-                            {
-                                case DrawMode.Straight:
-                                case DrawMode.Circle:
-                                    {
-                                        if (this.m_cachedControlPoints[1].m_direction != Vector3.zero)
-                                        {
-                                            if (this.m_keyboardAltDown)
-                                            {
-                                                _createPointColor = _copyPlaceColor; ;
-                                            }
-                                            else if (this.m_keyboardCtrlDown)
-                                            {
-                                                _createPointColor = m_PLTColor_locked;
-                                                //_createPointColor = controlMode == ControlMode.Itemwise ? _itemwiseLockColor : _lockIdleColor;
-                                            }
-                                            
-                                            switch (drawMode)
-                                            {
-                                                case DrawMode.Straight:
-                                                    {
-                                                        if (placementCalculator.segmentState.allItemsValid == false)
-                                                        {
-                                                            RenderSegment(cameraInfo, m_mainSegment, 1.50f, 0f, _curveWarningColor, false, true);
-                                                        }
+                        switch (drawMode) {
+                            case DrawMode.Straight:
+                            case DrawMode.Circle: {
+                                if (this.m_cachedControlPoints[1].m_direction != Vector3.zero) {
+                                    if (this.m_keyboardAltDown) {
+                                        _createPointColor = _copyPlaceColor; ;
+                                    } else if (this.m_keyboardCtrlDown) {
+                                        _createPointColor = m_PLTColor_locked;
+                                        //_createPointColor = controlMode == ControlMode.Itemwise ? _itemwiseLockColor : _lockIdleColor;
+                                    }
 
-                                                        RenderSegment(cameraInfo, m_mainSegment, 1.00f, 0f, _createPointColor, false, true);
-                                                        break;
-                                                    }
-                                                case DrawMode.Circle:
-                                                    {
-                                                        if (placementCalculator.segmentState.allItemsValid == false)
-                                                        {
-                                                            RenderMainCircle(cameraInfo, m_mainCircle, 1.50f, _curveWarningColor, false, true);
-                                                        }
-
-                                                        RenderMainCircle(cameraInfo, m_mainCircle, 1.00f, _createPointColor, false, true);
-                                                        break; 
-                                                    }
-                                                default:
-                                                    {
-                                                        //do nothing
-                                                        break; 
-                                                    }
-                                            }
-                                            
-                                            //MaxFillContinue
-                                            if (_renderMFC)
-                                            {
-                                                RenderMaxFillContinueMarkers(cameraInfo);
+                                    switch (drawMode) {
+                                        case DrawMode.Straight: {
+                                            if (placementCalculator.segmentState.allItemsValid == false) {
+                                                RenderSegment(cameraInfo, m_mainSegment, 1.50f, 0f, _curveWarningColor, false, true);
                                             }
 
+                                            RenderSegment(cameraInfo, m_mainSegment, 1.00f, 0f, _createPointColor, false, true);
+                                            break;
                                         }
-                                        else
-                                        {
-                                            _gotoCreatePointFirst = true;
+                                        case DrawMode.Circle: {
+                                            if (placementCalculator.segmentState.allItemsValid == false) {
+                                                RenderMainCircle(cameraInfo, m_mainCircle, 1.50f, _curveWarningColor, false, true);
+                                            }
+
+                                            RenderMainCircle(cameraInfo, m_mainCircle, 1.00f, _createPointColor, false, true);
+                                            break;
                                         }
-                                        break; 
+                                        default: {
+                                            //do nothing
+                                            break;
+                                        }
                                     }
-                                case DrawMode.Curved:
-                                case DrawMode.Freeform:
-                                    {
-                                        RenderLine(cameraInfo, m_mainArm1, 1.00f, 2f, _createPointColor, false, false);
-                                        break;
+
+                                    //MaxFillContinue
+                                    if (_renderMFC) {
+                                        RenderMaxFillContinueMarkers(cameraInfo);
                                     }
-                                default:
-                                    {
-                                        //do nothing
-                                        break;
-                                    }
+
+                                } else {
+                                    _gotoCreatePointFirst = true;
+                                }
+                                break;
                             }
-                            if (_gotoCreatePointFirst)
-                            {
-                                goto case ActiveState.CreatePointFirst;
+                            case DrawMode.Curved:
+                            case DrawMode.Freeform: {
+                                RenderLine(cameraInfo, m_mainArm1, 1.00f, 2f, _createPointColor, false, false);
+                                break;
+                            }
+                            default: {
+                                //do nothing
+                                break;
                             }
                         }
-
-                        //small pinpoint circles
-                        RenderCircle(cameraInfo, this.m_cachedControlPoints[0].m_position, 0.10f, _createPointColor, false, true);
-                        RenderCircle(cameraInfo, this.m_cachedControlPoints[1].m_position, 0.10f, _createPointColor, false, true);
-
-                        break;
+                        if (_gotoCreatePointFirst) {
+                            goto case ActiveState.CreatePointFirst;
+                        }
                     }
+
+                    //small pinpoint circles
+                    RenderCircle(cameraInfo, this.m_cachedControlPoints[0].m_position, 0.10f, _createPointColor, false, true);
+                    RenderCircle(cameraInfo, this.m_cachedControlPoints[1].m_position, 0.10f, _createPointColor, false, true);
+
+                    break;
+                }
 
                 //creating third control point
-                case ActiveState.CreatePointThird:
-                    {
-                        if (true || this.m_cachedControlPoints[2].m_direction != Vector3.zero)
+                case ActiveState.CreatePointThird: {
+                    if (true || this.m_cachedControlPoints[2].m_direction != Vector3.zero) {
+                        if ((PropLineTool.drawMode == PropLineTool.DrawMode.Curved) || (PropLineTool.drawMode == PropLineTool.DrawMode.Freeform)) //not sure if this is necessary
                         {
-                            if ((PropLineTool.drawMode == PropLineTool.DrawMode.Curved) || (PropLineTool.drawMode == PropLineTool.DrawMode.Freeform)) //not sure if this is necessary
-                            {
-                                if (this.m_keyboardAltDown)
-                                {
-                                    _createPointColor = _copyPlaceColor;
-                                }
-                                else if (this.m_keyboardCtrlDown)
-                                {
-                                    _createPointColor = m_PLTColor_locked;
-                                    //_createPointColor = controlMode == ControlMode.Itemwise ? _itemwiseLockColor : _lockIdleColor;
-                                }
+                            if (this.m_keyboardAltDown) {
+                                _createPointColor = _copyPlaceColor;
+                            } else if (this.m_keyboardCtrlDown) {
+                                _createPointColor = m_PLTColor_locked;
+                                //_createPointColor = controlMode == ControlMode.Itemwise ? _itemwiseLockColor : _lockIdleColor;
+                            }
 
-                                if (placementCalculator.segmentState.allItemsValid == false)
-                                {
-                                    RenderBezier(cameraInfo, m_mainBezier, 1.50f, _curveWarningColor, false, true);
-                                }
+                            if (placementCalculator.segmentState.allItemsValid == false) {
+                                RenderBezier(cameraInfo, m_mainBezier, 1.50f, _curveWarningColor, false, true);
+                            }
 
-                                //for the size for these it should be 1/4 the size for renderline
-                                RenderElbow(cameraInfo, m_mainArm1, m_mainArm2, 1.00f, 2f, _createPointColor, false, true);
-                                RenderBezier(cameraInfo, m_mainBezier, 1.00f, _createPointColor, false, true);
+                            //for the size for these it should be 1/4 the size for renderline
+                            RenderElbow(cameraInfo, m_mainArm1, m_mainArm2, 1.00f, 2f, _createPointColor, false, true);
+                            RenderBezier(cameraInfo, m_mainBezier, 1.00f, _createPointColor, false, true);
 
-                                //MaxFillContinue
-                                if (_renderMFC)
-                                {
-                                    RenderMaxFillContinueMarkers(cameraInfo);
-                                }
+                            //MaxFillContinue
+                            if (_renderMFC) {
+                                RenderMaxFillContinueMarkers(cameraInfo);
                             }
                         }
-                        else
-                        {
-                            goto case ActiveState.CreatePointSecond;
-                        }
-                        
-                        //small pinpoint circles
-                        RenderCircle(cameraInfo, this.m_cachedControlPoints[0].m_position, 0.10f, _createPointColor, false, true);
-                        RenderCircle(cameraInfo, this.m_cachedControlPoints[1].m_position, 0.10f, _createPointColor, false, true);
-                        RenderCircle(cameraInfo, this.m_cachedControlPoints[2].m_position, 0.10f, _createPointColor, false, true);
-
-                        break;
+                    } else {
+                        goto case ActiveState.CreatePointSecond;
                     }
-                
+
+                    //small pinpoint circles
+                    RenderCircle(cameraInfo, this.m_cachedControlPoints[0].m_position, 0.10f, _createPointColor, false, true);
+                    RenderCircle(cameraInfo, this.m_cachedControlPoints[1].m_position, 0.10f, _createPointColor, false, true);
+                    RenderCircle(cameraInfo, this.m_cachedControlPoints[2].m_position, 0.10f, _createPointColor, false, true);
+
+                    break;
+                }
+
                 //in lock mode, moving first control point
                 case ActiveState.MovePointFirst:
                 //in lock mode, moving second control point
@@ -7212,388 +5945,307 @@ namespace PropLineTool
                 //in itemwise lock mode, awaiting user input
                 case ActiveState.ItemwiseLock:
                 //in lock mode, moving position of single item
-                case ActiveState.MoveItemwiseItem:
-                    {
-                        bool _hoverSpacing = hoverState == HoverState.SpacingLocus ? true : false;
-                        _lockIdleColor = _hoverSpacing ? _lockIdleColorStrong : _lockIdleColor;
-                        
-                        if (this.m_keyboardAltDown)
-                        {
-                            _mainCurveColor = _copyPlaceColor;
+                case ActiveState.MoveItemwiseItem: {
+                    bool _hoverSpacing = hoverState == HoverState.SpacingLocus ? true : false;
+                    _lockIdleColor = _hoverSpacing ? _lockIdleColorStrong : _lockIdleColor;
+
+                    if (this.m_keyboardAltDown) {
+                        _mainCurveColor = _copyPlaceColor;
+                    } else {
+                        //MaxFillContinue
+                        if ((activeState == ActiveState.LockIdle || activeState == ActiveState.MaxFillContinue) && _renderMFC) {
+                            RenderMaxFillContinueMarkers(cameraInfo);
                         }
-                        else
-                        {
-                            //MaxFillContinue
-                            if ((activeState == ActiveState.LockIdle || activeState == ActiveState.MaxFillContinue) && _renderMFC)
-                            {
-                                RenderMaxFillContinueMarkers(cameraInfo);
+
+                        if (this.m_keyboardCtrlDown) {
+                            //_mainCurveColor = m_PLTColor_default;
+                            if (controlMode == ControlMode.Itemwise) {
+                                if (activeState == ActiveState.ItemwiseLock) {
+                                    _mainCurveColor = _lockIdleColor;
+                                } else if (activeState == ActiveState.LockIdle) {
+                                    _mainCurveColor = _itemwiseLockColor;
+                                }
+                            } else //not in itemwise mode
+                              {
+                                _mainCurveColor = _createPointColor;
+                            }
+                        } else {
+                            if (controlMode == ControlMode.Itemwise) {
+                                if (activeState == ActiveState.ItemwiseLock) {
+                                    _mainCurveColor = _itemwiseLockColor;
+                                } else if (activeState == ActiveState.LockIdle) {
+                                    _mainCurveColor = _lockIdleColor;
+                                }
+                            } else //not in itemwise mode
+                              {
+                                _mainCurveColor = _lockIdleColor;
+
+                                ////MaxFillContinue
+                                //if (activeState == ActiveState.LockIdle && _renderMFC)
+                                //{
+                                //    RenderMaxFillContinueMarkers(cameraInfo);
+                                //}
                             }
 
-                            if (this.m_keyboardCtrlDown)
-                            {
-                                //_mainCurveColor = m_PLTColor_default;
-                                if (controlMode == ControlMode.Itemwise)
-                                {
-                                    if (activeState == ActiveState.ItemwiseLock)
-                                    {
-                                        _mainCurveColor = _lockIdleColor;
-                                    }
-                                    else if (activeState == ActiveState.LockIdle)
-                                    {
-                                        _mainCurveColor = _itemwiseLockColor;
-                                    }
-                                }
-                                else //not in itemwise mode
-                                {
-                                    _mainCurveColor = _createPointColor;
-                                }
+                            //show adjustment circles
+                            RenderHoverObjectOverlays(cameraInfo);
+                            if (hoverState == HoverState.Curve && activeState == ActiveState.LockIdle) {
+                                Color32 _curveColor = m_keyboardAltDown == true ? m_PLTColor_copyPlaceHighlight : m_PLTColor_lockedHighlight;
+                                _mainCurveColor = _curveColor;
                             }
-                            else
-                            {
-                                if (controlMode == ControlMode.Itemwise)
-                                {
-                                    if (activeState == ActiveState.ItemwiseLock)
-                                    {
-                                        _mainCurveColor = _itemwiseLockColor;
-                                    }
-                                    else if (activeState == ActiveState.LockIdle)
-                                    {
-                                        _mainCurveColor = _lockIdleColor;
-                                    }
+                        }
+                    }
+
+                    switch (drawMode) {
+                        case DrawMode.Straight: {
+                            RenderSegment(cameraInfo, m_mainSegment, 1.00f, 0f, _mainCurveColor, false, false);
+
+                            if (placementCalculator.segmentState.allItemsValid == false) {
+                                RenderSegment(cameraInfo, m_mainSegment, 1.50f, 0f, _curveWarningColor, false, true);
+                            }
+                            break;
+                        }
+                        case DrawMode.Curved:
+                        case DrawMode.Freeform: {
+                            RenderElbow(cameraInfo, m_mainArm1, m_mainArm2, 1.00f, 2f, _lockIdleColor, false, true);
+                            //RenderBezier(cameraInfo, m_mainBezier, 1.00f, _mainCurveColor, false, false);
+                            if (_hoverSpacing) {
+                                RenderBezier(cameraInfo, m_mainBezier, 1.00f, _mainCurveColor, false, true);
+                            } else {
+                                RenderBezier(cameraInfo, m_mainBezier, 1.00f, _mainCurveColor, false, false);
+                            }
+
+
+                            if (placementCalculator.segmentState.allItemsValid == false) {
+                                RenderBezier(cameraInfo, m_mainBezier, 1.50f, _curveWarningColor, false, true);
+                            }
+                            break;
+                        }
+                        case DrawMode.Circle: {
+                            RenderMainCircle(cameraInfo, m_mainCircle, 1.00f, _mainCurveColor, false, true);
+
+                            if (placementCalculator.segmentState.allItemsValid == false) {
+                                RenderMainCircle(cameraInfo, m_mainCircle, 1.50f, _curveWarningColor, false, true);
+                            }
+                            break;
+                        }
+                        default: {
+                            //do nothing
+                            break;
+                        }
+                    }
+
+                    //small pinpoint circles
+                    RenderCircle(cameraInfo, this.m_cachedControlPoints[0].m_position, 0.10f, _lockIdleColor, false, true);
+                    RenderCircle(cameraInfo, this.m_cachedControlPoints[1].m_position, 0.10f, _lockIdleColor, false, true);
+                    RenderCircle(cameraInfo, this.m_cachedControlPoints[2].m_position, 0.10f, _lockIdleColor, false, true);
+
+                    break;
+                }
+                case ActiveState.MaxFillContinue: {
+                    switch (drawMode) {
+                        case DrawMode.Straight:
+                        case DrawMode.Circle: {
+                            if (this.m_cachedControlPoints[1].m_direction != Vector3.zero) {
+                                //MaxFillContinue
+                                if (_renderMFC) {
+                                    RenderMaxFillContinueMarkers(cameraInfo);
                                 }
-                                else //not in itemwise mode
-                                {
-                                    _mainCurveColor = _lockIdleColor;
+
+                                if (this.m_keyboardAltDown) {
+                                    _createPointColor = _copyPlaceColor; ;
+                                } else if (this.m_keyboardCtrlDown) {
+                                    _createPointColor = _lockIdleColor;
+                                    //_createPointColor = controlMode == ControlMode.Itemwise ? _itemwiseLockColor : _lockIdleColor;
+                                } else {
+                                    //nah
+                                    //instead we will use play/pause markers...
+                                    //_createPointColor = _maxFillContinueColor;
 
                                     ////MaxFillContinue
-                                    //if (activeState == ActiveState.LockIdle && _renderMFC)
+                                    //if (_renderMFC)
                                     //{
                                     //    RenderMaxFillContinueMarkers(cameraInfo);
                                     //}
                                 }
 
-                                //show adjustment circles
-                                RenderHoverObjectOverlays(cameraInfo);
-                                if (hoverState == HoverState.Curve && activeState == ActiveState.LockIdle)
-                                {
-                                    Color32 _curveColor = m_keyboardAltDown == true ? m_PLTColor_copyPlaceHighlight : m_PLTColor_lockedHighlight;
-                                    _mainCurveColor = _curveColor;
+                                switch (drawMode) {
+                                    case DrawMode.Straight: {
+                                        if (placementCalculator.segmentState.allItemsValid == false) {
+                                            RenderSegment(cameraInfo, m_mainSegment, 1.50f, 0f, _curveWarningColor, false, true);
+                                        }
+
+                                        RenderSegment(cameraInfo, m_mainSegment, 1.00f, 0f, _createPointColor, false, true);
+                                        break;
+                                    }
+                                    case DrawMode.Circle: {
+                                        if (placementCalculator.segmentState.allItemsValid == false) {
+                                            RenderMainCircle(cameraInfo, m_mainCircle, 1.50f, _curveWarningColor, false, true);
+                                        }
+
+                                        RenderMainCircle(cameraInfo, m_mainCircle, 1.00f, _createPointColor, false, true);
+                                        break;
+                                    }
+                                    default: {
+                                        //do nothing
+                                        break;
+                                    }
                                 }
+
                             }
+
+                            //small pinpoint circles
+                            RenderCircle(cameraInfo, this.m_cachedControlPoints[0].m_position, 0.10f, _createPointColor, false, true);
+                            RenderCircle(cameraInfo, this.m_cachedControlPoints[1].m_position, 0.10f, _createPointColor, false, true);
+
+                            break;
                         }
+                        case DrawMode.Curved:
+                        case DrawMode.Freeform: {
+                            if (true || this.m_cachedControlPoints[2].m_direction != Vector3.zero) {
+                                if (this.m_keyboardAltDown) {
+                                    _createPointColor = _copyPlaceColor;
+                                } else if (this.m_keyboardCtrlDown) {
+                                    _createPointColor = _lockIdleColor;
+                                    //_createPointColor = controlMode == ControlMode.Itemwise ? _itemwiseLockColor : _lockIdleColor;
+                                } else {
+                                    //use markers instead
+                                    //_createPointColor = _maxFillContinueColor;
 
-                        switch (drawMode)
-                        {
-                            case DrawMode.Straight:
-                                {
-                                    RenderSegment(cameraInfo, m_mainSegment, 1.00f, 0f, _mainCurveColor, false, false);
-
-                                    if (placementCalculator.segmentState.allItemsValid == false)
-                                    {
-                                        RenderSegment(cameraInfo, m_mainSegment, 1.50f, 0f, _curveWarningColor, false, true);
+                                    //MaxFillContinue
+                                    if (_renderMFC) {
+                                        RenderMaxFillContinueMarkers(cameraInfo);
                                     }
-                                    break; 
                                 }
-                            case DrawMode.Curved:
-                            case DrawMode.Freeform:
-                                {
-                                    RenderElbow(cameraInfo, m_mainArm1, m_mainArm2, 1.00f, 2f, _lockIdleColor, false, true);
-                                    //RenderBezier(cameraInfo, m_mainBezier, 1.00f, _mainCurveColor, false, false);
-                                    if (_hoverSpacing)
-                                    {
-                                        RenderBezier(cameraInfo, m_mainBezier, 1.00f, _mainCurveColor, false, true);
-                                    }
-                                    else
-                                    {
-                                        RenderBezier(cameraInfo, m_mainBezier, 1.00f, _mainCurveColor, false, false);
-                                    }
 
+                                if (placementCalculator.segmentState.allItemsValid == false) {
+                                    RenderBezier(cameraInfo, m_mainBezier, 1.50f, _curveWarningColor, false, true);
+                                }
 
-                                    if (placementCalculator.segmentState.allItemsValid == false)
-                                    {
-                                        RenderBezier(cameraInfo, m_mainBezier, 1.50f, _curveWarningColor, false, true);
-                                    }
-                                    break;
-                                }
-                            case DrawMode.Circle:
-                                {
-                                    RenderMainCircle(cameraInfo, m_mainCircle, 1.00f, _mainCurveColor, false, true);
+                                //for the size for these it should be 1/4 the size for renderline
+                                RenderElbow(cameraInfo, m_mainArm1, m_mainArm2, 1.00f, 2f, _createPointColor, false, true);
+                                RenderBezier(cameraInfo, m_mainBezier, 1.00f, _createPointColor, false, true);
+                            }
 
-                                    if (placementCalculator.segmentState.allItemsValid == false)
-                                    {
-                                        RenderMainCircle(cameraInfo, m_mainCircle, 1.50f, _curveWarningColor, false, true);
-                                    }
-                                    break;
-                                }
-                            default:
-                                {
-                                    //do nothing
-                                    break;
-                                }
+                            //small pinpoint circles
+                            RenderCircle(cameraInfo, this.m_cachedControlPoints[0].m_position, 0.10f, _createPointColor, false, true);
+                            RenderCircle(cameraInfo, this.m_cachedControlPoints[1].m_position, 0.10f, _createPointColor, false, true);
+                            RenderCircle(cameraInfo, this.m_cachedControlPoints[2].m_position, 0.10f, _createPointColor, false, true);
+
+                            break;
                         }
-                        
-                        //small pinpoint circles
-                        RenderCircle(cameraInfo, this.m_cachedControlPoints[0].m_position, 0.10f, _lockIdleColor, false, true);
-                        RenderCircle(cameraInfo, this.m_cachedControlPoints[1].m_position, 0.10f, _lockIdleColor, false, true);
-                        RenderCircle(cameraInfo, this.m_cachedControlPoints[2].m_position, 0.10f, _lockIdleColor, false, true);
-                        
-                        break;
+                        default: {
+                            //do nothing
+                            break;
+                        }
                     }
-                case ActiveState.MaxFillContinue:
-                    {
-                        switch (drawMode)
-                        {
-                            case DrawMode.Straight:
-                            case DrawMode.Circle:
-                                {
-                                    if (this.m_cachedControlPoints[1].m_direction != Vector3.zero)
-                                    {
-                                        //MaxFillContinue
-                                        if (_renderMFC)
-                                        {
-                                            RenderMaxFillContinueMarkers(cameraInfo);
-                                        }
-
-                                        if (this.m_keyboardAltDown)
-                                        {
-                                            _createPointColor = _copyPlaceColor; ;
-                                        }
-                                        else if (this.m_keyboardCtrlDown)
-                                        {
-                                            _createPointColor = _lockIdleColor;
-                                            //_createPointColor = controlMode == ControlMode.Itemwise ? _itemwiseLockColor : _lockIdleColor;
-                                        }
-                                        else
-                                        {
-                                            //nah
-                                            //instead we will use play/pause markers...
-                                            //_createPointColor = _maxFillContinueColor;
-
-                                            ////MaxFillContinue
-                                            //if (_renderMFC)
-                                            //{
-                                            //    RenderMaxFillContinueMarkers(cameraInfo);
-                                            //}
-                                        }
-
-                                        switch (drawMode)
-                                        {
-                                            case DrawMode.Straight:
-                                                {
-                                                    if (placementCalculator.segmentState.allItemsValid == false)
-                                                    {
-                                                        RenderSegment(cameraInfo, m_mainSegment, 1.50f, 0f, _curveWarningColor, false, true);
-                                                    }
-
-                                                    RenderSegment(cameraInfo, m_mainSegment, 1.00f, 0f, _createPointColor, false, true);
-                                                    break;
-                                                }
-                                            case DrawMode.Circle:
-                                                {
-                                                    if (placementCalculator.segmentState.allItemsValid == false)
-                                                    {
-                                                        RenderMainCircle(cameraInfo, m_mainCircle, 1.50f, _curveWarningColor, false, true);
-                                                    }
-
-                                                    RenderMainCircle(cameraInfo, m_mainCircle, 1.00f, _createPointColor, false, true);
-                                                    break;
-                                                }
-                                            default:
-                                                {
-                                                    //do nothing
-                                                    break;
-                                                }
-                                        }
-
-                                    }
-
-                                    //small pinpoint circles
-                                    RenderCircle(cameraInfo, this.m_cachedControlPoints[0].m_position, 0.10f, _createPointColor, false, true);
-                                    RenderCircle(cameraInfo, this.m_cachedControlPoints[1].m_position, 0.10f, _createPointColor, false, true);
-
-                                    break;
-                                }
-                            case DrawMode.Curved:
-                            case DrawMode.Freeform:
-                                {
-                                    if (true || this.m_cachedControlPoints[2].m_direction != Vector3.zero)
-                                    {
-                                        if (this.m_keyboardAltDown)
-                                        {
-                                            _createPointColor = _copyPlaceColor;
-                                        }
-                                        else if (this.m_keyboardCtrlDown)
-                                        {
-                                            _createPointColor = _lockIdleColor;
-                                            //_createPointColor = controlMode == ControlMode.Itemwise ? _itemwiseLockColor : _lockIdleColor;
-                                        }
-                                        else
-                                        {
-                                            //use markers instead
-                                            //_createPointColor = _maxFillContinueColor;
-
-                                            //MaxFillContinue
-                                            if (_renderMFC)
-                                            {
-                                                RenderMaxFillContinueMarkers(cameraInfo);
-                                            }
-                                        }
-
-                                        if (placementCalculator.segmentState.allItemsValid == false)
-                                        {
-                                            RenderBezier(cameraInfo, m_mainBezier, 1.50f, _curveWarningColor, false, true);
-                                        }
-
-                                        //for the size for these it should be 1/4 the size for renderline
-                                        RenderElbow(cameraInfo, m_mainArm1, m_mainArm2, 1.00f, 2f, _createPointColor, false, true);
-                                        RenderBezier(cameraInfo, m_mainBezier, 1.00f, _createPointColor, false, true);
-                                    }
-
-                                    //small pinpoint circles
-                                    RenderCircle(cameraInfo, this.m_cachedControlPoints[0].m_position, 0.10f, _createPointColor, false, true);
-                                    RenderCircle(cameraInfo, this.m_cachedControlPoints[1].m_position, 0.10f, _createPointColor, false, true);
-                                    RenderCircle(cameraInfo, this.m_cachedControlPoints[2].m_position, 0.10f, _createPointColor, false, true);
-
-                                    break; 
-                                }
-                            default:
-                                {
-                                    //do nothing
-                                    break; 
-                                }
-                        }
-                        break;
-                    }
+                    break;
+                }
                 //out of bounds
-                default:
-                    {
-                        //Debug.LogError("[PLT]: RenderOverlay(): Active state does not match a case!");
-                        break;
-                    }
-            }
-
-            if (userSettingsControlPanel.showErrorGuides == true)
-            {
-                RenderPlacementErrorOverlays(cameraInfo);
-            }
-            
-            bool _debugRenderItemPositionPoints = false;
-            if (_debugRenderItemPositionPoints || m_debugRenderOverlayItemPoints)
-            {
-                //DEBUG/TESTING ONLY
-                switch (activeState)
-                {
-                    case ActiveState.Undefined:
-                    case ActiveState.CreatePointFirst:
-                        {
-                            break;
-                        }
-                    default:
-                        {
-                            switch (drawMode)
-                            {
-                                case DrawMode.Straight:
-                                case DrawMode.Circle:
-                                    {
-                                        if (activeState == ActiveState.CreatePointSecond || activeState == ActiveState.LockIdle)
-                                        {
-                                            for (int i = 0; i < placementCalculator.GetItemCountActual(); i++)
-                                            {
-                                                RenderCircle(cameraInfo, m_placementInfo[i].position, 1.5f, m_PLTColor_default, false, false);
-                                                RenderCircle(cameraInfo, m_placementInfo[i].position, 0.1f, m_PLTColor_default, false, true);
-                                            }
-                                            if (fenceMode == true)
-                                            {
-                                                for (int i = 0; i < placementCalculator.GetItemCountActual() + 1; i++)
-                                                {
-                                                    RenderCircle(cameraInfo, m_fenceEndPoints[i], 0.1f, m_PLTColor_copyPlaceHighlight, false, false);
-                                                }
-                                            }
-                                        }
-                                        break;
-                                    }
-                                case DrawMode.Curved:
-                                case DrawMode.Freeform:
-                                    {
-                                        if (activeState == ActiveState.CreatePointThird || activeState == ActiveState.LockIdle)
-                                        {
-                                            for (int i = 0; i < placementCalculator.GetItemCountActual(); i++)
-                                            {
-                                                RenderCircle(cameraInfo, m_placementInfo[i].position, 1.5f, m_PLTColor_default, false, false);
-                                                RenderCircle(cameraInfo, m_placementInfo[i].position, 0.1f, m_PLTColor_default, false, true);
-                                            }
-                                            if (fenceMode == true)
-                                            {
-                                                for (int i = 0; i < placementCalculator.GetItemCountActual() + 1; i++)
-                                                {
-                                                    RenderCircle(cameraInfo, m_fenceEndPoints[i], 0.1f, m_PLTColor_copyPlaceHighlight, false, true);
-                                                }
-                                            }
-                                        }
-                                        break;
-                                    }
-                                default:
-                                    {
-                                        break;
-                                    }
-                            }
-                            break;
-                        }
+                default: {
+                    //Debug.LogError("[PLT]: RenderOverlay(): Active state does not match a case!");
+                    break;
                 }
             }
-            
+
+            if (userSettingsControlPanel.showErrorGuides == true) {
+                RenderPlacementErrorOverlays(cameraInfo);
+            }
+
+            bool _debugRenderItemPositionPoints = false;
+            if (_debugRenderItemPositionPoints || m_debugRenderOverlayItemPoints) {
+                //DEBUG/TESTING ONLY
+                switch (activeState) {
+                    case ActiveState.Undefined:
+                    case ActiveState.CreatePointFirst: {
+                        break;
+                    }
+                    default: {
+                        switch (drawMode) {
+                            case DrawMode.Straight:
+                            case DrawMode.Circle: {
+                                if (activeState == ActiveState.CreatePointSecond || activeState == ActiveState.LockIdle) {
+                                    for (int i = 0; i < placementCalculator.GetItemCountActual(); i++) {
+                                        RenderCircle(cameraInfo, m_placementInfo[i].position, 1.5f, m_PLTColor_default, false, false);
+                                        RenderCircle(cameraInfo, m_placementInfo[i].position, 0.1f, m_PLTColor_default, false, true);
+                                    }
+                                    if (fenceMode == true) {
+                                        for (int i = 0; i < placementCalculator.GetItemCountActual() + 1; i++) {
+                                            RenderCircle(cameraInfo, m_fenceEndPoints[i], 0.1f, m_PLTColor_copyPlaceHighlight, false, false);
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                            case DrawMode.Curved:
+                            case DrawMode.Freeform: {
+                                if (activeState == ActiveState.CreatePointThird || activeState == ActiveState.LockIdle) {
+                                    for (int i = 0; i < placementCalculator.GetItemCountActual(); i++) {
+                                        RenderCircle(cameraInfo, m_placementInfo[i].position, 1.5f, m_PLTColor_default, false, false);
+                                        RenderCircle(cameraInfo, m_placementInfo[i].position, 0.1f, m_PLTColor_default, false, true);
+                                    }
+                                    if (fenceMode == true) {
+                                        for (int i = 0; i < placementCalculator.GetItemCountActual() + 1; i++) {
+                                            RenderCircle(cameraInfo, m_fenceEndPoints[i], 0.1f, m_PLTColor_copyPlaceHighlight, false, true);
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                            default: {
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+
 
 
             //end RenderOverlay()
         }
 
-        public static void RenderCircle(RenderManager.CameraInfo cameraInfo, Vector3 position, float size, Color color, bool renderLimits, bool alphaBlend)
-        {
+        public static void RenderCircle(RenderManager.CameraInfo cameraInfo, Vector3 position, float size, Color color, bool renderLimits, bool alphaBlend) {
             ToolManager _instance = Singleton<ToolManager>.instance;
-            _instance.m_drawCallData.m_overlayCalls = _instance.m_drawCallData.m_overlayCalls + 1;
+            _instance.m_drawCallData.m_overlayCalls += 1;
             Singleton<RenderManager>.instance.OverlayEffect.DrawCircle(cameraInfo, color, position, size, -1f, 1280f, renderLimits, alphaBlend);
         }
 
-        public static void RenderLine(RenderManager.CameraInfo cameraInfo, Segment3 segment, float size, float dashLength, Color color, bool renderLimits, bool alphaBlend)
-        {
+        public static void RenderLine(RenderManager.CameraInfo cameraInfo, Segment3 segment, float size, float dashLength, Color color, bool renderLimits, bool alphaBlend) {
             ToolManager _instance = Singleton<ToolManager>.instance;
-            _instance.m_drawCallData.m_overlayCalls = _instance.m_drawCallData.m_overlayCalls + 1;
+            _instance.m_drawCallData.m_overlayCalls += 1;
             Singleton<RenderManager>.instance.OverlayEffect.DrawSegment(cameraInfo, color, segment, size, dashLength, -1f, 1280f, renderLimits, alphaBlend);
         }
 
-        public static void RenderSegment(RenderManager.CameraInfo cameraInfo, Segment3 segment, float size, float dashLength, Color color, bool renderLimits, bool alphaBlend)
-        {
+        public static void RenderSegment(RenderManager.CameraInfo cameraInfo, Segment3 segment, float size, float dashLength, Color color, bool renderLimits, bool alphaBlend) {
             ToolManager _instance = Singleton<ToolManager>.instance;
-            _instance.m_drawCallData.m_overlayCalls = _instance.m_drawCallData.m_overlayCalls + 1;
+            _instance.m_drawCallData.m_overlayCalls += 1;
             Singleton<RenderManager>.instance.OverlayEffect.DrawSegment(cameraInfo, color, segment, size, dashLength, -1f, 1280f, renderLimits, alphaBlend);
         }
 
-        public static void RenderElbow(RenderManager.CameraInfo cameraInfo, Segment3 segment1, Segment3 segment2, float size, float dashLength, Color color, bool renderLimits, bool alphaBlend)
-        {
+        public static void RenderElbow(RenderManager.CameraInfo cameraInfo, Segment3 segment1, Segment3 segment2, float size, float dashLength, Color color, bool renderLimits, bool alphaBlend) {
             ToolManager _instance = Singleton<ToolManager>.instance;
-            _instance.m_drawCallData.m_overlayCalls = _instance.m_drawCallData.m_overlayCalls + 1;
+            _instance.m_drawCallData.m_overlayCalls += 1;
             Singleton<RenderManager>.instance.OverlayEffect.DrawSegment(cameraInfo, color, segment1, segment2, size, dashLength, -1f, 1280f, renderLimits, alphaBlend);
         }
 
-        public static void RenderBezier(RenderManager.CameraInfo cameraInfo, Bezier3 bezier, float size, Color color, bool renderLimits, bool alphaBlend)
-        {
+        public static void RenderBezier(RenderManager.CameraInfo cameraInfo, Bezier3 bezier, float size, Color color, bool renderLimits, bool alphaBlend) {
             ToolManager _instance = Singleton<ToolManager>.instance;
-            _instance.m_drawCallData.m_overlayCalls = _instance.m_drawCallData.m_overlayCalls + 1;
+            _instance.m_drawCallData.m_overlayCalls += 1;
             Singleton<RenderManager>.instance.OverlayEffect.DrawBezier(cameraInfo, color, bezier, size, -100000f, 100000f, -1f, 1280f, renderLimits, alphaBlend);
         }
 
-        public static void RenderMainCircle(RenderManager.CameraInfo cameraInfo, Circle3XZ circle, float size, Color color, bool renderLimits, bool alphaBlend)
-        {
+        public static void RenderMainCircle(RenderManager.CameraInfo cameraInfo, Circle3XZ circle, float size, Color color, bool renderLimits, bool alphaBlend) {
             ToolManager _instance = Singleton<ToolManager>.instance;
-            _instance.m_drawCallData.m_overlayCalls = _instance.m_drawCallData.m_overlayCalls + 2;
+            _instance.m_drawCallData.m_overlayCalls += 2;
 
             //circle
             Singleton<RenderManager>.instance.OverlayEffect.DrawCircle(cameraInfo, color, circle.center, circle.diameter + size, -1f, 1280f, renderLimits, alphaBlend);
             Singleton<RenderManager>.instance.OverlayEffect.DrawCircle(cameraInfo, color, circle.center, circle.diameter - size, -1f, 1280f, renderLimits, alphaBlend);
 
             //orienting line
-            if (circle.radius > 0f)
-            {
+            if (circle.radius > 0f) {
                 Color _lineColor = color;
                 _lineColor.a *= 0.85f;
                 RenderLine(cameraInfo, new Segment3(circle.center, circle.Position(0f)), 0.05f, 1.00f, color, false, true);
@@ -7605,10 +6257,8 @@ namespace PropLineTool
         /// </summary>
         /// <param name="t"></param>
         /// <param name="interval">How far apart to space the small circles.</param>
-        public static void RenderProgressiveSpacingFill(RenderManager.CameraInfo cameraInfo, float fillLength, float interval, float size, Color color, bool renderLimits, bool alphaBlend)
-        {
-            if (fenceMode)
-            {
+        public static void RenderProgressiveSpacingFill(RenderManager.CameraInfo cameraInfo, float fillLength, float interval, float size, Color color, bool renderLimits, bool alphaBlend) {
+            if (fenceMode) {
                 return;
             }
 
@@ -7617,97 +6267,89 @@ namespace PropLineTool
             float _deltaT = 0f;
             int _numItems = Mathf.Clamp(Mathf.CeilToInt(fillLength / interval), 0, 262144);
 
-            switch (drawMode)
-            {
-                case DrawMode.Straight:
-                    {
-                        float _speed = MathPLT.LinearSpeedXZ(m_mainSegment);
-                        _deltaT = fillLength / _speed;
+            switch (drawMode) {
+                case DrawMode.Straight: {
+                    float _speed = MathPLT.LinearSpeedXZ(m_mainSegment);
+                    _deltaT = fillLength / _speed;
 
-                        float _firstItemT = m_placementInfo[0].t;
-                        float _tFill = _firstItemT + _deltaT;
+                    float _firstItemT = m_placementInfo[0].t;
+                    float _tFill = _firstItemT + _deltaT;
 
-                        Segment3 _fillSegment = m_mainSegment;
+                    Segment3 _fillSegment = m_mainSegment;
 
-                        _fillSegment = _fillSegment.Cut(_firstItemT, _tFill);
+                    _fillSegment = _fillSegment.Cut(_firstItemT, _tFill);
 
-                        Color _color = new Color(color.r, color.g, color.b, 0.75f * color.a);
-                        RenderSegment(cameraInfo, _fillSegment, size, 0f, _color, renderLimits, alphaBlend);
+                    Color _color = new Color(color.r, color.g, color.b, 0.75f * color.a);
+                    RenderSegment(cameraInfo, _fillSegment, size, 0f, _color, renderLimits, alphaBlend);
 
-                        break; 
-                    }
+                    break;
+                }
                 case DrawMode.Curved:
-                case DrawMode.Freeform:
-                    {
-                        Bezier3 _fillBezier = m_mainBezier;
+                case DrawMode.Freeform: {
+                    Bezier3 _fillBezier = m_mainBezier;
 
-                        //original bezier fill
-                        float _firstItemT = m_placementInfo[0].t;
-                        float _tFill = _firstItemT;
-                        MathPLT.StepDistanceCurve(m_mainBezier, _firstItemT, fillLength, placementCalculator.tolerance, out _tFill);
-                        _fillBezier = _fillBezier.Cut(_firstItemT, _tFill);
-                        //RenderBezier(cameraInfo, _fillBezier, size, color, renderLimits, alphaBlend);
-                        Color _color = new Color(color.r, color.g, color.b, 0.75f * color.a);
-                        RenderBezier(cameraInfo, _fillBezier, size, _color, renderLimits, true);
+                    //original bezier fill
+                    float _firstItemT = m_placementInfo[0].t;
+                    float _tFill = _firstItemT;
+                    MathPLT.StepDistanceCurve(m_mainBezier, _firstItemT, fillLength, placementCalculator.tolerance, out _tFill);
+                    _fillBezier = _fillBezier.Cut(_firstItemT, _tFill);
+                    //RenderBezier(cameraInfo, _fillBezier, size, color, renderLimits, alphaBlend);
+                    Color _color = new Color(color.r, color.g, color.b, 0.75f * color.a);
+                    RenderBezier(cameraInfo, _fillBezier, size, _color, renderLimits, true);
 
-                        //new circle fill
-                        //float _firstItemT = m_placementInfo[0].t;
-                        //Vector3 _position = m_mainBezier.a;
-                        //float _t = _firstItemT;
-                        //for (int i = 0; i < _numItems; i++)
-                        //{
-                        //    _position = m_mainBezier.Position(_t);
+                    //new circle fill
+                    //float _firstItemT = m_placementInfo[0].t;
+                    //Vector3 _position = m_mainBezier.a;
+                    //float _t = _firstItemT;
+                    //for (int i = 0; i < _numItems; i++)
+                    //{
+                    //    _position = m_mainBezier.Position(_t);
 
-                        //    RenderCircle(cameraInfo, _position, size, color, renderLimits, alphaBlend);
+                    //    RenderCircle(cameraInfo, _position, size, color, renderLimits, alphaBlend);
 
-                        //    MathPLT.StepDistanceCurve(m_mainBezier, _t, interval, placementCalculator.tolerance, out _t);
-                        //}
+                    //    MathPLT.StepDistanceCurve(m_mainBezier, _t, interval, placementCalculator.tolerance, out _t);
+                    //}
 
-                        break;
-                    }
-                case DrawMode.Circle:
-                    {
-                        if (m_mainCircle.radius <= 0f)
-                        {
-                            return;
-                        }
-                        
-                        _deltaT = interval / m_mainCircle.circumference;
-
-                        Quaternion _rotation = Quaternion.AngleAxis(_deltaT * -360f, Vector3.up);
-                        Vector3 _position = m_mainCircle.Position(0f);
-                        Vector3 _center = m_mainCircle.center;
-                        Vector3 _radiusVector = _position - _center;
-
-                        for (int i = 0; i < _numItems; i++)
-                        {
-                            RenderCircle(cameraInfo, _position, size, color, renderLimits, alphaBlend);
-
-                            _radiusVector = _rotation * _radiusVector;
-                            _position = _center + _radiusVector;
-                        }
-                        break;
-                    }
-                default:
-                    {
+                    break;
+                }
+                case DrawMode.Circle: {
+                    if (m_mainCircle.radius <= 0f) {
                         return;
                     }
+
+                    _deltaT = interval / m_mainCircle.circumference;
+
+                    Quaternion _rotation = Quaternion.AngleAxis(_deltaT * -360f, Vector3.up);
+                    Vector3 _position = m_mainCircle.Position(0f);
+                    Vector3 _center = m_mainCircle.center;
+                    Vector3 _radiusVector = _position - _center;
+
+                    for (int i = 0; i < _numItems; i++) {
+                        RenderCircle(cameraInfo, _position, size, color, renderLimits, alphaBlend);
+
+                        _radiusVector = _rotation * _radiusVector;
+                        _position = _center + _radiusVector;
+                    }
+                    break;
+                }
+                default: {
+                    return;
+                }
             }
         }
 
-        public static void RenderFilledCircle(RenderManager.CameraInfo cameraInfo, Vector3 position, float size, Color color, float dashLength, bool renderLimits, bool alphaBlend)
-        {
-            Segment3 _segment = new Segment3();
-            _segment.a = position;
-            _segment.b = position;
+        public static void RenderFilledCircle(RenderManager.CameraInfo cameraInfo, Vector3 position, float size, Color color, float dashLength, bool renderLimits, bool alphaBlend) {
+            Segment3 _segment = new Segment3 {
+                a = position,
+                b = position
+            };
 
             ToolManager _instance = Singleton<ToolManager>.instance;
-            _instance.m_drawCallData.m_overlayCalls = _instance.m_drawCallData.m_overlayCalls + 1;
+            _instance.m_drawCallData.m_overlayCalls += 1;
             Singleton<RenderManager>.instance.OverlayEffect.DrawSegment(cameraInfo, color, _segment, size, dashLength, -1f, 1280f, renderLimits, alphaBlend);
         }
-        
-        public override void SimulationStep()
-        {
+
+        public override void SimulationStep() {
             this.m_treeInfo = this.treePrefab;
             this.m_propInfo = this.propPrefab;
 
@@ -7715,98 +6357,81 @@ namespace PropLineTool
             //test if prefabs are all null then return
             bool _flag_propPrefabNull = (this.propPrefab == null);
             bool _flag_treePrefabNull = (this.treePrefab == null);
-            
-            if (_flag_propPrefabNull)
-            {
-                    this.m_wasPropPrefab = null;
-                    this.m_propInfo = null;
+
+            if (_flag_propPrefabNull) {
+                this.m_wasPropPrefab = null;
+                this.m_propInfo = null;
             }
-            if (_flag_treePrefabNull)
-            {
-                    this.m_wasTreePrefab = null;
-                    this.m_treeInfo = null;
+            if (_flag_treePrefabNull) {
+                this.m_wasTreePrefab = null;
+                this.m_treeInfo = null;
             }
-            
-            if (_flag_propPrefabNull && _flag_treePrefabNull)
-            {
+
+            if (_flag_propPrefabNull && _flag_treePrefabNull) {
                 return;
             }
 
-            if ((this.m_treeInfo == null) || (this.m_wasTreePrefab != this.treePrefab))
-            {
+            if ((this.m_treeInfo == null) || (this.m_wasTreePrefab != this.treePrefab)) {
                 this.m_wasTreePrefab = this.treePrefab;
 
                 //custom
                 this.m_treeInfo = this.treePrefab;
-                
+
             }
-            if ((this.m_propInfo == null) || (this.m_wasPropPrefab != this.propPrefab))
-            {
+            if ((this.m_propInfo == null) || (this.m_wasPropPrefab != this.propPrefab)) {
                 this.m_wasPropPrefab = this.propPrefab;
 
                 //custom
                 this.m_propInfo = this.propPrefab;
-                
+
             }
-            
+
 
             ToolBase.RaycastInput input = new ToolBase.RaycastInput(this.m_mouseRay, this.m_mouseRayLength);
-            try
-            {
+            try {
                 ToolBase.RaycastOutput raycastOutput;
-                if (this.m_mouseRayValid && ToolBase.RayCast(input, out raycastOutput))
-                {
+                if (this.m_mouseRayValid && ToolBase.RayCast(input, out raycastOutput)) {
 
                     //check here for tool mode
-                    if (true)
-                    {
-                        if (!raycastOutput.m_currentEditObject)
-                        {
-                            
+                    if (true) {
+                        if (!raycastOutput.m_currentEditObject) {
+
                             this.m_mousePosition = raycastOutput.m_hitPos;
                         }
                     }
 
                 }
             }
-            finally
-            {
+            finally {
                 //there was an EndColliding() here, but it cause a "Space already occupied!" bug...
                 //We're not gonna use it after all. It had no function in PLT.
             }
 
-            while (!Monitor.TryEnter(this.m_cacheLock, SimulationManager.SYNCHRONIZE_TIMEOUT))
-            {
+            while (!Monitor.TryEnter(this.m_cacheLock, SimulationManager.SYNCHRONIZE_TIMEOUT)) {
             }
-            try
-            {
+            try {
                 //these are from NetTool
                 //this.m_buildErrors = toolErrors;
                 //this.m_constructionCost = ((!flag6) ? 0 : num17);
                 //this.m_productionRate = productionRate;
             }
-            finally
-            {
+            finally {
                 Monitor.Exit(this.m_cacheLock);
             }
 
         }
 
-        private bool TryRaycast(out Vector3 hitPosition)
-        {
+        private bool TryRaycast(out Vector3 hitPosition) {
             bool result = false;
-            
+
             hitPosition = Vector3.zero;
 
             ToolBase.RaycastInput input = new ToolBase.RaycastInput(this.m_mouseRay, this.m_mouseRayLength);
-            try
-            {
+            try {
                 ToolBase.RaycastOutput raycastOutput;
-                if (this.m_mouseRayValid && ToolBase.RayCast(input, out raycastOutput))
-                {
+                if (this.m_mouseRayValid && ToolBase.RayCast(input, out raycastOutput)) {
 
-                    if (!raycastOutput.m_currentEditObject)
-                    {
+                    if (!raycastOutput.m_currentEditObject) {
                         result = true;
                         hitPosition = raycastOutput.m_hitPos;
 
@@ -7814,312 +6439,267 @@ namespace PropLineTool
 
                 }
             }
-            finally
-            {
+            finally {
                 //there was an EndColliding() here, but it cause a "Space already occupied!" bug...
                 //We're not gonna use it after all. It had no function in PLT.
             }
             return result;
         }
 
-        private void UpdateMiscHoverParameters()
-        {
+        private void UpdateMiscHoverParameters() {
             int _offset = fenceMode == true ? 0 : 1;
-            if (placementCalculator.GetItemCountActual() < (1 + _offset))
-            {
-                if (controlMode != ControlMode.Itemwise)
-                {
+            if (placementCalculator.GetItemCountActual() < (1 + _offset)) {
+                if (controlMode != ControlMode.Itemwise) {
                     return;
                 }
             }
 
-            switch (activeState)
-            {
-                case ActiveState.MoveSegment:
-                    {
-                        Vector3 _translation = m_cachedPosition - lockBackupCachedPosition;
+            switch (activeState) {
+                case ActiveState.MoveSegment: {
+                    Vector3 _translation = m_cachedPosition - lockBackupCachedPosition;
 
-                        for (int i = 0; i < m_controlPoints.Length; i++)
-                        {
-                            m_controlPoints[i].m_position = lockBackupControlPoints[i].m_position + _translation;
-                        }
-
-                        UpdateCachedControlPoints();
-                        UpdateCurves();
-                        
-                        placementCalculator.UpdateItemPlacementInfo();
-
-                        break;
+                    for (int i = 0; i < m_controlPoints.Length; i++) {
+                        m_controlPoints[i].m_position = lockBackupControlPoints[i].m_position + _translation;
                     }
-                case ActiveState.ChangeSpacing:
-                    {
-                        switch (drawMode)
-                        {
-                            case DrawMode.Straight:
-                                {
-                                    if (MathPLT.IsCloseToSegmentXZ(m_mainSegment, hoverCurveDistanceThreshold * 8f, m_cachedPosition, out hoverCurveT))
-                                    {
-                                        float _curveT = Mathf.Clamp(hoverCurveT, m_placementInfo[0].t, 0.995f);
-                                        Vector3 _linePosition = MathPLT.LinePosition(m_mainSegment, _curveT);
 
-                                        if (fenceMode == true)
-                                        {
-                                            //since straight fence mode auto snaps to last fence endpoint
-                                            Vector3 _lineZero = MathPLT.LinePosition(m_mainSegment, 0f);
-                                            float _distance = (_linePosition - _lineZero).MagnitudeXZ();
-                                            placementCalculator.spacingSingle = _distance;
-                                        }
-                                        else //non-fence mode
-                                        {
-                                            Vector3 _lineZero = MathPLT.LinePosition(m_mainSegment, m_placementInfo[0].t);
-                                            float _distance = (_linePosition - _lineZero).MagnitudeXZ();
-                                            placementCalculator.spacingSingle = _distance;
-                                        }
+                    UpdateCachedControlPoints();
+                    UpdateCurves();
 
-                                    }
-                                    break;
+                    placementCalculator.UpdateItemPlacementInfo();
+
+                    break;
+                }
+                case ActiveState.ChangeSpacing: {
+                    switch (drawMode) {
+                        case DrawMode.Straight: {
+                            if (MathPLT.IsCloseToSegmentXZ(m_mainSegment, hoverCurveDistanceThreshold * 8f, m_cachedPosition, out hoverCurveT)) {
+                                float _curveT = Mathf.Clamp(hoverCurveT, m_placementInfo[0].t, 0.995f);
+                                Vector3 _linePosition = MathPLT.LinePosition(m_mainSegment, _curveT);
+
+                                if (fenceMode == true) {
+                                    //since straight fence mode auto snaps to last fence endpoint
+                                    Vector3 _lineZero = MathPLT.LinePosition(m_mainSegment, 0f);
+                                    float _distance = (_linePosition - _lineZero).MagnitudeXZ();
+                                    placementCalculator.spacingSingle = _distance;
+                                } else //non-fence mode
+                                  {
+                                    Vector3 _lineZero = MathPLT.LinePosition(m_mainSegment, m_placementInfo[0].t);
+                                    float _distance = (_linePosition - _lineZero).MagnitudeXZ();
+                                    placementCalculator.spacingSingle = _distance;
                                 }
-                            case DrawMode.Curved:
-                            case DrawMode.Freeform:
-                                {
-                                    if (MathPLT.IsCloseToCurveXZ(m_mainBezier, hoverCurveDistanceThreshold * 8f, m_cachedPosition, out hoverCurveT))
-                                    {
-                                        
-                                        float _curveT = Mathf.Clamp(hoverCurveT, m_placementInfo[0].t, 0.995f);
 
-                                        if (fenceMode == true)
-                                        {
-                                            Vector3 _curvePosition = m_mainBezier.Position(_curveT);
-                                            Vector3 _fencePointZero = m_fenceEndPoints[0];
-                                            float _distance = (_curvePosition - _fencePointZero).MagnitudeXZ();
-                                            placementCalculator.spacingSingle = _distance;
-                                        }
-                                        else //non-fence mode
-                                        {
-                                            float _firstItemT = m_placementInfo[0].t;
-                                            placementCalculator.spacingSingle = MathPLT.CubicBezierArcLengthXZGauss12(m_mainBezier, _firstItemT, _curveT);
-                                        }
-
-                                    }
-                                    break;
-                                }
-                            case DrawMode.Circle:
-                                {
-                                    if (MathPLT.IsCloseToCircle3XZ(m_mainCircle, hoverCurveDistanceThreshold * 12f, m_cachedPosition, out hoverCurveT))
-                                    {
-
-                                        //Vector3 _radiusVectorHover = _circlePositionHover - m_mainCircle.center;
-                                        //_radiusVectorHover.y = 0f;
-                                        //Vector3 _radiusVectorZero = m_mainCircle.Position(0f) - m_mainCircle.center;
-                                        //_radiusVectorZero.y = 0f;
-
-                                        Circle3XZ _circle = (userSettingsControlPanel.perfectCircles) ? m_rawCircle : m_mainCircle;
-
-                                        if (fenceMode == true)
-                                        {
-                                            float _curveT = Mathf.Clamp(hoverCurveT, m_placementInfo[0].t, 0.500f);
-                                            Vector3 _circlePositionHover = _circle.Position(_curveT);
-
-                                            Vector3 _circleZero = _circle.Position(0f);
-                                            float _distance = (_circlePositionHover - _circleZero).MagnitudeXZ();
-
-                                            if (userSettingsControlPanel.perfectCircles)
-                                            {
-                                                _distance = Mathf.Clamp(_distance, UserParameters.SPACING_MIN, m_rawCircle.diameter);
-                                            }
-
-                                            placementCalculator.spacingSingle = _distance;
-                                        }
-                                        else //non-fence mode
-                                        {
-                                            float _curveT = Mathf.Clamp(hoverCurveT, m_placementInfo[0].t, 0.995f);
-                                            Vector3 _circlePositionHover = _circle.Position(_curveT);
-
-                                            //float _deltaAlpha = MathPLT.AngleSigned(_radiusVectorHover, _radiusVectorZero, Vector3.up) + Mathf.PI;
-                                            float _deltaAlpha = _circle.AngleBetween(0f, _curveT);
-                                            float _distance = _circle.radius * _deltaAlpha;
-
-                                            if (userSettingsControlPanel.perfectCircles)
-                                            {
-                                                _distance = Mathf.Clamp(_distance, UserParameters.SPACING_MIN, 0.50f * m_mainCircle.circumference);
-                                            }
-
-                                            placementCalculator.spacingSingle = _distance;
-                                        }
-
-                                    }
-                                    break;
-                                }
-                            default:
-                                {
-                                    break;
-                                }
+                            }
+                            break;
                         }
+                        case DrawMode.Curved:
+                        case DrawMode.Freeform: {
+                            if (MathPLT.IsCloseToCurveXZ(m_mainBezier, hoverCurveDistanceThreshold * 8f, m_cachedPosition, out hoverCurveT)) {
 
-                        UpdateCachedControlPoints();
-                        UpdateCurves();
-                        placementCalculator.UpdateItemPlacementInfo(true, true);
+                                float _curveT = Mathf.Clamp(hoverCurveT, m_placementInfo[0].t, 0.995f);
 
-                        break;
+                                if (fenceMode == true) {
+                                    Vector3 _curvePosition = m_mainBezier.Position(_curveT);
+                                    Vector3 _fencePointZero = m_fenceEndPoints[0];
+                                    float _distance = (_curvePosition - _fencePointZero).MagnitudeXZ();
+                                    placementCalculator.spacingSingle = _distance;
+                                } else //non-fence mode
+                                  {
+                                    float _firstItemT = m_placementInfo[0].t;
+                                    placementCalculator.spacingSingle = MathPLT.CubicBezierArcLengthXZGauss12(m_mainBezier, _firstItemT, _curveT);
+                                }
+
+                            }
+                            break;
+                        }
+                        case DrawMode.Circle: {
+                            if (MathPLT.IsCloseToCircle3XZ(m_mainCircle, hoverCurveDistanceThreshold * 12f, m_cachedPosition, out hoverCurveT)) {
+
+                                //Vector3 _radiusVectorHover = _circlePositionHover - m_mainCircle.center;
+                                //_radiusVectorHover.y = 0f;
+                                //Vector3 _radiusVectorZero = m_mainCircle.Position(0f) - m_mainCircle.center;
+                                //_radiusVectorZero.y = 0f;
+
+                                Circle3XZ _circle = (userSettingsControlPanel.perfectCircles) ? m_rawCircle : m_mainCircle;
+
+                                if (fenceMode == true) {
+                                    float _curveT = Mathf.Clamp(hoverCurveT, m_placementInfo[0].t, 0.500f);
+                                    Vector3 _circlePositionHover = _circle.Position(_curveT);
+
+                                    Vector3 _circleZero = _circle.Position(0f);
+                                    float _distance = (_circlePositionHover - _circleZero).MagnitudeXZ();
+
+                                    if (userSettingsControlPanel.perfectCircles) {
+                                        _distance = Mathf.Clamp(_distance, UserParameters.SPACING_MIN, m_rawCircle.diameter);
+                                    }
+
+                                    placementCalculator.spacingSingle = _distance;
+                                } else //non-fence mode
+                                  {
+                                    float _curveT = Mathf.Clamp(hoverCurveT, m_placementInfo[0].t, 0.995f);
+                                    Vector3 _circlePositionHover = _circle.Position(_curveT);
+
+                                    //float _deltaAlpha = MathPLT.AngleSigned(_radiusVectorHover, _radiusVectorZero, Vector3.up) + Mathf.PI;
+                                    float _deltaAlpha = _circle.AngleBetween(0f, _curveT);
+                                    float _distance = _circle.radius * _deltaAlpha;
+
+                                    if (userSettingsControlPanel.perfectCircles) {
+                                        _distance = Mathf.Clamp(_distance, UserParameters.SPACING_MIN, 0.50f * m_mainCircle.circumference);
+                                    }
+
+                                    placementCalculator.spacingSingle = _distance;
+                                }
+
+                            }
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
                     }
-                case ActiveState.ChangeAngle:
-                    {
-                        if (placementCalculator.angleMode == PlacementCalculator.AngleMode.Dynamic)
-                        {
-                            Vector3 _xAxis = Vector3.right;
-                            Vector3 _yAxis = Vector3.up;
 
-                            Vector3 _angleCenter = m_placementInfo[hoverItemAngleCenterIndex].position;
-                            Vector3 _angleVector = m_cachedPosition - _angleCenter;
-                            _angleVector.y = 0f;
-                            _angleVector.Normalize();
+                    UpdateCachedControlPoints();
+                    UpdateCurves();
+                    placementCalculator.UpdateItemPlacementInfo(true, true);
 
-                            float _angleHover = Math.MathPLT.AngleSigned(_angleVector, _xAxis, _yAxis);
+                    break;
+                }
+                case ActiveState.ChangeAngle: {
+                    if (placementCalculator.angleMode == PlacementCalculator.AngleMode.Dynamic) {
+                        Vector3 _xAxis = Vector3.right;
+                        Vector3 _yAxis = Vector3.up;
+
+                        Vector3 _angleCenter = m_placementInfo[hoverItemAngleCenterIndex].position;
+                        Vector3 _angleVector = m_cachedPosition - _angleCenter;
+                        _angleVector.y = 0f;
+                        _angleVector.Normalize();
+
+                        float _angleHover = Math.MathPLT.AngleSigned(_angleVector, _xAxis, _yAxis);
 
 
-                            float _itemAngle = PlacementCalculator.AngleDynamicXZ(lockBackupItemDirection);
+                        float _itemAngle = PlacementCalculator.AngleDynamicXZ(lockBackupItemDirection);
 
-                            float _angleOffset = _angleHover;
-                            
-                            hoverAngle = _angleHover;
-                            float _itemHoverAngleDifference = Math.MathPLT.AngleSigned(_angleVector, lockBackupItemDirection, _yAxis);
-                            placementCalculator.angleOffset = _itemHoverAngleDifference;
-                        }
-                        else if (placementCalculator.angleMode == PlacementCalculator.AngleMode.Single)
-                        {
-                            Vector3 _xAxis = Vector3.right;
-                            Vector3 _yAxis = Vector3.up;
-                            
-                            Vector3 _angleCenter = m_placementInfo[hoverItemAngleCenterIndex].position;
-                            Vector3 _angleVector = m_cachedPosition - _angleCenter;
-                            _angleVector.y = 0f;
-                            _angleVector.Normalize();
-                            
-                            float _angle = Math.MathPLT.AngleSigned(_angleVector, _xAxis, _yAxis);
+                        float _angleOffset = _angleHover;
 
-                            hoverAngle = _angle;
-                            placementCalculator.angleSingle = _angle + Mathf.PI;
-                        }
+                        hoverAngle = _angleHover;
+                        float _itemHoverAngleDifference = Math.MathPLT.AngleSigned(_angleVector, lockBackupItemDirection, _yAxis);
+                        placementCalculator.angleOffset = _itemHoverAngleDifference;
+                    } else if (placementCalculator.angleMode == PlacementCalculator.AngleMode.Single) {
+                        Vector3 _xAxis = Vector3.right;
+                        Vector3 _yAxis = Vector3.up;
 
-                        UpdateCachedControlPoints();
-                        UpdateCurves();
-                        
-                        placementCalculator.UpdateItemPlacementInfo();
+                        Vector3 _angleCenter = m_placementInfo[hoverItemAngleCenterIndex].position;
+                        Vector3 _angleVector = m_cachedPosition - _angleCenter;
+                        _angleVector.y = 0f;
+                        _angleVector.Normalize();
 
-                        break;
+                        float _angle = Math.MathPLT.AngleSigned(_angleVector, _xAxis, _yAxis);
+
+                        hoverAngle = _angle;
+                        placementCalculator.angleSingle = _angle + Mathf.PI;
                     }
+
+                    UpdateCachedControlPoints();
+                    UpdateCurves();
+
+                    placementCalculator.UpdateItemPlacementInfo();
+
+                    break;
+                }
                 case ActiveState.ItemwiseLock:
-                case ActiveState.MoveItemwiseItem:
-                    {
-                        placementCalculator.UpdateItemPlacementInfo();
-                        break;
-                    }
-                default:
-                    {
-                        return;
-                    }
+                case ActiveState.MoveItemwiseItem: {
+                    placementCalculator.UpdateItemPlacementInfo();
+                    break;
+                }
+                default: {
+                    return;
+                }
             }
         }
 
         /// <summary>
         /// Reverses control points for 3-pointed curved and freeform curves.
         /// </summary>
-        private void ReverseControlPoints3()
-        {
+        private void ReverseControlPoints3() {
             ControlPoint _buffer = m_controlPoints[0];
             m_controlPoints[0] = m_controlPoints[2];
             m_controlPoints[2] = _buffer;
-            
+
             m_controlPoints[0].m_direction *= -1f;
             m_controlPoints[2].m_direction *= -1f;
 
             m_controlPoints[1].m_direction = m_controlPoints[0].m_direction;
         }
 
-        private void UpdatePrefabs()
-        {
+        private void UpdatePrefabs() {
             this.m_treeInfo = this.treePrefab;
             this.m_propInfo = this.propPrefab;
         }
 
         //continuously update control points to follow mouse
-        private void UpdateControlPoints()
-        {
+        private void UpdateControlPoints() {
             //continuously update control points to follow mouse
-            switch (activeState)
-            {
-                case ActiveState.CreatePointFirst:
-                    {
-                        placementCalculator.UpdateItemPlacementInfo(false, false);
-                        break;
+            switch (activeState) {
+                case ActiveState.CreatePointFirst: {
+                    placementCalculator.UpdateItemPlacementInfo(false, false);
+                    break;
+                }
+                case ActiveState.CreatePointSecond: {
+                    ModifyControlPoint(this.m_cachedPosition, 2);
+                    //break;
+                    if (drawMode == DrawMode.Straight || drawMode == DrawMode.Circle) {
+                        placementCalculator.UpdateItemPlacementInfo();
                     }
-                case ActiveState.CreatePointSecond:
-                    {
-                        ModifyControlPoint(this.m_cachedPosition, 2);
-                        //break;
-                        if (drawMode == DrawMode.Straight || drawMode == DrawMode.Circle)
-                        {
-                            placementCalculator.UpdateItemPlacementInfo();
-                        }
-                        goto Label_updateCurves;
+                    goto Label_updateCurves;
+                }
+                case ActiveState.CreatePointThird: {
+                    ModifyControlPoint(this.m_cachedPosition, 3);
+                    //break;
+                    if (drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform) {
+                        placementCalculator.UpdateItemPlacementInfo();
                     }
-                case ActiveState.CreatePointThird:
-                    {
-                        ModifyControlPoint(this.m_cachedPosition, 3);
-                        //break;
-                        if (drawMode == DrawMode.Curved || drawMode == DrawMode.Freeform)
-                        {
-                            placementCalculator.UpdateItemPlacementInfo();
-                        }
-                        goto Label_updateCurves;
-                    }
-                
+                    goto Label_updateCurves;
+                }
+
                 case ActiveState.MoveSegment:
                 case ActiveState.ChangeSpacing:
                 case ActiveState.ChangeAngle:
                 case ActiveState.LockIdle:
-                case ActiveState.MaxFillContinue:
-                    {
-                        placementCalculator.UpdateItemPlacementInfo();
-                        break;
-                    }
-                case ActiveState.MovePointFirst:
-                    {
-                        ModifyControlPoint(this.m_cachedPosition, 1);
-                        
-                        placementCalculator.UpdateItemPlacementInfo();
+                case ActiveState.MaxFillContinue: {
+                    placementCalculator.UpdateItemPlacementInfo();
+                    break;
+                }
+                case ActiveState.MovePointFirst: {
+                    ModifyControlPoint(this.m_cachedPosition, 1);
 
-                        goto Label_updateCurves;
-                    }
-                case ActiveState.MovePointSecond:
-                    {
-                        ModifyControlPoint(this.m_cachedPosition, 2);
-                        
-                        placementCalculator.UpdateItemPlacementInfo();
+                    placementCalculator.UpdateItemPlacementInfo();
 
-                        goto Label_updateCurves;
-                    }
-                case ActiveState.MovePointThird:
-                    {
-                        ModifyControlPoint(this.m_cachedPosition, 3);
-                        
-                        placementCalculator.UpdateItemPlacementInfo();
+                    goto Label_updateCurves;
+                }
+                case ActiveState.MovePointSecond: {
+                    ModifyControlPoint(this.m_cachedPosition, 2);
 
-                        goto Label_updateCurves;
-                    }
-                Label_updateCurves:
-                    {
-                        UpdateCurves();
-                        
-                        break;
-                    }
+                    placementCalculator.UpdateItemPlacementInfo();
+
+                    goto Label_updateCurves;
+                }
+                case ActiveState.MovePointThird: {
+                    ModifyControlPoint(this.m_cachedPosition, 3);
+
+                    placementCalculator.UpdateItemPlacementInfo();
+
+                    goto Label_updateCurves;
+                }
+            Label_updateCurves:
+                {
+                    UpdateCurves();
+
+                    break;
+                }
             }
         }
 
-        private void UpdateCurves()
-        {
-            if (this.m_cachedControlPointCount == 0)
-            {
+        private void UpdateCurves() {
+            if (this.m_cachedControlPointCount == 0) {
                 return;
             }
             //very bad things...
@@ -8127,299 +6707,240 @@ namespace PropLineTool
             //{
             //    return;
             //}
-            else
-            {
+            else {
                 m_pendingPlacementUpdate = true;
 
-                switch (PropLineTool.drawMode)
-                {
-                    case PropLineTool.DrawMode.Straight:
-                        {
-                            if (this.m_cachedControlPointCount >= 1)
-                            {
-                                m_mainSegment.a = this.m_cachedControlPoints[0].m_position;
-                                m_mainSegment.b = this.m_cachedControlPoints[1].m_position;
-                            }
-                            break;
+                switch (PropLineTool.drawMode) {
+                    case PropLineTool.DrawMode.Straight: {
+                        if (this.m_cachedControlPointCount >= 1) {
+                            m_mainSegment.a = this.m_cachedControlPoints[0].m_position;
+                            m_mainSegment.b = this.m_cachedControlPoints[1].m_position;
                         }
+                        break;
+                    }
                     case PropLineTool.DrawMode.Curved:
-                    case PropLineTool.DrawMode.Freeform:
-                        {
-                            if (this.m_cachedControlPointCount >= 1)
-                            {
-                                m_mainArm1.a = this.m_cachedControlPoints[0].m_position;
-                                m_mainArm1.b = this.m_cachedControlPoints[1].m_position;
-                            }
-                            if (this.m_cachedControlPointCount >= 2)
-                            {
-                                if (PropLineTool.m_useCOBezierMethod == true)
-                                {
-                                    //uses negative of endDirection
-                                    m_mainBezier = Math.MathPLT.QuadraticToCubicBezierCOMethod(this.m_cachedControlPoints[0].m_position, this.m_cachedControlPoints[1].m_direction, this.m_cachedControlPoints[2].m_position, (-this.m_cachedControlPoints[2].m_direction));
-                                }
-                                else
-                                {
-                                    m_mainBezier = Math.MathPLT.QuadraticToCubicBezier(this.m_cachedControlPoints[0].m_position, this.m_cachedControlPoints[1].m_position, this.m_cachedControlPoints[2].m_position);
-                                }
-                                m_mainArm2.a = this.m_cachedControlPoints[1].m_position;
-                                m_mainArm2.b = this.m_cachedControlPoints[2].m_position;
-
-                                //***SUPER-IMPORTANT (for convergence of fenceMode)***
-                                Math.MathPLT.BezierXZ(ref m_mainBezier);
-
-                                //calculate direction here in case controlPoint direction was not set correctly
-                                Vector3 _dirArm1 = (m_mainArm1.b - m_mainArm1.a);
-                                _dirArm1.y = 0f;
-                                _dirArm1.Normalize();
-                                Vector3 _dirArm2 = (m_mainArm2.b - m_mainArm2.a);
-                                _dirArm2.y = 0f;
-                                _dirArm2.Normalize();
-                                m_mainElbowAngle = Mathf.Abs(Math.MathPLT.AngleSigned(-_dirArm1, _dirArm2, Vector3.up));
-                            }
-                            break;
+                    case PropLineTool.DrawMode.Freeform: {
+                        if (this.m_cachedControlPointCount >= 1) {
+                            m_mainArm1.a = this.m_cachedControlPoints[0].m_position;
+                            m_mainArm1.b = this.m_cachedControlPoints[1].m_position;
                         }
-                    case DrawMode.Circle:
-                        {
-                            if (this.m_cachedControlPointCount >= 1)
-                            {
-                                Vector3 _center = this.m_cachedControlPoints[0].m_position;
-                                Vector3 _pointOnCircle = this.m_cachedControlPoints[1].m_position;
-                                
-                                //constrain to XZ plane
-                                _center.y = 0f;
-                                _pointOnCircle.y = 0f;
+                        if (this.m_cachedControlPointCount >= 2) {
+                            if (PropLineTool.m_useCOBezierMethod == true) {
+                                //uses negative of endDirection
+                                m_mainBezier = Math.MathPLT.QuadraticToCubicBezierCOMethod(this.m_cachedControlPoints[0].m_position, this.m_cachedControlPoints[1].m_direction, this.m_cachedControlPoints[2].m_position, (-this.m_cachedControlPoints[2].m_direction));
+                            } else {
+                                m_mainBezier = Math.MathPLT.QuadraticToCubicBezier(this.m_cachedControlPoints[0].m_position, this.m_cachedControlPoints[1].m_position, this.m_cachedControlPoints[2].m_position);
+                            }
+                            m_mainArm2.a = this.m_cachedControlPoints[1].m_position;
+                            m_mainArm2.b = this.m_cachedControlPoints[2].m_position;
 
-                                Circle3XZ _mainCircle = new Circle3XZ(_center, _pointOnCircle);
-                                m_rawCircle = _mainCircle;
+                            //***SUPER-IMPORTANT (for convergence of fenceMode)***
+                            Math.MathPLT.BezierXZ(ref m_mainBezier);
 
-                                //perfect circle radius-snapping
-                                if (userSettingsControlPanel.perfectCircles)
-                                {
-                                    switch (controlMode)
-                                    {
-                                        case ControlMode.Itemwise:
-                                        case ControlMode.Spacing:
-                                            {
-                                                //snap to perfect circle
-                                                if (fenceMode)
-                                                {
-                                                    _mainCircle.radius = _mainCircle.PerfectRadiusByChords(placementCalculator.spacingSingle);
-                                                }
-                                                else
-                                                {
-                                                    _mainCircle.radius = _mainCircle.PerfectRadiusByArcs(placementCalculator.spacingSingle);
-                                                }
-                                                break; 
-                                            }
-                                        default:
-                                            {
-                                                break; 
-                                            }
+                            //calculate direction here in case controlPoint direction was not set correctly
+                            Vector3 _dirArm1 = (m_mainArm1.b - m_mainArm1.a);
+                            _dirArm1.y = 0f;
+                            _dirArm1.Normalize();
+                            Vector3 _dirArm2 = (m_mainArm2.b - m_mainArm2.a);
+                            _dirArm2.y = 0f;
+                            _dirArm2.Normalize();
+                            m_mainElbowAngle = Mathf.Abs(Math.MathPLT.AngleSigned(-_dirArm1, _dirArm2, Vector3.up));
+                        }
+                        break;
+                    }
+                    case DrawMode.Circle: {
+                        if (this.m_cachedControlPointCount >= 1) {
+                            Vector3 _center = this.m_cachedControlPoints[0].m_position;
+                            Vector3 _pointOnCircle = this.m_cachedControlPoints[1].m_position;
+
+                            //constrain to XZ plane
+                            _center.y = 0f;
+                            _pointOnCircle.y = 0f;
+
+                            Circle3XZ _mainCircle = new Circle3XZ(_center, _pointOnCircle);
+                            m_rawCircle = _mainCircle;
+
+                            //perfect circle radius-snapping
+                            if (userSettingsControlPanel.perfectCircles) {
+                                switch (controlMode) {
+                                    case ControlMode.Itemwise:
+                                    case ControlMode.Spacing: {
+                                        //snap to perfect circle
+                                        if (fenceMode) {
+                                            _mainCircle.radius = _mainCircle.PerfectRadiusByChords(placementCalculator.spacingSingle);
+                                        } else {
+                                            _mainCircle.radius = _mainCircle.PerfectRadiusByArcs(placementCalculator.spacingSingle);
+                                        }
+                                        break;
+                                    }
+                                    default: {
+                                        break;
                                     }
                                 }
-
-                                //finally
-                                m_mainCircle = _mainCircle;
-
                             }
-                            break;
+
+                            //finally
+                            m_mainCircle = _mainCircle;
+
                         }
-                    default:
-                        {
-                            break;
-                        }
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
                 }
             }
         }
 
-        private void CheckPendingPlacement()
-        {
-            if (m_pendingPlacementUpdate)
-            {
+        private void CheckPendingPlacement() {
+            if (m_pendingPlacementUpdate) {
                 placementCalculator.UpdateItemPlacementInfo();
 
                 m_pendingPlacementUpdate = false;
             }
         }
 
-        private void UpdateCachedControlPoints()
-        {
-            while (!Monitor.TryEnter(this.m_cacheLock, SimulationManager.SYNCHRONIZE_TIMEOUT))
-            {
+        private void UpdateCachedControlPoints() {
+            while (!Monitor.TryEnter(this.m_cacheLock, SimulationManager.SYNCHRONIZE_TIMEOUT)) {
             }
-            try
-            {
-                for (int i = 0; i < this.m_controlPoints.Length; i++)
-                {
+            try {
+                for (int i = 0; i < this.m_controlPoints.Length; i++) {
                     this.m_cachedControlPoints[i] = this.m_controlPoints[i];
                 }
                 this.m_cachedControlPointCount = this.m_controlPointCount;
             }
-            finally
-            {
+            finally {
                 Monitor.Exit(this.m_cacheLock);
             }
         }
 
-        private void UpdateCachedPosition(bool ignorePosChangingCondition)
-        {
-            if (ignorePosChangingCondition || (IsVectorXZPositionChanging(this.m_cachedPosition, this.m_mousePosition, 0.001f)))
-            {
+        private void UpdateCachedPosition(bool ignorePosChangingCondition) {
+            if (ignorePosChangingCondition || (IsVectorXZPositionChanging(this.m_cachedPosition, this.m_mousePosition, 0.001f))) {
                 this.m_positionChanging = true;
-            }
-            else if (false)
-            {
+            } else if (false) {
 
-            }
-            else
-            {
+            } else {
                 this.m_positionChanging = false;
             }
             this.m_cachedPosition = this.m_mousePosition; //from prop/tree tool *IMPORTANT*
         }
 
-        private bool DoesPositionNeedUpdating(out Vector3 newPosition)
-        {
+        private bool DoesPositionNeedUpdating(out Vector3 newPosition) {
             bool result = false;
             Vector3 _checkPoint = new Vector3();
             Vector3 _hitPos = new Vector3();
 
             newPosition = Vector3.zero;
 
-            if(!TryRaycast(out _hitPos))
-            {
+            if (!TryRaycast(out _hitPos)) {
                 return false;
             }
 
             bool _checkPosition = false;
-            switch (activeState)
-            {
-                case ActiveState.CreatePointFirst:
-                    {
-                        _checkPoint = m_cachedControlPoints[0].m_position;
-                        _checkPosition = true;
-                        break; 
-                    }
-                case ActiveState.CreatePointSecond:
-                    {
-                        _checkPoint = m_cachedControlPoints[1].m_position;
-                        _checkPosition = true;
-                        break; 
-                    }
-                case ActiveState.CreatePointThird:
-                    {
-                        _checkPoint = m_cachedControlPoints[2].m_position;
-                        _checkPosition = true;
-                        break; 
-                    }
+            switch (activeState) {
+                case ActiveState.CreatePointFirst: {
+                    _checkPoint = m_cachedControlPoints[0].m_position;
+                    _checkPosition = true;
+                    break;
+                }
+                case ActiveState.CreatePointSecond: {
+                    _checkPoint = m_cachedControlPoints[1].m_position;
+                    _checkPosition = true;
+                    break;
+                }
+                case ActiveState.CreatePointThird: {
+                    _checkPoint = m_cachedControlPoints[2].m_position;
+                    _checkPosition = true;
+                    break;
+                }
                 case ActiveState.MaxFillContinue:
-                case ActiveState.LockIdle:
-                    {
-                        //don't think I need to test LockIdle nor MaxFillContinue
-                        break; 
-                    }
-                case ActiveState.MovePointFirst:
-                    {
-                        _checkPoint = m_cachedControlPoints[0].m_position;
-                        _checkPosition = true;
-                        break; 
-                    }
-                case ActiveState.MovePointSecond:
-                    {
-                        _checkPoint = m_cachedControlPoints[1].m_position;
-                        _checkPosition = true;
-                        break; 
-                    }
-                case ActiveState.MovePointThird:
-                    {
-                        _checkPoint = m_cachedControlPoints[2].m_position;
-                        _checkPosition = true;
-                        break; 
-                    }
-                case ActiveState.MoveSegment:
-                    {
-                        break; 
-                    }
-                case ActiveState.ChangeSpacing:
-                    {
-                        break; 
-                    }
-                case ActiveState.ChangeAngle:
-                    {
-                        break; 
-                    }
+                case ActiveState.LockIdle: {
+                    //don't think I need to test LockIdle nor MaxFillContinue
+                    break;
+                }
+                case ActiveState.MovePointFirst: {
+                    _checkPoint = m_cachedControlPoints[0].m_position;
+                    _checkPosition = true;
+                    break;
+                }
+                case ActiveState.MovePointSecond: {
+                    _checkPoint = m_cachedControlPoints[1].m_position;
+                    _checkPosition = true;
+                    break;
+                }
+                case ActiveState.MovePointThird: {
+                    _checkPoint = m_cachedControlPoints[2].m_position;
+                    _checkPosition = true;
+                    break;
+                }
+                case ActiveState.MoveSegment: {
+                    break;
+                }
+                case ActiveState.ChangeSpacing: {
+                    break;
+                }
+                case ActiveState.ChangeAngle: {
+                    break;
+                }
                 default:
                     break;
             }
-            if (_checkPosition)
-            {
-                if (_checkPoint != _hitPos)
-                {
+            if (_checkPosition) {
+                if (_checkPoint != _hitPos) {
                     result = true;
                 }
             }
             newPosition = _hitPos;
             return result;
         }
-        
+
         //place IEnumerators down here
 
         [CompilerGenerated]
         //big Special Thanks to JapaMala's FineRoadHeights for how to do this!
-        private sealed class TProcessKeyEventTc_Iterator32G : IEnumerator, IDisposable, IEnumerator<object>
-        {
+        private sealed class TProcessKeyEventTc_Iterator32G : IEnumerator, IDisposable, IEnumerator<object> {
             internal object Scurrent;
             internal int SPC;
             internal PropLineTool TTf__this;
             internal KeyPressEvent _keyPressEvent;
 
             [DebuggerHidden]
-            public void Dispose()
-            {
+            public void Dispose() {
                 this.SPC = -1;
             }
 
-            public bool MoveNext()
-            {
+            public bool MoveNext() {
                 uint num = (uint)this.SPC;
                 this.SPC = -1;
-                switch (num)
-                {
-                    case 0:
-                        {
-                            TTf__this.ProcessKeyInputImpl(_keyPressEvent);
-                            this.Scurrent = 0;
-                            return true;
-                        }
+                switch (num) {
+                    case 0: {
+                        TTf__this.ProcessKeyInputImpl(_keyPressEvent);
+                        this.Scurrent = 0;
+                        return true;
+                    }
                     case 1:
-                    default:
-                        {
-                            break;
-                        }
+                    default: {
+                        break;
+                    }
                 }
                 return false;
             }
 
             [DebuggerHidden]
-            public void Reset()
-            {
+            public void Reset() {
                 throw new NotSupportedException();
             }
 
-            object IEnumerator<object>.Current
-            {
+            object IEnumerator<object>.Current {
                 [DebuggerHidden]
-                get
-                {
+                get {
                     return this.Scurrent;
                 }
             }
-            
-            object IEnumerator.Current
-            {
+
+            object IEnumerator.Current {
                 [DebuggerHidden]
-                get
-                {
+                get {
                     return this.Scurrent;
                 }
             }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ColossalFramework.UI;
@@ -12,10 +12,8 @@ using UnityEngine;
 //debug only
 //using PropLineTool.DebugUtils;
 
-namespace PropLineTool.UI.ControlPanel
-{
-    public abstract class UIBasicCalculator : UIPanel
-    {
+namespace PropLineTool.UI.ControlPanel {
+    public abstract class UIBasicCalculator : UIPanel {
         //background panels
         protected UIPanel setPanel;
         protected UIPanel adjustPanel;
@@ -23,68 +21,52 @@ namespace PropLineTool.UI.ControlPanel
         //button dictionary
         protected Dictionary<string, UIButton> buttons = new Dictionary<string, UIButton>(20);
 
-        public Color32 hoverTextColor
-        {
-            set
-            {
+        public Color32 hoverTextColor {
+            set {
                 var _keyList = buttons.Keys;
-                foreach (var _key in _keyList)
-                {
+                foreach (var _key in _keyList) {
                     buttons[_key].hoveredTextColor = value;
                 }
             }
         }
-        public Color32 focusTextColor
-        {
-            set
-            {
+        public Color32 focusTextColor {
+            set {
                 var _keyList = buttons.Keys;
-                foreach (var _key in _keyList)
-                {
+                foreach (var _key in _keyList) {
                     buttons[_key].focusedTextColor = value;
                 }
             }
         }
 
-        
 
-        public UIButton AddButton(UIComponent parent, string buttonKey)
-        {
-            if (!buttons.ContainsKey(buttonKey))
-            {
+
+        public UIButton AddButton(UIComponent parent, string buttonKey) {
+            if (!buttons.ContainsKey(buttonKey)) {
                 UIButton _button = parent.AddUIComponent<UIButton>();
 
                 buttons.Add(buttonKey, _button);
 
                 return _button;
-            }
-            else
-            {
+            } else {
                 return buttons[buttonKey];
             }
         }
 
-        public UIButton AddButton(UIComponent parent, string buttonKey, string text, float textScale, Vector2 size, Vector3 relativePosition)
-        {
-            if (!buttons.ContainsKey(buttonKey))
-            {
+        public UIButton AddButton(UIComponent parent, string buttonKey, string text, float textScale, Vector2 size, Vector3 relativePosition) {
+            if (!buttons.ContainsKey(buttonKey)) {
                 UIButton _button = UI.Elements.UISimpleElems.CreateCalcButton(parent, text, textScale, size, relativePosition);
                 _button.relativePosition = relativePosition;
 
                 buttons.Add(buttonKey, _button);
 
                 return _button;
-            }
-            else
-            {
+            } else {
                 return buttons[buttonKey];
             }
         }
 
-        public UIButton AddButton(UIComponent parent, string buttonKey, string text, float textScale, Vector2 size, Vector3 relativePosition, out bool result)
-        {
-            if (!buttons.ContainsKey(buttonKey))
-            {
+        public UIButton AddButton(UIComponent parent, string buttonKey, string text, float textScale, Vector2 size, Vector3 relativePosition, out bool result) {
+            if (!buttons.ContainsKey(buttonKey)) {
                 UIButton _button = UI.Elements.UISimpleElems.CreateCalcButton(parent, text, textScale, size, relativePosition);
                 _button.relativePosition = relativePosition;
 
@@ -92,36 +74,28 @@ namespace PropLineTool.UI.ControlPanel
 
                 result = true;
                 return _button;
-            }
-            else
-            {
+            } else {
                 result = false;
                 return buttons[buttonKey];
             }
         }
 
-        public UIButton AddButton(UIComponent parent, string buttonKey, out bool result)
-        {
-            if (!buttons.ContainsKey(buttonKey))
-            {
+        public UIButton AddButton(UIComponent parent, string buttonKey, out bool result) {
+            if (!buttons.ContainsKey(buttonKey)) {
                 UIButton _button = parent.AddUIComponent<UIButton>();
 
                 buttons.Add(buttonKey, _button);
 
                 result = true;
                 return _button;
-            }
-            else
-            {
+            } else {
                 result = false;
                 return buttons[buttonKey];
             }
         }
 
-        public bool RemoveButton(string buttonKey)
-        {
-            if (!buttons.ContainsKey(buttonKey))
-            {
+        public bool RemoveButton(string buttonKey) {
+            if (!buttons.ContainsKey(buttonKey)) {
                 UIButton _button = buttons[buttonKey];
                 buttons.Remove(buttonKey);
 
@@ -130,15 +104,12 @@ namespace PropLineTool.UI.ControlPanel
                 UnityEngine.Object.Destroy(_button.gameObject);
 
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
 
-        public override void Awake()
-        {
+        public override void Awake() {
             base.Awake();
 
             this.size = new Vector2(323f, 40f);
@@ -148,29 +119,24 @@ namespace PropLineTool.UI.ControlPanel
             adjustPanel.color = new Color32(74, 83, 88, 255);
         }
 
-        public UIBasicCalculator()
-        {
+        public UIBasicCalculator() {
             setPanel = this.AddUIComponent<UIPanel>();
             adjustPanel = this.AddUIComponent<UIPanel>();
         }
 
-        public virtual void SetVanillaAtlas(UITextureAtlas atlas)
-        {
+        public virtual void SetVanillaAtlas(UITextureAtlas atlas) {
             setPanel.atlas = atlas;
             adjustPanel.atlas = atlas;
 
             var _keyList = buttons.Keys;
-            foreach (var _key in _keyList)
-            {
+            foreach (var _key in _keyList) {
                 buttons[_key].atlas = atlas;
             }
         }
     }
 
-    public class UIBasicSpacingCalculator : UIBasicCalculator
-    {
-        public override void Awake()
-        {
+    public class UIBasicSpacingCalculator : UIBasicCalculator {
+        public override void Awake() {
             base.Awake();
 
             //setup panels
@@ -201,88 +167,64 @@ namespace PropLineTool.UI.ControlPanel
 
             //setup button events
             //set
-            buttons["setDefault"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["setDefault"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.SetDefaultSpacing();
                 }
             };
-            buttons["setLength"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["setLength"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.spacingSingle = PropLineTool.placementCalculator.getLength;
                 }
             };
-            buttons["setWidth"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["setWidth"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.spacingSingle = PropLineTool.placementCalculator.getWidth;
                 }
             };
             //adjust
-            buttons["addZeroPointOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["addZeroPointOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.spacingSingle += 0.1f;
                 }
             };
-            buttons["subZeroPointOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["subZeroPointOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.spacingSingle -= 0.1f;
                 }
             };
-            buttons["addOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["addOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.spacingSingle += 1f;
                 }
             };
-            buttons["subOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["subOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.spacingSingle -= 1f;
                 }
             };
-            buttons["addTen"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["addTen"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.spacingSingle += 10f;
                 }
             };
-            buttons["subTen"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["subTen"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.spacingSingle -= 10f;
                 }
             };
-            buttons["addOneHundred"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["addOneHundred"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.spacingSingle += 100f;
                 }
             };
-            buttons["subOneHundred"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["subOneHundred"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.spacingSingle -= 100f;
                 }
             };
-            buttons["round"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
+            buttons["round"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
                     PropLineTool.placementCalculator.spacingSingle = Mathf.Round(PropLineTool.placementCalculator.spacingSingle);
                 }
             };
@@ -292,10 +234,8 @@ namespace PropLineTool.UI.ControlPanel
         }
     }
 
-    public class UIBasicAngleCalculator : UIBasicCalculator
-    {
-        public override void Awake()
-        {
+    public class UIBasicAngleCalculator : UIBasicCalculator {
+        public override void Awake() {
             base.Awake();
 
             //setup panels
@@ -329,271 +269,201 @@ namespace PropLineTool.UI.ControlPanel
             //setup button events
             //set
             //be sure to multiply by Mathf.Deg2Rad!
-            buttons["setZero"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset = 0f * Mathf.Deg2Rad;
-                                break; 
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle = 0f * Mathf.Deg2Rad;
-                                break; 
-                            }
+            buttons["setZero"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset = 0f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle = 0f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
             //adjust
             //be sure to multiply by Mathf.Deg2Rad!
-            buttons["addZeroPointOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset += 0.1f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle += 0.1f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["addZeroPointOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset += 0.1f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle += 0.1f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["subZeroPointOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset -= 0.1f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle -= 0.1f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["subZeroPointOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset -= 0.1f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle -= 0.1f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["addOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset += 1f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle += 1f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["addOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset += 1f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle += 1f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["subOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset -= 1f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle -= 1f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["subOne"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset -= 1f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle -= 1f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["addTen"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset += 10f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle += 10f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["addTen"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset += 10f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle += 10f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["subTen"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset -= 10f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle -= 10f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["subTen"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset -= 10f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle -= 10f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["addThirty"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset += 30f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle += 30f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["addThirty"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset += 30f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle += 30f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["subThirty"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset -= 30f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle -= 30f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["subThirty"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset -= 30f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle -= 30f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["addFortyFive"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset += 45f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle += 45f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["addFortyFive"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset += 45f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle += 45f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["subFortyFive"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset -= 45f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle -= 45f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["subFortyFive"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset -= 45f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle -= 45f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["addNinety"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset += 90f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle += 90f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["addNinety"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset += 90f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle += 90f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["subNinety"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset -= 90f * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle -= 90f * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["subNinety"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset -= 90f * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle -= 90f * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
-            buttons["round"].eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
-                if (p.buttons == UIMouseButton.Left)
-                {
-                    switch (PropLineTool.placementCalculator.angleMode)
-                    {
-                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                            {
-                                PropLineTool.placementCalculator.angleOffset = Mathf.Round(PropLineTool.placementCalculator.angleOffset * Mathf.Rad2Deg) * Mathf.Deg2Rad;
-                                break;
-                            }
-                        case PropLineTool.PlacementCalculator.AngleMode.Single:
-                            {
-                                PropLineTool.placementCalculator.angleSingle = Mathf.Round(PropLineTool.placementCalculator.angleSingle * Mathf.Rad2Deg) * Mathf.Deg2Rad;
-                                break;
-                            }
+            buttons["round"].eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
+                if (p.buttons == UIMouseButton.Left) {
+                    switch (PropLineTool.placementCalculator.angleMode) {
+                        case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                            PropLineTool.placementCalculator.angleOffset = Mathf.Round(PropLineTool.placementCalculator.angleOffset * Mathf.Rad2Deg) * Mathf.Deg2Rad;
+                            break;
+                        }
+                        case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                            PropLineTool.placementCalculator.angleSingle = Mathf.Round(PropLineTool.placementCalculator.angleSingle * Mathf.Rad2Deg) * Mathf.Deg2Rad;
+                            break;
+                        }
                     }
                 }
             };
@@ -604,8 +474,7 @@ namespace PropLineTool.UI.ControlPanel
 
     }
 
-    public class UIBasicSingleParameterPanel : UIPanel
-    {
+    public class UIBasicSingleParameterPanel : UIPanel {
         //constants
         public static readonly Vector2 SIZE_PANEL_DEFAULT = new Vector2(374f, 140f);
         public static readonly Vector2 SIZE_MINI_CHECKBOX_LISTING = new Vector2(116f, 16f);
@@ -619,10 +488,9 @@ namespace PropLineTool.UI.ControlPanel
         //numbox listing
         public UINumboxListing numboxListing;
 
-        public override void Awake()
-        {
+        public override void Awake() {
             base.Awake();
-            
+
             //labels
             labelTitle = UISimpleElems.CreateLabelWhite(this, "Section", 1.25f, UIHorizontalAlignment.Left, new RectOffset(5, 5, 5, 5), new Vector2(87f, 34f), new Vector3(12f, 2f));
             labelTitle.relativePosition = new Vector3(12f, 2f);
@@ -634,15 +502,13 @@ namespace PropLineTool.UI.ControlPanel
             numboxListing.relativePosition = new Vector3(70f, 49f);
         }
 
-        public virtual void SetVanillaAtlas(UITextureAtlas atlas)
-        {
+        public virtual void SetVanillaAtlas(UITextureAtlas atlas) {
             dropDownListing.dropDown.atlas = atlas;
             numboxListing.numbox.atlas = atlas;
         }
     }
 
-    public class UIBasicSpacingPanel : UIBasicSingleParameterPanel
-    {
+    public class UIBasicSpacingPanel : UIBasicSingleParameterPanel {
         //spacing calculator
         protected UIBasicSpacingCalculator spacingCalculator;
 
@@ -650,13 +516,11 @@ namespace PropLineTool.UI.ControlPanel
         protected UICheckboxListing checkboxListingAutoDefault;
 
         //external events
-        private void userParameters_SpacingSingleChanged(object o, float value)
-        {
+        private void userParameters_SpacingSingleChanged(object o, float value) {
             numboxListing.numbox.value = value;
         }
 
-        public override void Awake()
-        {
+        public override void Awake() {
             base.Awake();
 
             labelTitle.text = "Spacing";
@@ -685,29 +549,25 @@ namespace PropLineTool.UI.ControlPanel
 
             //events
             //numbox
-            numboxListing.numbox.eventValueChanged += delegate (UIComponent c, float value)
-            {
+            numboxListing.numbox.eventValueChanged += delegate (UIComponent c, float value) {
                 PropLineTool.placementCalculator.spacingSingle = value;
             };
             //checkbox listing
-            checkboxListingAutoDefault.eventCheckChanged += delegate (UIComponent c, bool state)
-            {
+            checkboxListingAutoDefault.eventCheckChanged += delegate (UIComponent c, bool state) {
                 PropLineTool.userSettingsControlPanel.autoDefaultSpacing = state;
             };
             //placement calc event subscriptions
             PropLineTool.placementCalculator.eventSpacingSingleChanged += userParameters_SpacingSingleChanged;
         }
-        
-        public override void OnDestroy()
-        {
+
+        public override void OnDestroy() {
             //event unsubscriptions
             PropLineTool.placementCalculator.eventSpacingSingleChanged -= userParameters_SpacingSingleChanged;
 
             base.OnDestroy();
         }
 
-        public override void SetVanillaAtlas(UITextureAtlas atlas)
-        {
+        public override void SetVanillaAtlas(UITextureAtlas atlas) {
             base.SetVanillaAtlas(atlas);
 
             spacingCalculator.SetVanillaAtlas(atlas);
@@ -717,61 +577,49 @@ namespace PropLineTool.UI.ControlPanel
         }
     }
 
-    public class UIBasicAnglePanel : UIBasicSingleParameterPanel
-    {
+    public class UIBasicAnglePanel : UIBasicSingleParameterPanel {
         //angle calculator
         protected UIBasicAngleCalculator angleCalculator;
 
         //checkbox listings
-        protected UICheckboxListing checkboxListingFlip180; 
+        protected UICheckboxListing checkboxListingFlip180;
 
         //external events
-        private void userParameters_AngleSingleChanged(object o, float value)
-        {
+        private void userParameters_AngleSingleChanged(object o, float value) {
             numboxListing.numbox.value = value * Mathf.Rad2Deg;
         }
-        private void userParameters_AngleOffsetChanged(object o, float value)
-        {
+        private void userParameters_AngleOffsetChanged(object o, float value) {
             numboxListing.numbox.value = value * Mathf.Rad2Deg;
         }
-        private void userParameters_AngleModeChanged(object o, PropLineTool.PlacementCalculator.AngleMode mode)
-        {
-            switch (mode)
-            {
-                case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                    {
-                        numboxListing.numbox.value = PropLineTool.placementCalculator.angleOffset;
-                        numboxListing.labelText.text = "Relative Angle";
-                        numboxListing.labelUnits.text = "Δ°";
-                        break;
-                    }
-                case PropLineTool.PlacementCalculator.AngleMode.Single:
-                    {
-                        numboxListing.numbox.value = PropLineTool.placementCalculator.angleSingle;
-                        numboxListing.labelText.text = "Absolute Angle";
-                        numboxListing.labelUnits.text = "°";
-                        break;
-                    }
+        private void userParameters_AngleModeChanged(object o, PropLineTool.PlacementCalculator.AngleMode mode) {
+            switch (mode) {
+                case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                    numboxListing.numbox.value = PropLineTool.placementCalculator.angleOffset;
+                    numboxListing.labelText.text = "Relative Angle";
+                    numboxListing.labelUnits.text = "Δ°";
+                    break;
+                }
+                case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                    numboxListing.numbox.value = PropLineTool.placementCalculator.angleSingle;
+                    numboxListing.labelText.text = "Absolute Angle";
+                    numboxListing.labelUnits.text = "°";
+                    break;
+                }
             }
         }
-        private void PropLineTool_FenceModeChanged(bool state)
-        {
-            if (state == true)
-            {
+        private void PropLineTool_FenceModeChanged(bool state) {
+            if (state == true) {
                 dropDownListing.Disable();
                 dropDownListing.tooltip = "Fence Mode must be OFF in order to change Angle Mode.";
 
                 dropDownListing.dropDown.selectedIndex = 0;
-            }
-            else
-            {
+            } else {
                 dropDownListing.Enable();
                 dropDownListing.tooltip = "";
             }
         }
 
-        public override void Awake()
-        {
+        public override void Awake() {
             base.Awake();
 
             labelTitle.text = "Angle";
@@ -783,35 +631,31 @@ namespace PropLineTool.UI.ControlPanel
                 "Single"
             });
 
-            switch (PropLineTool.placementCalculator.angleMode)
-            {
-                case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                    {
-                        numboxListing.labelText.text = "Relative Angle";
-                        numboxListing.labelUnits.text = "Δ°";
-                        numboxListing.numbox.maxLength = 6;
-                        //numboxListing.numbox.value = 0f;
-                        numboxListing.numbox.value = PropLineTool.placementCalculator.angleOffset * Mathf.Rad2Deg;
-                        break;
-                    }
-                case PropLineTool.PlacementCalculator.AngleMode.Single:
-                    {
-                        numboxListing.labelText.text = "Absolute Angle";
-                        numboxListing.labelUnits.text = "°";
-                        numboxListing.numbox.maxLength = 6;
-                        //numboxListing.numbox.value = 0f;
-                        numboxListing.numbox.value = PropLineTool.placementCalculator.angleSingle * Mathf.Rad2Deg;
-                        break;
-                    }
-                default:
-                    {
-                        numboxListing.labelText.text = "Relative Angle";
-                        numboxListing.labelUnits.text = "Δ°";
-                        numboxListing.numbox.maxLength = 6;
-                        //numboxListing.numbox.value = 0f;
-                        numboxListing.numbox.value = PropLineTool.placementCalculator.angleOffset * Mathf.Rad2Deg;
-                        break;
-                    }
+            switch (PropLineTool.placementCalculator.angleMode) {
+                case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                    numboxListing.labelText.text = "Relative Angle";
+                    numboxListing.labelUnits.text = "Δ°";
+                    numboxListing.numbox.maxLength = 6;
+                    //numboxListing.numbox.value = 0f;
+                    numboxListing.numbox.value = PropLineTool.placementCalculator.angleOffset * Mathf.Rad2Deg;
+                    break;
+                }
+                case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                    numboxListing.labelText.text = "Absolute Angle";
+                    numboxListing.labelUnits.text = "°";
+                    numboxListing.numbox.maxLength = 6;
+                    //numboxListing.numbox.value = 0f;
+                    numboxListing.numbox.value = PropLineTool.placementCalculator.angleSingle * Mathf.Rad2Deg;
+                    break;
+                }
+                default: {
+                    numboxListing.labelText.text = "Relative Angle";
+                    numboxListing.labelUnits.text = "Δ°";
+                    numboxListing.numbox.maxLength = 6;
+                    //numboxListing.numbox.value = 0f;
+                    numboxListing.numbox.value = PropLineTool.placementCalculator.angleOffset * Mathf.Rad2Deg;
+                    break;
+                }
             }
 
             angleCalculator = this.AddUIComponent<UIBasicAngleCalculator>();
@@ -829,42 +673,33 @@ namespace PropLineTool.UI.ControlPanel
 
             //events
             //numboxes
-            numboxListing.numbox.eventValueChanged += delegate (UIComponent c, float value)
-            {
-                switch (PropLineTool.placementCalculator.angleMode)
-                {
-                    case PropLineTool.PlacementCalculator.AngleMode.Dynamic:
-                        {
-                            PropLineTool.placementCalculator.angleOffset = value * Mathf.Deg2Rad;
-                            break;
-                        }
-                    case PropLineTool.PlacementCalculator.AngleMode.Single:
-                        {
-                            PropLineTool.placementCalculator.angleSingle = value * Mathf.Deg2Rad;
-                            break;
-                        }
+            numboxListing.numbox.eventValueChanged += delegate (UIComponent c, float value) {
+                switch (PropLineTool.placementCalculator.angleMode) {
+                    case PropLineTool.PlacementCalculator.AngleMode.Dynamic: {
+                        PropLineTool.placementCalculator.angleOffset = value * Mathf.Deg2Rad;
+                        break;
+                    }
+                    case PropLineTool.PlacementCalculator.AngleMode.Single: {
+                        PropLineTool.placementCalculator.angleSingle = value * Mathf.Deg2Rad;
+                        break;
+                    }
                 }
             };
             //dropdowns
-            dropDownListing.dropDown.eventSelectedIndexChanged += delegate (UIComponent c, int index)
-            {
-                switch (index)
-                {
-                    case 0:
-                        {
-                            PropLineTool.placementCalculator.angleMode = PropLineTool.PlacementCalculator.AngleMode.Dynamic;
-                            break;
-                        }
-                    case 1:
-                        {
-                            PropLineTool.placementCalculator.angleMode = PropLineTool.PlacementCalculator.AngleMode.Single;
-                            break;
-                        }
+            dropDownListing.dropDown.eventSelectedIndexChanged += delegate (UIComponent c, int index) {
+                switch (index) {
+                    case 0: {
+                        PropLineTool.placementCalculator.angleMode = PropLineTool.PlacementCalculator.AngleMode.Dynamic;
+                        break;
+                    }
+                    case 1: {
+                        PropLineTool.placementCalculator.angleMode = PropLineTool.PlacementCalculator.AngleMode.Single;
+                        break;
+                    }
                 }
             };
             //checkbox listing
-            checkboxListingFlip180.eventCheckChanged += delegate (UIComponent c, bool state)
-            {
+            checkboxListingFlip180.eventCheckChanged += delegate (UIComponent c, bool state) {
                 PropLineTool.userSettingsControlPanel.angleFlip180 = state;
             };
             //placement calc event subscriptions
@@ -875,8 +710,7 @@ namespace PropLineTool.UI.ControlPanel
             PropLineTool.eventFenceModeChanged += PropLineTool_FenceModeChanged;
         }
 
-        public override void OnDestroy()
-        {
+        public override void OnDestroy() {
             //event unsubscriptions
             PropLineTool.placementCalculator.eventAngleSingleChanged -= userParameters_AngleSingleChanged;
             PropLineTool.placementCalculator.eventAngleOffsetChanged -= userParameters_AngleOffsetChanged;
@@ -886,8 +720,7 @@ namespace PropLineTool.UI.ControlPanel
             base.OnDestroy();
         }
 
-        public override void SetVanillaAtlas(UITextureAtlas atlas)
-        {
+        public override void SetVanillaAtlas(UITextureAtlas atlas) {
             base.SetVanillaAtlas(atlas);
 
             angleCalculator.SetVanillaAtlas(atlas);
@@ -897,13 +730,11 @@ namespace PropLineTool.UI.ControlPanel
         }
     }
 
-    public abstract class UIPLTTabPanel : UIPanel
-    {
+    public abstract class UIPLTTabPanel : UIPanel {
         public abstract void SetVanillaAtlas(UITextureAtlas atlas);
     }
 
-    public class UIBasicParametersPanel : UIPLTTabPanel
-    {
+    public class UIBasicParametersPanel : UIPLTTabPanel {
         //constants
         public static readonly Vector2 SIZE_PANEL = new Vector2(374f, 408f);
 
@@ -920,43 +751,35 @@ namespace PropLineTool.UI.ControlPanel
         protected UIBasicAnglePanel anglePanel;
 
         //external events
-        private void userParameters_LastContinueParameterChanged()
-        {
+        private void userParameters_LastContinueParameterChanged() {
             //Debug.Log("[PLTDEBUG]: Start userParameters_LastContinueParameterChanged()");
 
-            if (PropLineTool.placementCalculator.segmentState.AreLastContinueParametersZero())
-            {
+            if (PropLineTool.placementCalculator.segmentState.AreLastContinueParametersZero()) {
                 buttonDecoupleFromPreviousSegment.Hide();
-            }
-            else   //curve is coupled to previous segment
-            {
+            } else   //curve is coupled to previous segment
+              {
                 buttonDecoupleFromPreviousSegment.Show();
             }
 
             //Debug.Log("[PLTDEBUG]: End userParameters_LastContinueParameterChanged()");
         }
-        private void PropLineTool_ObjectModeChanged(PropLineTool.ObjectMode mode)
-        {
-            switch (mode)
-            {
-                case PropLineTool.ObjectMode.Props:
-                    {
-                        anglePanel.Show();
-                        anglePanel.Enable();
-                        break;
-                    }
-                case PropLineTool.ObjectMode.Trees:
-                    {
-                        anglePanel.Disable();
-                        anglePanel.Hide();
-                        break;
-                    }
+        private void PropLineTool_ObjectModeChanged(PropLineTool.ObjectMode mode) {
+            switch (mode) {
+                case PropLineTool.ObjectMode.Props: {
+                    anglePanel.Show();
+                    anglePanel.Enable();
+                    break;
+                }
+                case PropLineTool.ObjectMode.Trees: {
+                    anglePanel.Disable();
+                    anglePanel.Hide();
+                    break;
+                }
             }
         }
 
         //awake
-        public override void Awake()
-        {
+        public override void Awake() {
             base.Awake();
 
             this.size = SIZE_PANEL;
@@ -991,13 +814,12 @@ namespace PropLineTool.UI.ControlPanel
             anglePanel = this.AddUIComponent<UIBasicAnglePanel>();
             anglePanel.size = UIBasicAnglePanel.SIZE_PANEL_DEFAULT;
             anglePanel.relativePosition = new Vector3(0f, 242f);
-            
+
 
 
             //events
             //buttons
-            buttonDecoupleFromPreviousSegment.eventClick += delegate (UIComponent c, UIMouseEventParameter p)
-            {
+            buttonDecoupleFromPreviousSegment.eventClick += delegate (UIComponent c, UIMouseEventParameter p) {
                 PropLineTool.placementCalculator.ResetLastContinueParameters();
             };
             //placement calc event subscriptions
@@ -1007,17 +829,15 @@ namespace PropLineTool.UI.ControlPanel
             //PropLineTool event subscriptions
             PropLineTool.eventObjectModeChanged += PropLineTool_ObjectModeChanged;
         }
-        
-        public override void Start()
-        {
+
+        public override void Start() {
             base.Start();
 
             //controlModeTabstrip.Disable();
             //controlModeTabstrip.Hide();
         }
 
-        public override void OnDestroy()
-        {
+        public override void OnDestroy() {
             //event unsubscriptions
             PropLineTool.placementCalculator.segmentState.eventLastContinueParameterChanged -= userParameters_LastContinueParameterChanged;
             //PropLineTool.eventLastContinueParameterChanged -= userParameters_LastContinueParameterChanged;
@@ -1029,8 +849,7 @@ namespace PropLineTool.UI.ControlPanel
         }
 
         //set vanilla atlas
-        public override void SetVanillaAtlas(UITextureAtlas atlas)
-        {
+        public override void SetVanillaAtlas(UITextureAtlas atlas) {
             spacingPanel.SetVanillaAtlas(atlas);
             anglePanel.SetVanillaAtlas(atlas);
 
@@ -1038,8 +857,7 @@ namespace PropLineTool.UI.ControlPanel
         }
     }
 
-    public class UIBasicOptionsPanel : UIPLTTabPanel
-    {
+    public class UIBasicOptionsPanel : UIPLTTabPanel {
         //constants
         public static readonly Vector2 SIZE_PANEL = new Vector2(374f, 408f);
         public static readonly Vector2 SIZE_CHECK_LISTING_TIER_1 = new Vector2(342f, 24f);
@@ -1070,10 +888,8 @@ namespace PropLineTool.UI.ControlPanel
 
         //external events
         //  no need to update checkbox.isChecked, as these states can only be changed via the checkboxes
-        private void userSettingsControlPanel_ErrorCheckingSettingChanged()
-        {
-            if (PropLineTool.userSettingsControlPanel.errorChecking == true)
-            {
+        private void userSettingsControlPanel_ErrorCheckingSettingChanged() {
+            if (PropLineTool.userSettingsControlPanel.errorChecking == true) {
                 checkboxListingErrorChecking.label.text = "Error Checking: Enabled";
 
                 checkboxListingShowErrorGuides.Enable();
@@ -1082,37 +898,31 @@ namespace PropLineTool.UI.ControlPanel
                 checkboxListingShowErrorGuides.tooltip = "Highlights items that are blocked by road/building (Yellow-Orange) and items that are invalid placement (Red).";
                 checkboxListingPLTAnarchy.tooltip = "If Enabled, items are placed regardless of collision-errors.";
 
-                if (PropLineTool.userSettingsControlPanel.showErrorGuides == true)
-                {
+                if (PropLineTool.userSettingsControlPanel.showErrorGuides == true) {
                     //nothing here...
-                }
-                else  //error guides are hidden
-                {
+                } else  //error guides are hidden
+                  {
                     //nothing here...
                 }
 
-                if (PropLineTool.userSettingsControlPanel.anarchyPLT == true)
-                {
+                if (PropLineTool.userSettingsControlPanel.anarchyPLT == true) {
                     checkboxListingPlaceBlockedItems.Disable();
                     checkboxListingPlaceBlockedItems.tooltip = "PLT Anarchy must be OFF to access this feature.";
 
                     checkboxListingPLTAnarchy.label.text = "PLT Anarchy : ON";
-                }
-                else  //anarchy PLT is disabled
-                {
+                } else  //anarchy PLT is disabled
+                  {
                     checkboxListingPlaceBlockedItems.Enable();
                     checkboxListingPlaceBlockedItems.tooltip = "If Enabled, items blocked by road/building (Yellow-Orange) will be placed, while invalid items (Red) will not.";
 
                     checkboxListingPLTAnarchy.label.text = "PLT Anarchy : OFF";
 
-                    if (PropLineTool.userSettingsControlPanel.placeBlockedItems == true)
-                    {
+                    if (PropLineTool.userSettingsControlPanel.placeBlockedItems == true) {
                         //nothing here...
                     }
                 }
-            }
-            else  //error checking is disabled
-            {
+            } else  //error checking is disabled
+              {
                 checkboxListingErrorChecking.label.text = "Error Checking: Disabled";
 
                 checkboxListingShowErrorGuides.Disable();
@@ -1126,8 +936,7 @@ namespace PropLineTool.UI.ControlPanel
         }
 
         //awake
-        public override void Awake()
-        {
+        public override void Awake() {
             base.Awake();
 
             Debug.Log("[PLT]: Begin UIBasicControlPanel.Awake()");
@@ -1214,50 +1023,41 @@ namespace PropLineTool.UI.ControlPanel
 
             //events
             //undo stuff
-            checkboxListingShowUndoPreviews.eventCheckChanged += delegate (UIComponent c, bool state)
-            {
+            checkboxListingShowUndoPreviews.eventCheckChanged += delegate (UIComponent c, bool state) {
                 PropLineTool.userSettingsControlPanel.showUndoPreviews = state;
             };
             //error checking
             //  base
-            checkboxListingErrorChecking.eventCheckChanged += delegate (UIComponent c, bool state)
-            {
+            checkboxListingErrorChecking.eventCheckChanged += delegate (UIComponent c, bool state) {
                 PropLineTool.userSettingsControlPanel.errorChecking = state;
             };
             //  error guides
-            checkboxListingShowErrorGuides.eventCheckChanged += delegate (UIComponent c, bool state)
-            {
+            checkboxListingShowErrorGuides.eventCheckChanged += delegate (UIComponent c, bool state) {
                 PropLineTool.userSettingsControlPanel.showErrorGuides = state;
             };
             //  anarchy PLT
-            checkboxListingPLTAnarchy.eventCheckChanged += delegate (UIComponent c, bool state)
-            {
+            checkboxListingPLTAnarchy.eventCheckChanged += delegate (UIComponent c, bool state) {
                 PropLineTool.userSettingsControlPanel.anarchyPLT = state;
             };
             //  place blocked items
-            checkboxListingPlaceBlockedItems.eventCheckChanged += delegate (UIComponent c, bool state)
-            {
+            checkboxListingPlaceBlockedItems.eventCheckChanged += delegate (UIComponent c, bool state) {
                 PropLineTool.userSettingsControlPanel.placeBlockedItems = state;
             };
             //item rendering and positioning
             //  vanilla prop grid
-            checkboxListingRenderPosResVanilla.eventCheckChanged += delegate (UIComponent c, bool state)
-            {
+            checkboxListingRenderPosResVanilla.eventCheckChanged += delegate (UIComponent c, bool state) {
                 PropLineTool.userSettingsControlPanel.renderAndPlacePosResVanilla = state;
             };
             //  mesh center correction
-            checkboxListingUseMeshCenterCorrection.eventCheckChanged += delegate (UIComponent c, bool state)
-            {
+            checkboxListingUseMeshCenterCorrection.eventCheckChanged += delegate (UIComponent c, bool state) {
                 PropLineTool.userSettingsControlPanel.useMeshCenterCorrection = state;
             };
             //  perfect circles
-            checkboxListingPerfectCircles.eventCheckChanged += delegate (UIComponent c, bool state)
-            {
+            checkboxListingPerfectCircles.eventCheckChanged += delegate (UIComponent c, bool state) {
                 PropLineTool.userSettingsControlPanel.perfectCircles = state;
             };
             //  linear fence fill
-            checkboxListingLinearFenceFill.eventCheckChanged += delegate (UIComponent c, bool state)
-            {
+            checkboxListingLinearFenceFill.eventCheckChanged += delegate (UIComponent c, bool state) {
                 PropLineTool.userSettingsControlPanel.linearFenceFill = state;
             };
 
@@ -1266,24 +1066,21 @@ namespace PropLineTool.UI.ControlPanel
 
 
             //finally
-            if (SpriteManager.atlasPLT == null)
-            {
+            if (SpriteManager.atlasPLT == null) {
                 CheckAndRevertToVanillaSprites();
             }
 
             Debug.Log("[PLT]: End UIBasicControlPanel.Awake()");
         }
 
-        public override void Start()
-        {
+        public override void Start() {
             base.Start();
 
             //checkboxListingPerfectCircles.Disable();
             //checkboxListingPerfectCircles.Hide();
         }
 
-        public override void OnDestroy()
-        {
+        public override void OnDestroy() {
             //event unsubscriptions
             PropLineTool.userSettingsControlPanel.eventErrorCheckingSettingChanged -= userSettingsControlPanel_ErrorCheckingSettingChanged;
 
@@ -1291,21 +1088,16 @@ namespace PropLineTool.UI.ControlPanel
         }
 
         //set vanilla atlas
-        public override void SetVanillaAtlas(UITextureAtlas atlas)
-        {
+        public override void SetVanillaAtlas(UITextureAtlas atlas) {
             //nothing so far...
         }
 
-        public void CheckAndRevertToVanillaSprites()
-        {
-            if (SpriteManager.atlasPLT == null)
-            {
+        public void CheckAndRevertToVanillaSprites() {
+            if (SpriteManager.atlasPLT == null) {
                 var _checkboxes = this.components;
 
-                foreach (UIComponent _component in _checkboxes)
-                {
-                    if (_component is UICheckboxListing)
-                    {
+                foreach (UIComponent _component in _checkboxes) {
+                    if (_component is UICheckboxListing) {
                         UICheckboxListing _checkboxListing = _component as UICheckboxListing;
 
                         _checkboxListing.atlas = atlas;
@@ -1316,13 +1108,12 @@ namespace PropLineTool.UI.ControlPanel
             }
         }
     }
-    
+
     //BASIC CONTROL PANEL
-    public class UIBasicControlPanel : UIPanel
-    {
+    public class UIBasicControlPanel : UIPanel {
         //debug
         //PerformanceMeter _DEBUG_meterPanelUpdate = new PerformanceMeter("UIBasicControlPanel.Update");
-        
+
         //constants
         public static readonly Vector2 CONTROL_PANEL_SIZE = new Vector2(374f, 450f);
         public const float TITLEBAR_HEIGHT = 42f;
@@ -1340,11 +1131,10 @@ namespace PropLineTool.UI.ControlPanel
         protected float localTabX = 0f;
         //labels
         protected UILabel labelMainTitle;
-        
+
         //events ?
-        
-        public override void Awake()
-        {
+
+        public override void Awake() {
             base.Awake();
 
             //base panel
@@ -1377,19 +1167,15 @@ namespace PropLineTool.UI.ControlPanel
             //penultimately
             ICities.LoadMode _loadMode = PropLineToolMod.GetLoadMode();
             //if ((_loadMode == ICities.LoadMode.LoadMap) || (_loadMode == ICities.LoadMode.LoadAsset) || (_loadMode == ICities.LoadMode.NewAsset) || (_loadMode == ICities.LoadMode.NewMap))
-            if (!_loadMode.IsMainGameplay())
-            {
+            if (!_loadMode.IsMainGameplay()) {
                 //UITextureAtlas _ingameAtlas = GameObject.Find("SnappingToggle").GetComponent<UIMultiStateButton>().atlas;
                 //UITextureAtlas _ingameAtlas = ResourceLoader.GetAtlas("Ingame");
                 UITextureAtlas _ingameAtlas = SpriteManager.vanillaAtlasIngame;
 
-                if (_ingameAtlas == null)
-                {
+                if (_ingameAtlas == null) {
                     Debug.LogError("[PLT]: UIBasicControlPanel.Awake(): Could not find Ingame atlas!");
                     _ingameAtlas = UIView.GetAView().defaultAtlas;
-                }
-                else
-                {
+                } else {
                     SetAllSectionsVanillaAtlas(_ingameAtlas);
                     Debug.Log("[PLT]: UIBasicControlPanel.Awake(): Vanilla atlas set from Ingame atlas.");
                 }
@@ -1406,8 +1192,7 @@ namespace PropLineTool.UI.ControlPanel
         }
 
 
-        public override void Start()
-        {
+        public override void Start() {
             base.Start();
 
             absolutePosition = new Vector3(Mathf.Floor(base.GetUIView().GetScreenResolution().x - base.width - 50f), Mathf.Floor(base.GetUIView().GetScreenResolution().y - base.height - 300f));
@@ -1415,40 +1200,35 @@ namespace PropLineTool.UI.ControlPanel
             this.Hide();
         }
 
-        public UIPanel AddTabPage(string tabName)
-        {
-            if (titleBar == null)
-            {
+        public UIPanel AddTabPage(string tabName) {
+            if (titleBar == null) {
                 titleBar = this.AddUIComponent<UIDragHandle>();
                 titleBar.width = this.width;
                 titleBar.height = TITLEBAR_HEIGHT;
                 titleBar.target = this;
                 titleBar.relativePosition = new Vector3(0f, 0f);
             }
-            
-            if (tabstrip == null)
-            {
+
+            if (tabstrip == null) {
                 tabstrip = titleBar.AddUIComponent<UITabstrip>();
                 tabstrip.width = this.width - (2f * PADDING_TABSTRIP_SIDES);
                 tabstrip.height = TABSTRIP_HEIGHT;
                 tabstrip.padding = new RectOffset(0, 0, 0, 0);
                 tabstrip.relativePosition = new Vector3(PADDING_TABSTRIP_SIDES, PADDING_PANEL);
             }
-            
-            if (tabstrip.tabPages == null)
-            {
+
+            if (tabstrip.tabPages == null) {
                 UITabContainer _tabContainer = this.AddUIComponent<UITabContainer>();
                 _tabContainer.size = new Vector2(CONTROL_PANEL_SIZE.x, CONTROL_PANEL_SIZE.y - TITLEBAR_HEIGHT);
                 _tabContainer.relativePosition = new Vector3(0f, TITLEBAR_HEIGHT);
 
                 tabstrip.tabPages = _tabContainer;
             }
-            
-            if (!tabPanels.ContainsKey(tabName))
-            {
+
+            if (!tabPanels.ContainsKey(tabName)) {
                 //post-ND: this tabstrip no longer exists
                 //UIButton _buttonTemplate = GameObject.Find("KeyMappingTabStrip").GetComponent<UITabstrip>().GetComponentInChildren<UIButton>();
-                
+
                 //UIButton _tab = tabstrip.AddTab(tabName, _buttonTemplate, true);
                 UIButton _tab = tabstrip.AddTab(tabName);
                 //_tab.atlas = ResourceLoader.GetAtlas("Ingame");
@@ -1467,39 +1247,30 @@ namespace PropLineTool.UI.ControlPanel
                 _tab.focusedColor = new Color32(205, 220, 255, 255);
                 //_tab.disabledTextColor = _buttonTemplate.disabledTextColor;
                 _tab.disabledTextColor = new Color32(230, 230, 230, 140);
-                
+
                 UIPanel _panel = tabstrip.tabPages.components.Last<UIComponent>() as UIPanel;
                 _panel.autoLayoutDirection = LayoutDirection.Vertical;
                 _panel.autoLayoutPadding = new RectOffset(0, 0, 0, 0);
                 _panel.isVisible = false;
                 tabPanels.Add(tabName, _panel);
-                
+
                 return _panel;
-            }
-            else
-            {
+            } else {
                 return tabPanels[tabName];
             }
         }
 
-        public UIPanel GetTabPage(string tabName)
-        {
-            if (tabPanels.ContainsKey(tabName))
-            {
+        public UIPanel GetTabPage(string tabName) {
+            if (tabPanels.ContainsKey(tabName)) {
                 return tabPanels[tabName];
-            }
-            else
-            {
+            } else {
                 return AddTabPage(tabName);
             }
         }
-        
-        public bool SetSectionPanel<TPanel>(string tabName, Vector2 sectionSize) where TPanel : UIPLTTabPanel
-        {
-            if (tabPanels.ContainsKey(tabName))
-            {
-                if (!sectionPanels.ContainsKey(tabName))
-                {
+
+        public bool SetSectionPanel<TPanel>(string tabName, Vector2 sectionSize) where TPanel : UIPLTTabPanel {
+            if (tabPanels.ContainsKey(tabName)) {
+                if (!sectionPanels.ContainsKey(tabName)) {
                     UIPanel _tabPage = GetTabPage(tabName);
 
                     TPanel _newPanel = _tabPage.AddUIComponent<TPanel>();
@@ -1510,33 +1281,26 @@ namespace PropLineTool.UI.ControlPanel
                     sectionPanels.Add(tabName, _newPanel);
 
                     return true;
-                }
-                else
-                {
+                } else {
                     return false;
                 }
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
 
-        public void SetAllSectionsVanillaAtlas(UITextureAtlas atlas)
-        {
+        public void SetAllSectionsVanillaAtlas(UITextureAtlas atlas) {
             var _keyList = sectionPanels.Keys;
-            foreach (var _key in _keyList)
-            {
+            foreach (var _key in _keyList) {
                 sectionPanels[_key].SetVanillaAtlas(atlas);
             }
         }
-        
-        public override void Update()
-        {
+
+        public override void Update() {
             //_DEBUG_meterPanelUpdate.FrameStart();
             base.Update();
             //_DEBUG_meterPanelUpdate.FrameEnd();
         }
     }
-    
+
 }

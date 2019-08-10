@@ -1,4 +1,4 @@
-﻿using ICities;
+using ICities;
 using ColossalFramework.UI;
 using PropLineTool.Settings;
 using PropLineTool.UI.OptionPanel;
@@ -9,10 +9,8 @@ using ColossalFramework;
 
 using System;
 
-namespace PropLineTool
-{
-    public class PropLineToolMod : LoadingExtensionBase, IUserMod
-    {
+namespace PropLineTool {
+    public class PropLineToolMod : LoadingExtensionBase, IUserMod {
         private static ICities.LoadMode m_loadMode;
 
         private static int m_onLevelLoadedCount = 0;
@@ -21,50 +19,34 @@ namespace PropLineTool
         //Cannot automate using BuildDate.txt Resource as it does not reflect properly.
         public const string BUILD_VERSION = "190809";
 
-        public static ICities.LoadMode GetLoadMode()
-        {
+        public static ICities.LoadMode GetLoadMode() {
             ICities.LoadMode mode = m_loadMode;
             return mode;
         }
-        
-        public static UIOptionPanel optionPanel;
-        
-        public static UIBasicControlPanel basicControlPanel;
-        
-        public string Name
-        {
-            get
-            {
-                return "Prop Line Tool";
-            }
-        }
 
-        public string Description
-        {
-            get
-            {
-                return "Place props and trees along curves. Also: fences!";
-            }
-        }
-        
+        public static UIOptionPanel optionPanel;
+
+        public static UIBasicControlPanel basicControlPanel;
+
+        public string Name => "Prop Line Tool";
+
+        public string Description => "Place props and trees along curves. Also: fences!";
+
         //Detour Deploy code here
-        public override void OnCreated(ILoading loading)
-        {
+        public override void OnCreated(ILoading loading) {
             base.OnCreated(loading);
-            
+
             //no detours
         }
 
         //Detour Revert code here
-        public override void OnReleased()
-        {
+        public override void OnReleased() {
             base.OnReleased();
-            
+
             //no detours
         }
 
-        public override void OnLevelLoaded(LoadMode mode)
-        {
+        public override void OnLevelLoaded(LoadMode mode) {
             base.OnLevelLoaded(mode);
             Debug.Log("[PropLineTool, hereafter PLT]: start PropLineToolMod.OnLevelLoaded");
             m_loadMode = mode;
@@ -83,18 +65,15 @@ namespace PropLineTool
             //PropLineTool Initialization
             PropLineTool.PopulateRandIntArray(0, 10000);
 
-            if (_initializeToolMan == true)
-            {
+            if (_initializeToolMan == true) {
                 Debug.Log("[PLT]: PropLineToolMod.OnLevelLoaded(): ToolMan.Initialize() returned true.");
                 Debug.Log("[PLT]: PropLineToolMod.OnLevelLoaded(): Adding/Initializing UI components...");
 
-                if (optionPanel == null)
-                {
+                if (optionPanel == null) {
                     optionPanel = (UIView.GetAView().AddUIComponent(typeof(UIOptionPanel)) as UIOptionPanel);
                 }
 
-                if (basicControlPanel == null)
-                {
+                if (basicControlPanel == null) {
                     basicControlPanel = (UIView.GetAView().AddUIComponent(typeof(UIBasicControlPanel)) as UIBasicControlPanel);
                 }
 
@@ -102,9 +81,7 @@ namespace PropLineTool
 
                 //debug purposes only
                 //UIView.library.ShowModal<ExceptionPanel>("ExceptionPanel").SetMessage("[DEBUG] Prop Line Tool [PLT] Success in Initialization", "Prop Line Tool succeeded in registering itself with the game's tool controllers!", false);
-            }
-            else
-            {
+            } else {
                 Debug.LogError("[PLT]: PropLineToolMod.OnLevelLoaded(): ToolMan.Initialize() returned false.");
 
                 //special thanks to RushHour.Compatibility for this
@@ -114,54 +91,45 @@ namespace PropLineTool
             Debug.Log("[PLT]: end PropLineToolMod.OnLevelLoaded");
         }
 
-        public override void OnLevelUnloading()
-        {
+        public override void OnLevelUnloading() {
             base.OnLevelUnloading();
 
             PropLineTool.OnLevelUnloading();
-            
+
             //new as of 160816 0041
             //in reference to NetworkSkinsMod.OnLevelUnloading
             //destroy in reverse order of creation
-            if (basicControlPanel != null)
-            {
+            if (basicControlPanel != null) {
                 UnityEngine.GameObject.Destroy(basicControlPanel);
             }
-            if (optionPanel != null)
-            {
+            if (optionPanel != null) {
                 UnityEngine.GameObject.Destroy(optionPanel);
             }
-            
+
         }
-        
+
         //Special Thanks to SamsamTS' mod MoveIt! on how to add Main Menu settings.
-        public void OnSettingsUI(UIHelperBase helper)
-        {
-            try
-            {
+        public void OnSettingsUI(UIHelperBase helper) {
+            try {
                 UIHelper _UIHelper = helper.AddGroup(this.Name) as UIHelper;
                 UIPanel _UIPanel = _UIHelper.self as UIPanel;
                 UICheckBox _UICheckbox = (UICheckBox)_UIHelper.AddCheckbox("PLT Anarchy ON by default               >> see tooltip <<", UserSettingsMainMenu.anarchyPLTOnByDefault.value, OnAnarchyPLTDefaultChecked);
                 _UICheckbox.tooltip = "If enabled, automatically enables PLT Anarchy on map load.\n\n>> Recommended to also enable:\nProp & Tree Anarchy: \"Anarchy ON by default\"\n(separate mod). <<";
                 _UICheckbox.playAudioEvents = true;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Debug.LogError("[PLT]: OnSettingsUI failed!");
                 Debug.LogException(e);
             }
         }
 
-        private void OnAnarchyPLTDefaultChecked(bool state)
-        {
+        private void OnAnarchyPLTDefaultChecked(bool state) {
             UserSettingsMainMenu.anarchyPLTOnByDefault.value = state;
         }
 
-        public PropLineToolMod()
-        {
+        public PropLineToolMod() {
             //initialize main menu settings file
-            try
-            {
+            try {
                 GameSettings.AddSettingsFile(new SettingsFile[]
                 {
                     new SettingsFile
@@ -170,8 +138,7 @@ namespace PropLineTool
                     }
                 });
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 Debug.LogError("[PLT]: PropLineToolMod.ctor(): Error in loading/creating the settings file!");
                 Debug.LogException(e);
             }
